@@ -1,0 +1,243 @@
+:host {
+  --row-pad: 1.5rem;
+  --row-lead: 1.75rem;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1rem;
+  align-items: start;
+  padding: var(--row-lead) var(--row-pad);
+  transition: background-color 0.16s ease;
+}
+
+// Separators start at the text, iOS-list style, and never cross the rounded ends.
+:host(:not(:first-child))::before {
+  content: '';
+  position: absolute;
+  inset: 0 var(--row-pad) auto;
+  height: 1px;
+  background: var(--line);
+}
+
+:host(:first-child) {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+:host(:last-child) {
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+
+:host(:hover) {
+  background: var(--surface-hover);
+}
+
+// The one loud mark in the feed: an offer that appeared since the last visit.
+:host(.job-row--new)::after {
+  content: '';
+  position: absolute;
+  top: var(--row-lead);
+  bottom: var(--row-lead);
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--signal);
+}
+
+// Already opened: de-emphasised by weight and one step of ink, never below AA.
+:host(.job-row--viewed) .job-row__title {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.job-row {
+  // No blanket `p { margin: 0 }` here: it outranks the block classes below,
+  // which is what flattened the row's vertical rhythm.
+  &__body {
+    min-width: 0;
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+  }
+
+  &__title {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.021em;
+    text-decoration: none;
+    text-wrap: balance;
+
+    // Stretches the click target to the whole row without nesting interactive content.
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.125rem 0.5rem;
+    // Title and employer are one identity block: they stay tied together.
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  &__company {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  &__note {
+    color: var(--ink-3);
+  }
+
+  // Middot between the meta fragments, drawn rather than typed so it never wraps alone.
+  &__place::before,
+  &__note::before {
+    content: '·';
+    margin-right: 0.5rem;
+    color: var(--ink-3);
+  }
+
+  &__excerpt {
+    margin: 0.75rem 0 0;
+    max-width: 62ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--ink-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    // Widest break in the row: the provenance band is a different register from the offer.
+    gap: 0.25rem 0.75rem;
+    margin: 1rem 0 0;
+    color: var(--ink-3);
+  }
+
+  &__source {
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  &__contract::before,
+  &__date::before {
+    content: '·';
+    margin-right: 0.75rem;
+  }
+
+  // The left bar already carries the state: the word is here for anyone not seeing colour.
+  &__new {
+    color: var(--signal-ink);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  // Above the stretched title link.
+  &__actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0.125rem;
+    margin: -0.25rem -0.5rem 0 0;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+  }
+
+  &__salary {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  &__star {
+    --icon-size: 1.125rem;
+  }
+
+  &__hide {
+    --icon-size: 1.125rem;
+  }
+}
+
+:host(:hover) .job-row__actions,
+:host(:focus-within) .job-row__actions,
+:host(.job-row--starred) .job-row__actions {
+  opacity: 1;
+}
+
+:host(.job-row--starred) .job-row__star {
+  color: var(--signal);
+}
+
+// Nothing to hover on a touch screen: the actions stay out.
+@media (hover: none) {
+  .job-row__actions {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 40rem) {
+  :host {
+    --row-pad: 1.125rem;
+    --row-lead: 1.25rem;
+
+    column-gap: 0.5rem;
+  }
+
+  // No room for a money column: the head dissolves so the salary can drop to the end.
+  .job-row__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .job-row__head {
+    display: contents;
+  }
+
+  .job-row__salary {
+    order: 1;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .job-row__title {
+    font-size: 1.0625rem;
+  }
+
+  .job-row__excerpt {
+    -webkit-line-clamp: 3;
+  }
+
+  // A wrapped fragment would carry its separator to the head of the next line.
+  .job-row__meta,
+  .job-row__footer {
+    column-gap: 0.75rem;
+  }
+
+  .job-row__place::before,
+  .job-row__note::before,
+  .job-row__contract::before,
+  .job-row__date::before {
+    content: none;
+  }
+}

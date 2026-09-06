@@ -1,0 +1,225 @@
+.topbar {
+  &__row--filters {
+    height: 3.25rem;
+    padding-bottom: 0.625rem;
+    align-items: flex-start;
+  }
+
+  // Date and its refresh read as one unit; the round button hangs into the
+  // gutter so its glyph lines up with the content edge, not its hit area.
+  &__status {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    margin-right: -0.5rem;
+  }
+
+  &__refresh {
+    --icon-size: 1.1875rem;
+  }
+
+  &__refresh--degraded {
+    color: var(--alert);
+  }
+
+  &__refresh--spinning app-icon {
+    animation: topbar-spin 0.9s linear infinite;
+  }
+
+  // A sentence, not a data label: the mono caps belonged to the wrong register.
+  &__stamp {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  &__stamp-fresh {
+    color: var(--signal-ink);
+  }
+}
+
+@keyframes topbar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.brand {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+}
+
+/* The page's one memorable control: how many offers landed since the last visit,
+   and a way to see only those. */
+.pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  flex: none;
+  padding: 0.3125rem 0.6875rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 0.8125rem/1.2 var(--font-sans);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.18s var(--ease);
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &__dot {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--signal);
+    animation: pulse-breathe 2.6s ease-in-out infinite;
+  }
+
+  // Pressed state stays ink: the orange is reserved for the marks it filters on.
+  &--on {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--surface);
+  }
+
+  &--on &__dot {
+    animation: none;
+  }
+}
+
+@keyframes pulse-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--signal-soft);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px var(--signal-soft);
+  }
+}
+
+/* Sliding-thumb segmented control. */
+.segments {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  flex: 1;
+  max-width: 27rem;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-sunken);
+
+  &__thumb {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc((100% - 6px) / 3);
+    border-radius: 9px;
+    background: var(--surface);
+    box-shadow: var(--shadow-thumb);
+    transform: translateX(calc(var(--segments-index, 0) * 100%));
+    transition: transform 0.34s var(--ease);
+  }
+
+  &__item {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-width: 0;
+    padding: 0.4375rem 0.5rem;
+    border: 0;
+    border-radius: 9px;
+    background: none;
+    color: var(--ink-2);
+    font: 500 0.8125rem/1.2 var(--font-sans);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &--on {
+      color: var(--ink);
+    }
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__count {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  &__item--on &__count {
+    color: var(--signal-ink);
+  }
+}
+
+.feed {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 1.75rem var(--gutter) 5rem;
+
+  &__list {
+    overflow: hidden;
+    animation: feed-rise 0.42s var(--ease) both;
+  }
+}
+
+@keyframes feed-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (max-width: 40rem) {
+  :host {
+    --gutter: 1rem;
+  }
+
+  .topbar__row--filters {
+    height: auto;
+    padding-bottom: 0.625rem;
+  }
+
+  .topbar__stamp {
+    display: none;
+  }
+
+  .segments {
+    max-width: none;
+  }
+
+  .segments__item {
+    gap: 0.25rem;
+    padding: 0.4375rem 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  .pulse {
+    font-size: 0.75rem;
+  }
+}

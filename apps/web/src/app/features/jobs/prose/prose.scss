@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  // Reading text, not secondary information: full ink, generous leading, ~66-character measure.
+  max-width: 36rem;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+:host > :last-child {
+  margin-bottom: 0;
+}
+
+.prose {
+  &__paragraph {
+    margin: 0 0 1.25rem;
+    text-wrap: pretty;
+
+    // "Vos missions :" belongs to what comes next, not to what came before.
+    &--lead {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__list {
+    margin: 0 0 1.25rem;
+    padding: 0;
+    list-style: none;
+
+    li {
+      position: relative;
+      padding-left: 1.375rem;
+      text-wrap: pretty;
+    }
+
+    li + li {
+      margin-top: 0.625rem;
+    }
+
+    // A hairline dash rather than a bullet: same drawing language as the dividers.
+    li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.85em;
+      width: 0.5rem;
+      height: 1px;
+      background: var(--ink-3);
+    }
+  }
+}
+
+@media (max-width: 40rem) {
+  :host {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}

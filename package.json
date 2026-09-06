@@ -1,0 +1,27 @@
+{
+  "name": "job-finder",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "setup": "npm run build -w @job-finder/shared && npm run db:setup && npm run db:migrate",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run start:dev -w api\" \"npm start -w web\"",
+    "build": "npm run build -w @job-finder/shared && npm run build -w api && npm run build -w web",
+    "test": "npm run test -w api",
+    "lint": "npm run lint -w api",
+    "db:setup": "bash scripts/db-setup.sh",
+    "db:migrate": "npm run db:migrate -w api",
+    "db:studio": "npm run db:studio -w api",
+    "geo:isochrone": "npm run geo:isochrone -w api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

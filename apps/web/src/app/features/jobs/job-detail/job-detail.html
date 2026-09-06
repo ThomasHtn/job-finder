@@ -1,0 +1,110 @@
+<header class="topbar">
+  <div class="topbar__row">
+    <a class="topbar__back" routerLink="/" queryParamsHandling="preserve">
+      <app-icon name="back" />
+      Offres
+    </a>
+
+    <span class="topbar__spacer"></span>
+
+    @if (job(); as job) {
+      <button
+        type="button"
+        class="icon-btn topbar__star"
+        [class.topbar__star--on]="job.isFavorite"
+        [attr.aria-label]="job.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        [attr.aria-pressed]="job.isFavorite"
+        (click)="toggleFavorite()"
+      >
+        <app-icon [name]="job.isFavorite ? 'star-filled' : 'star'" />
+      </button>
+    }
+  </div>
+
+  <div class="scan" [class.scan--on]="loading()" aria-hidden="true"></div>
+</header>
+
+<main class="detail" [attr.aria-busy]="loading()">
+  @if (error(); as message) {
+    <div class="empty">
+      <p class="empty__title">{{ message }}</p>
+      <a class="btn" routerLink="/" queryParamsHandling="preserve">Revenir à la liste</a>
+    </div>
+  } @else if (job(); as job) {
+    <article class="detail__article">
+      <header class="detail__header">
+        <p class="detail__eyebrow u-mono">{{ job.sourceLabel }}</p>
+        <h1 class="detail__title">{{ job.title }}</h1>
+        <p class="detail__meta">
+          <span class="detail__company">{{ job.company ?? 'Entreprise non précisée' }}</span>
+          <span class="detail__place">{{ place() }}</span>
+        </p>
+      </header>
+
+      <dl class="detail__facts card">
+        <div class="detail__fact">
+          <dt class="u-mono">Contrat</dt>
+          <dd>{{ job.contractLabel ?? 'CDI' }}</dd>
+        </div>
+        <div class="detail__fact">
+          <dt class="u-mono">Salaire</dt>
+          <dd>{{ job.salary ?? 'Non communiqué' }}</dd>
+        </div>
+        <div class="detail__fact">
+          <dt class="u-mono">Publiée le</dt>
+          <dd>{{ job.publishedAt ? (job.publishedAt | date: 'dd/MM/yyyy') : 'Date inconnue' }}</dd>
+        </div>
+      </dl>
+
+      <a class="btn btn--primary detail__apply" [href]="job.url" target="_blank" rel="noopener">
+        Voir l'offre sur {{ job.sourceLabel }}
+        <app-icon name="external" />
+      </a>
+
+      @if (!job.hasFullDescription) {
+        <p class="notice">
+          <app-icon name="info" />
+          <span
+            >Cette source ne publie qu'un extrait. L'annonce complète est sur le site
+            d'origine.</span
+          >
+        </p>
+      }
+
+      @if (job.description) {
+        <section class="detail__section">
+          <h2 class="detail__section-title u-mono">L'offre</h2>
+          <app-prose [text]="job.description" />
+        </section>
+      }
+
+      @if (job.companyDescription) {
+        <section class="detail__section">
+          <h2 class="detail__section-title u-mono">L'entreprise</h2>
+          <app-prose [text]="job.companyDescription" />
+        </section>
+      }
+
+      @if (alternatives().length) {
+        <section class="detail__section">
+          <h2 class="detail__section-title u-mono">Également publiée sur</h2>
+          <ul class="detail__alternatives">
+            @for (alternative of alternatives(); track alternative.url) {
+              <li>
+                <a
+                  [href]="alternative.url"
+                  target="_blank"
+                  rel="noopener"
+                  [title]="alternative.url"
+                >
+                  {{ alternative.label }}
+                  <app-icon name="external" />
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </article>
+  }
+</main>

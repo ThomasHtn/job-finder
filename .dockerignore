@@ -1,0 +1,116 @@
+# Docker uses Go path matching, not gitignore rules: a bare pattern only matches at the
+# root of the build context, so nested files need an explicit **/ prefix.
+
+# -----------------------------------------------------------------------------
+# Build output and dependencies (rebuilt inside the image)
+# -----------------------------------------------------------------------------
+node_modules
+**/node_modules
+**/dist
+**/coverage
+**/.angular
+**/*.tsbuildinfo
+apps/api/src/generated
+
+# -----------------------------------------------------------------------------
+# Version control and CI metadata (.git carries the whole history)
+# -----------------------------------------------------------------------------
+.git
+.gitignore
+.gitattributes
+.github
+
+# -----------------------------------------------------------------------------
+# Environment variables: read by compose on the host, never baked into an image
+# -----------------------------------------------------------------------------
+.env
+**/.env
+**/.env.*
+**/*.env
+.envrc
+.direnv
+
+# -----------------------------------------------------------------------------
+# Credential files
+# -----------------------------------------------------------------------------
+**/secrets
+**/secrets.*
+**/credentials.*
+**/service-account*.json
+**/*.credentials
+# .npmrc would bake a registry token into a build layer.
+**/.npmrc
+**/.yarnrc
+**/.yarnrc.yml
+**/.netrc
+**/.pgpass
+**/.htpasswd
+**/auth.json
+
+# -----------------------------------------------------------------------------
+# Keys and certificates
+# -----------------------------------------------------------------------------
+**/*.pem
+**/*.key
+**/*.crt
+**/*.cer
+**/*.der
+**/*.csr
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.keystore
+**/*.truststore
+**/*.gpg
+**/*.asc
+**/id_rsa*
+**/id_ed25519*
+**/*.ppk
+**/.ssh
+
+# -----------------------------------------------------------------------------
+# Database dumps and local snapshots (real data, kept out of the image)
+# -----------------------------------------------------------------------------
+**/*.dump
+**/*.dmp
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.bak
+**/*.orig
+**/backup
+**/backups
+**/dumps
+
+# -----------------------------------------------------------------------------
+# Deploy descriptors: the image must not ship the stack that runs it
+# -----------------------------------------------------------------------------
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.*.yml
+**/*.local.yml
+.dockerignore
+
+# -----------------------------------------------------------------------------
+# Editor, AI and OS local state
+# -----------------------------------------------------------------------------
+.idea
+.vscode
+.claude
+.agents
+.mcp.json
+**/CLAUDE.md
+.playwright-mcp
+**/.history
+**/*.swp
+**/*.swo
+**/*~
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# -----------------------------------------------------------------------------
+# Runtime logs
+# -----------------------------------------------------------------------------
+**/*.log
+logs

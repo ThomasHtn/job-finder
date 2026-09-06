@@ -1,0 +1,37 @@
+<main class="login">
+  <div class="login__panel">
+    <span class="login__mark" aria-hidden="true"></span>
+    <h1 class="login__title">Offres d'emploi</h1>
+    <p class="login__lead">Entrez le mot de passe pour ouvrir votre veille.</p>
+
+    <form class="login__form" (ngSubmit)="submit()">
+      <label class="login__field">
+        <span class="login__label u-mono">Mot de passe</span>
+        <input
+          class="login__input"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          autofocus
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+      </label>
+
+      @if (error(); as message) {
+        <p class="login__error" role="alert">
+          <app-icon name="alert" />
+          <span>{{ message }}</span>
+        </p>
+      }
+
+      <button
+        class="btn btn--primary login__submit"
+        type="submit"
+        [disabled]="loading() || !password()"
+      >
+        {{ loading() ? 'Vérification…' : 'Entrer' }}
+      </button>
+    </form>
+  </div>
+</main>

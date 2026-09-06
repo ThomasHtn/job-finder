@@ -1,0 +1,124 @@
+<header class="topbar">
+  <div class="topbar__row">
+    <h1 class="brand">Offres d'emploi</h1>
+
+    <span class="topbar__spacer"></span>
+
+    @if (newCount() > 0) {
+      <button
+        type="button"
+        class="pulse"
+        [class.pulse--on]="onlyNew()"
+        [attr.aria-pressed]="onlyNew()"
+        (click)="toggleOnlyNew()"
+      >
+        <span class="pulse__dot" aria-hidden="true"></span>
+        {{ newCount() }} nouvelle{{ newCount() > 1 ? 's' : '' }}
+      </button>
+    }
+
+    <!-- The button sits with the timestamp it refreshes, not alone at the far edge. -->
+    <div class="topbar__status">
+      <p class="topbar__stamp" aria-live="polite">
+        @if (refreshMessage(); as message) {
+          <span class="topbar__stamp-fresh">{{ message }}</span>
+        } @else if (lastIngestionAt(); as updated) {
+          Mis à jour {{ updated | date: 'dd/MM à HH:mm' }}
+        }
+      </p>
+
+      <button
+        type="button"
+        class="icon-btn topbar__refresh"
+        [class.topbar__refresh--degraded]="sourcesDegraded()"
+        [class.topbar__refresh--spinning]="refreshing()"
+        aria-label="Rechercher de nouvelles offres"
+        [attr.title]="sourceStatusLabel() || null"
+        [disabled]="refreshing()"
+        (click)="refreshJobs()"
+      >
+        <app-icon name="refresh" />
+      </button>
+    </div>
+  </div>
+
+  <div class="topbar__row topbar__row--filters">
+    <div class="segments" role="tablist" [style.--segments-index]="tabIndex()">
+      <span class="segments__thumb" aria-hidden="true"></span>
+      @for (segment of segments(); track segment.tab) {
+        <button
+          type="button"
+          role="tab"
+          class="segments__item"
+          [class.segments__item--on]="segment.tab === currentTab()"
+          [attr.aria-selected]="segment.tab === currentTab()"
+          (click)="selectTab(segment.tab)"
+        >
+          <span class="segments__label">{{ segment.label }}</span>
+          <span class="segments__count">{{ segment.count }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="scan" [class.scan--on]="loading() || refreshing()" aria-hidden="true"></div>
+</header>
+
+<main class="feed" [attr.aria-busy]="loading() || refreshing()">
+  @if (sourceWarning(); as warning) {
+    <p class="notice notice--alert">
+      <app-icon name="alert" />
+      <span>{{ warning }}</span>
+    </p>
+  }
+
+  @if (error(); as message) {
+    <div class="empty">
+      <p class="empty__title">{{ message }}</p>
+      <button type="button" class="btn btn--primary" (click)="reload()">Réessayer</button>
+    </div>
+  } @else if (jobs().length === 0 && !loading()) {
+    <div class="empty">
+      @if (onlyNew()) {
+        <p class="empty__title">Rien de nouveau depuis votre dernière visite.</p>
+        <p class="empty__hint">Les offres déjà vues sont toujours là.</p>
+        <button type="button" class="btn" (click)="toggleOnlyNew()">Voir toutes les offres</button>
+      } @else if (currentTab() === 'favorites') {
+        <p class="empty__title">Aucun favori.</p>
+        <p class="empty__hint">Touchez l'étoile d'une offre pour la garder ici.</p>
+      } @else if (currentTab() === 'remote') {
+        <p class="empty__title">Aucune offre en full remote.</p>
+        <p class="empty__hint">Interrogez les sources pour remplir la liste.</p>
+        <button
+          type="button"
+          class="btn btn--primary"
+          [disabled]="refreshing()"
+          (click)="refreshJobs()"
+        >
+          Rechercher des offres
+        </button>
+      } @else {
+        <p class="empty__title">Aucune offre pour l'instant.</p>
+        <p class="empty__hint">Interrogez les sources pour remplir la liste.</p>
+        <button
+          type="button"
+          class="btn btn--primary"
+          [disabled]="refreshing()"
+          (click)="refreshJobs()"
+        >
+          Rechercher des offres
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="feed__list card">
+      @for (job of jobs(); track job.id) {
+        <app-job-row
+          [job]="job"
+          (favoriteToggled)="toggleFavorite($event)"
+          (hidden)="hideJob($event)"
+        />
+      }
+    </div>
+  }
+</main>

@@ -1,0 +1,152 @@
+node_modules/
+dist/
+.env.local
+.angular/
+coverage/
+*.tsbuildinfo
+apps/api/src/generated/
+
+
+# -----------------------------------------------------------------------------
+# Maven build output
+# -----------------------------------------------------------------------------
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Keep the Maven Wrapper JAR when the wrapper is added to the repository.
+!.mvn/wrapper/maven-wrapper.jar
+
+# -----------------------------------------------------------------------------
+# IntelliJ IDEA
+# -----------------------------------------------------------------------------
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# -----------------------------------------------------------------------------
+# AI
+# -----------------------------------------------------------------------------
+.claude/
+.agents/
+CLAUDE.md
+**/CLAUDE.md
+*skills-lock.json
+.mcp.json
+docs/agents
+
+# -----------------------------------------------------------------------------
+# Graphify generated files
+# -----------------------------------------------------------------------------
+graphify-out/
+graph.json
+
+# -----------------------------------------------------------------------------
+# Visual Studio Code
+# -----------------------------------------------------------------------------
+.vscode/
+
+# -----------------------------------------------------------------------------
+# Eclipse and Spring Tool Suite
+# -----------------------------------------------------------------------------
+.classpath
+.project
+.settings/
+.factorypath
+
+# -----------------------------------------------------------------------------
+# Local environment variables and secrets
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+.envrc
+.direnv/
+
+# Credential files that must never reach the repository
+secrets/
+secrets.*
+credentials.*
+service-account*.json
+*.credentials
+.htpasswd
+.netrc
+.pgpass
+.npmrc
+.yarnrc
+.yarnrc.yml
+auth.json
+
+# Keys and certificates (nginx TLS, SSH, signing)
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.csr
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+*.gpg
+*.asc
+id_rsa*
+id_ed25519*
+*.ppk
+.ssh/
+
+# Database dumps and local snapshots (may contain real data)
+*.dump
+*.dmp
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.orig
+backup/
+backups/
+dumps/
+
+# Local Docker/deploy overrides, usually holding real hosts and passwords
+docker-compose.override.yml
+docker-compose.*.local.yml
+*.local.yml
+
+# -----------------------------------------------------------------------------
+# GIT
+# -----------------------------------------------------------------------------
+.gitattributes
+
+# -----------------------------------------------------------------------------
+# Runtime logs
+# -----------------------------------------------------------------------------
+*.log
+logs/
+
+# -----------------------------------------------------------------------------
+# Operating-system metadata
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# -----------------------------------------------------------------------------
+# Editor local state and history (can hold snippets of secret files)
+# -----------------------------------------------------------------------------
+.history/
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------------------------------------
+# Legacy Spring Initializr helper file
+# -----------------------------------------------------------------------------
+HELP.md
+
+# -----------------------------------------------------------------------------
+# Playwright MCP screenshots and console logs
+# -----------------------------------------------------------------------------
+.playwright-mcp/

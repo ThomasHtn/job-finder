@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Connection URL lives in prisma.config.ts (Prisma 7 no longer accepts `url` here).
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobSourceType {
+  FRANCE_TRAVAIL
+  ADZUNA
+  ATS
+  EURES
+}
+
+model Job {
+  id       String        @id @default(cuid())
+  source   JobSourceType
+  sourceId String
+  /// Human readable origin, e.g. "France Travail" or "Doctolib (Greenhouse)".
+  sourceLabel String
+
+  title              String
+  company            String?
+  companyDescription String?
+  description        String?
+  /// False when the source only exposes a truncated description: the UI links out instead.
+  hasFullDescription Boolean @default(false)
+  contractLabel      String?
+  salary             String?
+
+  city       String?
+  postalCode String?
+  latitude   Float?
+  longitude  Float?
+  isRemote   Boolean @default(false)
+  /// True when only the region is known, so the commute is unverified.
+  isLocationApproximate Boolean @default(false)
+
+  isViewed Boolean @default(false)
+  /// Set from the "not interested" action: excluded from every tab, unlike a stale purge.
+  isHidden Boolean @default(false)
+
+  url             String
+  /// Links to the same offer found on other sources during deduplication.
+  alternativeUrls String[] @default([])
+
+  publishedAt DateTime?
+  firstSeenAt DateTime  @default(now())
+  lastSeenAt  DateTime  @updatedAt
+
+  /// Similarity key used to merge the same offer republished across sources.
+  dedupeHash String
+  isFavorite Boolean @default(false)
+
+  @@unique([source, sourceId])
+  @@index([dedupeHash])
+  @@index([isRemote, publishedAt])
+  @@index([isFavorite])
+}
+
+/// Avoids re-geocoding the same place on every ingestion run. Null coordinates cache a failure.
+model GeocodeCache {
+  query      String   @id
+  latitude   Float?
+  longitude  Float?
+  city       String?
+  postalCode String?
+  createdAt  DateTime @default(now())
+}
+
+model IngestionRun {
+  id         String    @id @default(cuid())
+  source     String
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  fetched    Int       @default(0)
+  kept       Int       @default(0)
+  inserted   Int       @default(0)
+  updated    Int       @default(0)
+  error      String?
+
+  @@index([startedAt])
+}
