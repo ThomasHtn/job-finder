@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600" width="1400" height="600" role="img" aria-label="La zone est un contour de temps de trajet, pas un rayon à vol d'oiseau">
+  <style>
+    text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .bg { fill: #fbfcfd }
+    .map { fill: #f1f4f6 }
+    .ink { fill: #101822 }
+    .ink2 { fill: #545f6d }
+    .ink3 { fill: #6c7784 }
+    .acc { fill: #0e6e63 }
+    .zone { fill: #0e6e63; fill-opacity: .12; stroke: #0e6e63; stroke-opacity: .55; stroke-width: 2 }
+    .radius { fill: none; stroke: #6c7784; stroke-width: 2; stroke-dasharray: 9 7 }
+    .road { stroke: #101822; stroke-opacity: .12; stroke-width: 5; stroke-linecap: round }
+    .pin-out { fill: #6c7784 }
+    .hole { fill: #f1f4f6 }
+    .halo { paint-order: stroke; stroke: #f1f4f6; stroke-width: 5; stroke-linejoin: round }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1013 }
+      .map { fill: #1a1f24 }
+      .ink { fill: #e9edf1 }
+      .ink2 { fill: #a0aab5 }
+      .ink3 { fill: #838e9a }
+      .acc { fill: #3fb8a6 }
+      .zone { fill: #3fb8a6; fill-opacity: .16; stroke: #3fb8a6; stroke-opacity: .6 }
+      .radius { stroke: #838e9a }
+      .road { stroke: #ffffff; stroke-opacity: .1 }
+      .pin-out { fill: #838e9a }
+      .hole { fill: #1a1f24 }
+      .halo { stroke: #1a1f24 }
+    }
+  </style>
+
+  <rect class="bg" width="1400" height="600" rx="26" />
+  <rect class="map" x="80" y="70" width="760" height="460" rx="18" />
+
+  <path class="road" d="M460 300 626 297" />
+  <path class="road" d="M460 300 322 297" />
+  <path class="road" d="M460 300 566 236" />
+  <path class="road" d="M460 300 374 372" />
+
+  <circle class="radius" cx="460" cy="300" r="190" />
+  <path class="zone" d="M719.0 300.0 C720.6 316.8 705.1 340.2 685.3 351.4 C665.5 362.7 623.0 364.4 600.0 367.4 C576.9 370.4 559.2 366.7 546.8 369.2 C534.4 371.7 532.6 378.3 525.6 382.2 C518.6 386.1 511.6 389.0 504.6 392.6 C497.6 396.3 491.2 401.5 483.8 404.1 C476.3 406.7 467.6 409.5 460.0 408.3 C452.4 407.0 446.9 396.1 438.0 396.6 C429.0 397.1 421.2 404.2 406.4 411.3 C391.6 418.3 364.7 438.0 349.3 438.8 C333.9 439.7 321.8 426.9 314.1 416.4 C306.3 405.9 310.7 387.8 302.7 375.8 C294.6 363.8 274.5 357.0 265.7 344.4 C256.9 331.7 246.6 314.0 249.9 300.0 C253.3 286.0 272.6 270.8 285.7 260.2 C298.8 249.7 315.0 242.5 328.5 236.7 C341.9 230.9 355.0 228.0 366.5 225.4 C377.9 222.8 388.7 223.5 397.2 221.2 C405.7 218.9 410.5 213.9 417.5 211.7 C424.4 209.5 431.9 210.1 439.0 208.1 C446.1 206.1 451.2 207.4 460.0 199.5 C468.8 191.6 478.2 172.3 491.8 160.8 C505.4 149.3 527.2 132.0 541.7 130.4 C556.2 128.8 570.2 140.5 578.8 151.0 C587.4 161.5 586.6 181.6 593.5 193.5 C600.4 205.5 606.7 213.3 620.3 222.8 C634.0 232.4 659.0 238.0 675.4 250.8 C691.8 263.7 717.3 283.2 719.0 300.0 Z" />
+
+  <circle class="acc" cx="460" cy="300" r="7" />
+  <circle cx="460" cy="300" r="13" fill="none" stroke="#0e6e63" stroke-opacity=".45" stroke-width="2" class="home-ring" />
+  <text class="ink2 halo" x="460" y="344" font-size="17" text-anchor="middle">Chez vous</text>
+
+  <g transform="translate(652.8 250.4) scale(1.6)">
+    <path class="acc" d="M12 21c4.2-4.6 6.3-8.1 6.3-10.6a6.3 6.3 0 0 0-12.6 0C5.7 12.9 7.8 16.4 12 21Z" />
+    <circle class="hole" cx="12" cy="10.3" r="2.4" />
+  </g>
+  <text class="acc halo" x="672" y="322" font-size="19" font-weight="600" text-anchor="middle">Gardée</text>
+  <text class="ink3 halo" x="672" y="346" font-size="17" text-anchor="middle">100 km par l'autoroute</text>
+
+  <g transform="translate(565.8 384.4) scale(1.6)">
+    <path class="pin-out" d="M12 21c4.2-4.6 6.3-8.1 6.3-10.6a6.3 6.3 0 0 0-12.6 0C5.7 12.9 7.8 16.4 12 21Z" />
+    <circle class="hole" cx="12" cy="10.3" r="2.4" />
+  </g>
+  <text class="ink2 halo" x="585" y="456" font-size="19" font-weight="600" text-anchor="middle">Écartée</text>
+  <text class="ink3 halo" x="585" y="480" font-size="17" text-anchor="middle">60 km de départementales</text>
+
+  <g transform="translate(900 218)">
+    <path class="zone" vector-effect="non-scaling-stroke" transform="translate(-37.6 -30) scale(.16)" d="M719.0 300.0 C720.6 316.8 705.1 340.2 685.3 351.4 C665.5 362.7 623.0 364.4 600.0 367.4 C576.9 370.4 559.2 366.7 546.8 369.2 C534.4 371.7 532.6 378.3 525.6 382.2 C518.6 386.1 511.6 389.0 504.6 392.6 C497.6 396.3 491.2 401.5 483.8 404.1 C476.3 406.7 467.6 409.5 460.0 408.3 C452.4 407.0 446.9 396.1 438.0 396.6 C429.0 397.1 421.2 404.2 406.4 411.3 C391.6 418.3 364.7 438.0 349.3 438.8 C333.9 439.7 321.8 426.9 314.1 416.4 C306.3 405.9 310.7 387.8 302.7 375.8 C294.6 363.8 274.5 357.0 265.7 344.4 C256.9 331.7 246.6 314.0 249.9 300.0 C253.3 286.0 272.6 270.8 285.7 260.2 C298.8 249.7 315.0 242.5 328.5 236.7 C341.9 230.9 355.0 228.0 366.5 225.4 C377.9 222.8 388.7 223.5 397.2 221.2 C405.7 218.9 410.5 213.9 417.5 211.7 C424.4 209.5 431.9 210.1 439.0 208.1 C446.1 206.1 451.2 207.4 460.0 199.5 C468.8 191.6 478.2 172.3 491.8 160.8 C505.4 149.3 527.2 132.0 541.7 130.4 C556.2 128.8 570.2 140.5 578.8 151.0 C587.4 161.5 586.6 181.6 593.5 193.5 C600.4 205.5 606.7 213.3 620.3 222.8 C634.0 232.4 659.0 238.0 675.4 250.8 C691.8 263.7 717.3 283.2 719.0 300.0 Z" />
+    <text class="ink" x="96" y="10" font-size="22" font-weight="600" letter-spacing="-.3">45 min de voiture</text>
+    <text class="ink3" x="96" y="38" font-size="18">Le contour routier réel, calculé une fois</text>
+    <text class="ink3" x="96" y="62" font-size="18">puis vérifié offre par offre.</text>
+  </g>
+
+  <g transform="translate(900 352)">
+    <circle class="radius" cx="36" cy="18" r="26" />
+    <text class="ink" x="96" y="10" font-size="22" font-weight="600" letter-spacing="-.3">50 km à vol d'oiseau</text>
+    <text class="ink3" x="96" y="38" font-size="18">Le rayon d'un site d'emploi : il ignore</text>
+    <text class="ink3" x="96" y="62" font-size="18">les routes, donc il se trompe deux fois.</text>
+  </g>
+</svg>

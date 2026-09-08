@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" width="1400" height="520" role="img" aria-label="Entonnoir : 51 sources filtrées par métier, contrat, zone puis dédoublonnées">
+  <style>
+    text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .bg { fill: #fbfcfd }
+    .card { fill: #ffffff }
+    .ink { fill: #101822 }
+    .ink2 { fill: #545f6d }
+    .ink3 { fill: #6c7784 }
+    .acc { fill: #0e6e63 }
+    .funnel { fill: #0e6e63; fill-opacity: .09 }
+    .edge { stroke: #0e6e63; stroke-opacity: .5; fill: none; stroke-width: 1.5 }
+    .gate { stroke: #0e6e63; stroke-opacity: .3; stroke-width: 1.5 }
+    .hair { stroke: #101822; stroke-opacity: .1; stroke-width: 1; fill: none }
+    .tick { stroke: #101822; stroke-opacity: .18; stroke-width: 1 }
+    .arrow { stroke: #6c7784; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1013 }
+      .card { fill: #14181c }
+      .ink { fill: #e9edf1 }
+      .ink2 { fill: #a0aab5 }
+      .ink3 { fill: #838e9a }
+      .acc { fill: #3fb8a6 }
+      .funnel { fill: #3fb8a6; fill-opacity: .14 }
+      .edge { stroke: #3fb8a6; stroke-opacity: .55 }
+      .gate { stroke: #3fb8a6; stroke-opacity: .35 }
+      .hair { stroke: #ffffff; stroke-opacity: .13 }
+      .tick { stroke: #ffffff; stroke-opacity: .2 }
+      .arrow { stroke: #838e9a }
+    }
+  </style>
+
+  <rect class="bg" width="1400" height="520" rx="26" />
+
+  <text class="ink" x="140" y="72" font-size="23" font-weight="600" letter-spacing="-.3">51 sources, toutes les deux heures</text>
+  <text class="ink3" x="140" y="98" font-size="17">5 plateformes et 46 sites carrière d'entreprises</text>
+
+  <path class="funnel" d="M140 110 L1010 218 L1010 282 L140 390 Z" />
+  <path class="edge" d="M140 110 L1010 218" />
+  <path class="edge" d="M140 390 L1010 282" />
+
+  <path class="gate" d="M140 110V390" />
+  <path class="gate" d="M340 134.8V365.2" />
+  <path class="gate" d="M560 162.1V337.9" />
+  <path class="gate" d="M780 189.5V310.5" />
+  <path class="gate" d="M940 209.4V290.6" />
+
+  <text class="ink2" x="238" y="259" font-size="24" font-weight="600" text-anchor="middle">312</text>
+  <text class="ink2" x="450" y="259" font-size="24" font-weight="600" text-anchor="middle">74</text>
+  <text class="ink2" x="670" y="259" font-size="24" font-weight="600" text-anchor="middle">41</text>
+  <text class="ink2" x="860" y="259" font-size="22" font-weight="600" text-anchor="middle">28</text>
+  <text class="acc" x="976" y="258" font-size="22" font-weight="600" text-anchor="middle">24</text>
+
+  <path class="tick" d="M340 365.2V410" />
+  <path class="tick" d="M560 337.9V410" />
+  <path class="tick" d="M780 310.5V410" />
+  <path class="tick" d="M940 290.6V410" />
+  <text class="ink" x="340" y="437" font-size="20" text-anchor="middle">Votre métier</text>
+  <text class="ink" x="560" y="437" font-size="20" text-anchor="middle">CDI uniquement</text>
+  <text class="ink" x="780" y="437" font-size="20" text-anchor="middle">Zone de trajet</text>
+  <text class="ink" x="940" y="437" font-size="20" text-anchor="middle">Doublons</text>
+  <text class="ink3" x="140" y="480" font-size="17">Exemple d'une tournée : ce qui reste après chaque filtre.</text>
+
+  <path class="arrow" d="M1022 250h26" />
+  <path class="arrow" d="M1042 244l6 6-6 6" />
+
+  <text class="ink" x="1160" y="146" font-size="20" font-weight="600" text-anchor="middle">Votre liste</text>
+  <rect class="card" x="1060" y="170" width="200" height="190" rx="14" />
+  <rect x="1060" y="170" width="200" height="190" rx="14" class="hair" />
+  <rect class="acc" x="1084" y="198" width="96" height="7" rx="3.5" />
+  <rect class="ink3" x="1084" y="215" width="56" height="6" rx="3" opacity=".5" />
+  <path class="hair" d="M1060 236h200" />
+  <rect class="ink2" x="1084" y="264" width="116" height="7" rx="3.5" opacity=".85" />
+  <rect class="ink3" x="1084" y="281" width="48" height="6" rx="3" opacity=".5" />
+  <path class="hair" d="M1060 302h200" />
+  <rect class="ink2" x="1084" y="330" width="86" height="7" rx="3.5" opacity=".85" />
+</svg>

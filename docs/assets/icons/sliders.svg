@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Réglages">
+  <style>
+    .s { fill: none; stroke: #101822; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+    .f { fill: #101822 }
+    @media (prefers-color-scheme: dark) { .s { stroke: #e9edf1 } .f { fill: #e9edf1 } }
+  </style>
+  <path class="s" d="M3.4 8.2h8.2" />
+  <path class="s" d="M16.4 8.2h4.2" />
+  <path class="s" d="M3.4 15.8h4.2" />
+  <path class="s" d="M12.4 15.8h8.2" />
+  <circle class="s" cx="14" cy="8.2" r="2.4" />
+  <circle class="s" cx="10" cy="15.8" r="2.4" />
+</svg>

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 820" width="1400" height="820" role="img" aria-label="Job Finder : la liste d'offres déjà triée">
+  <style>
+    text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .bg { fill: #fbfcfd }
+    .card { fill: #ffffff }
+    .ink { fill: #101822 }
+    .ink2 { fill: #545f6d }
+    .ink3 { fill: #6c7784 }
+    .acc { fill: #0e6e63 }
+    .accs { fill: #0e6e63; fill-opacity: .1 }
+    .hair { stroke: #101822; stroke-opacity: .1; stroke-width: 1 }
+    .glyph { stroke: #6c7784; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round }
+    .glyph-on { stroke: #0e6e63; fill: #0e6e63; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+    .mark { stroke: #101822; stroke-width: 2; fill: none; stroke-linecap: round }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1013 }
+      .card { fill: #14181c }
+      .ink { fill: #e9edf1 }
+      .ink2 { fill: #a0aab5 }
+      .ink3 { fill: #838e9a }
+      .acc { fill: #3fb8a6 }
+      .accs { fill: #3fb8a6; fill-opacity: .16 }
+      .hair { stroke: #ffffff; stroke-opacity: .13 }
+      .glyph { stroke: #838e9a }
+      .glyph-on { stroke: #3fb8a6; fill: #3fb8a6 }
+      .mark { stroke: #e9edf1 }
+    }
+  </style>
+  <defs>
+    <filter id="float" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#101822" flood-opacity=".1" />
+    </filter>
+  </defs>
+
+  <rect class="bg" width="1400" height="820" rx="26" />
+
+  <!-- Wordmark: the app's own mark, the teal dot standing for what just arrived. -->
+  <g transform="translate(678.4 58) scale(1.8)">
+    <circle class="acc" cx="4.6" cy="6.5" r="3" />
+    <path class="mark" d="M10.6 6.5H21" />
+    <path class="mark" d="M3 13h16" />
+    <path class="mark" d="M3 19h11" />
+  </g>
+  <text class="ink" x="700" y="182" font-size="48" font-weight="620" letter-spacing="-1.4" text-anchor="middle">Job Finder</text>
+  <text class="ink2" x="700" y="224" font-size="22" text-anchor="middle">Votre veille emploi, déjà triée.</text>
+
+  <!-- The product itself: three tabs, three lines, nothing to fill in. -->
+  <g filter="url(#float)">
+    <rect class="card" x="180" y="286" width="1040" height="482" rx="18" />
+  </g>
+  <rect x="180" y="286" width="1040" height="482" rx="18" fill="none" class="hair" />
+
+  <g transform="translate(212 300)">
+    <circle class="acc" cx="4.6" cy="6.5" r="2.4" transform="scale(1.15)" />
+    <g transform="scale(1.15)">
+      <path class="mark" d="M10.6 6.5H21" />
+      <path class="mark" d="M3 13h16" />
+      <path class="mark" d="M3 19h11" />
+    </g>
+  </g>
+  <text class="ink" x="252" y="325" font-size="20" font-weight="600" letter-spacing="-.4">Job Finder</text>
+  <text class="ink3" x="1188" y="324" font-size="17" text-anchor="end">Synchronisé il y a 40 min</text>
+
+  <text class="acc" x="212" y="376" font-size="20" font-weight="600">Normandie</text>
+  <rect class="acc" x="212" y="390" width="114" height="3" rx="1.5" />
+  <text class="ink2" x="356" y="376" font-size="20">Full remote</text>
+  <text class="ink2" x="512" y="376" font-size="20">Favoris</text>
+  <text class="ink3" x="588" y="376" font-size="20">7</text>
+  <path class="hair" d="M180 396h1040" />
+
+  <text class="ink" x="212" y="436" font-size="24" font-weight="600" letter-spacing="-.4">Développeur Full Stack Angular / Java</text>
+  <text class="ink2" x="1188" y="436" font-size="21" text-anchor="end">45 - 55 k€</text>
+  <text class="ink2" x="212" y="466" font-size="20">Doctolib · Rouen</text>
+  <text class="ink3" x="212" y="494" font-size="17">Site carrière · il y a 2 h</text>
+  <rect class="accs" x="404" y="478" width="94" height="24" rx="12" />
+  <text class="acc" x="451" y="495" font-size="15" font-weight="600" text-anchor="middle">Nouveau</text>
+  <g class="glyph" transform="translate(1150 456) scale(1.1)">
+    <path d="M12 3.9 14.55 9.1l5.7.83-4.12 4.02.97 5.68L12 16.94l-5.1 2.69.97-5.68L3.75 9.93l5.7-.83z" />
+  </g>
+  <path class="hair" d="M180 520h1040" />
+
+  <text class="ink" x="212" y="560" font-size="24" font-weight="600" letter-spacing="-.4">Ingénieur d'études logiciel (H/F)</text>
+  <text class="ink2" x="212" y="590" font-size="20">Segula Technologies · Le Havre</text>
+  <text class="ink3" x="212" y="618" font-size="17">France Travail · hier</text>
+  <g class="glyph-on" transform="translate(1150 580) scale(1.1)">
+    <path d="M12 3.9 14.55 9.1l5.7.83-4.12 4.02.97 5.68L12 16.94l-5.1 2.69.97-5.68L3.75 9.93l5.7-.83z" />
+  </g>
+  <path class="hair" d="M180 644h1040" />
+
+  <text class="ink" x="212" y="684" font-size="24" font-weight="600" letter-spacing="-.4">Développeur Node.js, 100 % télétravail</text>
+  <text class="ink2" x="1188" y="684" font-size="21" text-anchor="end">50 - 60 k€</text>
+  <text class="ink2" x="212" y="714" font-size="20">Alan · Full remote</text>
+  <text class="ink3" x="212" y="742" font-size="17">Free-Work · avant-hier</text>
+  <g class="glyph" transform="translate(1150 704) scale(1.1)">
+    <path d="M12 3.9 14.55 9.1l5.7.83-4.12 4.02.97 5.68L12 16.94l-5.1 2.69.97-5.68L3.75 9.93l5.7-.83z" />
+  </g>
+</svg>

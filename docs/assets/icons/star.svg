@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Favori">
+  <style>
+    .s { fill: none; stroke: #101822; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+    .f { fill: #101822 }
+    @media (prefers-color-scheme: dark) { .s { stroke: #e9edf1 } .f { fill: #e9edf1 } }
+  </style>
+  <path class="s" d="M12 3.9 14.55 9.1l5.7.83-4.12 4.02.97 5.68L12 16.94l-5.1 2.69.97-5.68L3.75 9.93l5.7-.83z" />
+</svg>
