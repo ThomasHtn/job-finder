@@ -55,15 +55,49 @@ cp .env.example .env    # clés, profil, et un vrai POSTGRES_PASSWORD
 docker compose up -d --build
 ```
 
-L'app est servie sur `http://localhost:8480` (`HTTP_PORT`). C'est le seul port publié :
-l'API et PostgreSQL restent sur le réseau Docker du projet (deux blocs `ports` commentés
-dans `docker-compose.yml` permettent de les exposer ponctuellement). `CORS_ORIGIN` doit
-pointer vers l'URL réellement servie, port compris.
+L'app est servie sur `http://localhost:8480` (`HTTP_PORT`). C'est le seul port publié, et
+seulement sur la loopback : l'API et PostgreSQL restent sur le réseau Docker du projet (deux
+blocs `ports` commentés dans `docker-compose.yml` permettent de les exposer ponctuellement).
+`CORS_ORIGIN` doit pointer vers l'URL réellement servie, port compris.
 
 Les migrations Prisma s'appliquent au démarrage du conteneur API et une première ingestion
 se lance toute seule (`INGESTION_ON_STARTUP=true`).
 
 Mise à jour : `git pull && docker compose up -d --build`.
+
+## Déploiement sur un serveur
+
+Le conteneur web n'écoute que sur `127.0.0.1:8480` : il faut un reverse proxy sur l'hôte
+pour terminer le TLS. Avec Caddy, qui obtient et renouvelle le certificat tout seul,
+`/etc/caddy/Caddyfile` tient en trois lignes :
+
+```
+jobs.exemple.fr {
+    reverse_proxy 127.0.0.1:8480
+}
+```
+
+Avec nginx + certbot à la place, le bloc `location /` doit poser
+`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` : c'est de cet en-tête que
+l'API tire l'adresse du client, dont dépend la limitation du nombre d'essais de connexion.
+
+Ordre du premier démarrage, le mot de passe étant à poser tout de suite :
+
+```bash
+cp .env.example .env                     # clés, profil, un vrai POSTGRES_PASSWORD,
+                                         # CORS_ORIGIN sur l'URL publique en https
+docker compose up -d --build
+docker compose exec api npm run auth:set-password -- "<mot de passe>"
+```
+
+Tant qu'aucun mot de passe n'est en base, l'API déployée (`NODE_ENV=production`) répond 503
+sur toutes les routes protégées et le signale dans ses logs, plutôt que de servir l'app en
+accès libre. Seuls `/api/config`, `/api/auth/login` et `/api/health` restent publics.
+
+Côté machine, ouvrir uniquement 22, 80 et 443 (`ufw allow`), et garder `.env` en `chmod 600`.
+
+Une fois la base amorcée, `INGESTION_ON_STARTUP=false` évite de relancer une ingestion
+complète, et donc de consommer les quotas des sources, à chaque redémarrage du conteneur.
 
 ## Commandes
 
@@ -103,5 +137,6 @@ npm run auth:set-password -- --clear              # retire le mot de passe : app
 Sous Docker : `docker compose exec api npm run auth:set-password -- "..."`. Le front affiche
 alors un écran de connexion ; `POST /api/auth/login` renvoie un jeton de session aléatoire
 (valide 30 jours, stocké hashé en base) que le front envoie dans le header `x-app-token`.
-Changer le mot de passe révoque toutes les sessions. Sans mot de passe en base, aucune
-authentification. La route de connexion est limitée à 5 essais par quart d'heure et par adresse.
+Changer le mot de passe révoque toutes les sessions. Sans mot de passe en base, l'app est
+ouverte en développement et refusée en production (503). La route de connexion est limitée à
+5 essais par quart d'heure et par adresse.

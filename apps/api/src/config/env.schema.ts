@@ -12,6 +12,10 @@ import type { SearchProfile } from './search-profile.js';
  * Every variable read from the environment, before derivation.
  */
 const rawSchema = z.object({
+  /**
+   * "production" makes the auth fail closed: an app without a password is refused.
+   */
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   DATABASE_URL: z.string().min(1),
   PORT: z.coerce.number().int().positive().default(3000),
   CORS_ORIGIN: z.string().default('http://localhost:4200'),

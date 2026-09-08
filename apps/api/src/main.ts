@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
+import { AuthService } from './auth/auth.service.js';
 import type { Env } from './config/env.schema.js';
 
 /**
@@ -15,13 +16,23 @@ async function bootstrap(): Promise<void> {
 
   /* Standard security headers; the API only serves JSON, so no CSP tuning is needed. */
   app.use(helmet());
-  /* Nginx sits in front in production: trust its X-Forwarded-For so request.ip is the client. */
+  /* One trusted hop: the front nginx, which rewrites X-Forwarded-For to the real client. */
   app.set('trust proxy', 1);
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: config.get('CORS_ORIGIN', { infer: true }).split(','),
   });
   app.enableShutdownHooks();
+
+  if (
+    config.get('NODE_ENV', { infer: true }) === 'production' &&
+    !(await app.get(AuthService).isRequired())
+  ) {
+    Logger.error(
+      'No app password set: every route answers 503. Run `docker compose exec api npm run auth:set-password -- "<password>"`.',
+      'Bootstrap',
+    );
+  }
 
   const port = config.get('PORT', { infer: true });
   await app.listen(port, '0.0.0.0');

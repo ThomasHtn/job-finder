@@ -47,10 +47,12 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
-    # Only port published on the host. Default kept off 80/8080/8501 so it cannot
-    # collide with an existing web server or Streamlit app.
+    # Only port published, and only on the loopback: a reverse proxy on the host
+    # terminates TLS and forwards here. Published on 0.0.0.0 it would be reachable
+    # in clear text from the internet, bypassing TLS and UFW alike (docker writes
+    # its rules ahead of them). Default kept off 80/8080/8501 to avoid collisions.
     ports:
-      - '${HTTP_PORT:-8480}:80'
+      - '127.0.0.1:${HTTP_PORT:-8480}:80'
     depends_on:
       - api
 

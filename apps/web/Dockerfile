@@ -15,4 +15,5 @@ RUN npm run build -w @job-finder/shared && npm run build -w web
 FROM nginx:alpine
 COPY --from=build /app/apps/web/dist/web/browser /usr/share/nginx/html
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/web/security-headers.conf /etc/nginx/snippets/security-headers.conf
 EXPOSE 80
