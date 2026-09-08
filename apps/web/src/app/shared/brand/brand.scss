@@ -1,0 +1,25 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+}
+
+.brand {
+  &__mark {
+    width: var(--brand-size, 1.375rem);
+    height: var(--brand-size, 1.375rem);
+    flex: none;
+  }
+
+  // The one place the accent appears outside the feed's "new" marks.
+  &__dot {
+    fill: var(--accent);
+  }
+
+  &__name {
+    font-size: var(--brand-name-size, 1rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+}

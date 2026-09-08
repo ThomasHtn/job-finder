@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 
 /**
- * Three screens, all lazy: login, the feed, and one offer.
+ * Two screens: login, and the feed. One offer is a child of the feed, never a page of its own,
+ * so opening it never unmounts the list behind it.
  */
 export const routes: Routes = [
   {
@@ -13,11 +14,13 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./features/jobs/job-list/job-list').then((m) => m.JobList),
-  },
-  {
-    path: 'offres/:id',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/jobs/job-detail/job-detail').then((m) => m.JobDetail),
+    children: [
+      {
+        path: 'offres/:id',
+        loadComponent: () =>
+          import('./features/jobs/job-detail/job-detail').then((m) => m.JobDetail),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

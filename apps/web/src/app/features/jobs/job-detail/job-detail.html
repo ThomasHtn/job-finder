@@ -1,21 +1,30 @@
-<!-- Top bar: back link and the favourite toggle. -->
-<header class="topbar">
-  <div class="topbar__row">
-    <!-- Back to the feed, keeping the tab in the URL. -->
-    <a class="topbar__back" routerLink="/" queryParamsHandling="preserve">
-      <app-icon name="back" />
-      Offres
-    </a>
+<!-- Sheet bar: the handle to pull it away on a phone, the way back, and the star. -->
+<header
+  class="sheet__bar"
+  (pointerdown)="startDrag($event)"
+  (pointermove)="moveDrag($event)"
+  (pointerup)="endDrag()"
+  (pointercancel)="endDrag()"
+>
+  <span class="sheet__handle" aria-hidden="true"></span>
 
-    <!-- Pushes the star to the edge. -->
-    <span class="topbar__spacer"></span>
+  <div class="sheet__bar-row">
+    <button
+      type="button"
+      class="icon-btn sheet__close"
+      aria-label="Fermer l'offre"
+      (click)="close()"
+    >
+      <app-icon [name]="compact() ? 'chevron-down' : 'dismiss'" />
+    </button>
 
-    <!-- Favourite toggle, only once the offer is loaded. -->
     @if (job(); as job) {
+      <p class="sheet__origin">{{ job.sourceLabel }}</p>
+
       <button
         type="button"
-        class="icon-btn topbar__star"
-        [class.topbar__star--on]="job.isFavorite"
+        class="icon-btn sheet__star"
+        [class.sheet__star--on]="job.isFavorite"
         [attr.aria-label]="job.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
         [attr.aria-pressed]="job.isFavorite"
         (click)="toggleFavorite()"
@@ -25,51 +34,43 @@
     }
   </div>
 
-  <!-- Thin progress line while loading. -->
+  <!-- Thin progress line while the offer loads. -->
   <div class="scan" [class.scan--on]="loading()" aria-hidden="true"></div>
 </header>
 
 <!-- The offer, or the error that replaced it. -->
-<main class="detail" [attr.aria-busy]="loading()">
+<div class="sheet__scroll" #scroller [attr.aria-busy]="loading()">
   @if (error(); as message) {
-    <!-- Error state with a way back. -->
     <div class="empty">
       <p class="empty__title">{{ message }}</p>
-      <a class="btn" routerLink="/" queryParamsHandling="preserve">Revenir à la liste</a>
+      <button type="button" class="btn" (click)="close()">Revenir à la liste</button>
     </div>
   } @else if (job(); as job) {
-    <article class="detail__article">
-      <!-- Source, title, company and place. -->
-      <header class="detail__header">
-        <p class="detail__eyebrow u-mono">{{ job.sourceLabel }}</p>
-        <h1 class="detail__title">{{ job.title }}</h1>
-        <p class="detail__meta">
-          <span class="detail__company">{{ job.company ?? 'Entreprise non précisée' }}</span>
-          <span class="detail__place">{{ place() }}</span>
-        </p>
-      </header>
+    <article class="offer">
+      <!-- Title, company and place. -->
+      <h1 class="offer__title">{{ job.title }}</h1>
+      <p class="offer__meta">
+        <span class="offer__company">{{ job.company ?? 'Entreprise non précisée' }}</span>
+        <span class="offer__place">{{ place() }}</span>
+      </p>
 
-      <!-- Key facts: contract, salary, publication date. -->
-      <dl class="detail__facts card">
-        <div class="detail__fact">
-          <dt class="u-mono">Contrat</dt>
+      <!-- Key facts, on one band rather than in three boxes. -->
+      <dl class="facts">
+        <div class="facts__item">
+          <dt>Contrat</dt>
           <dd>{{ job.contractLabel ?? 'CDI' }}</dd>
         </div>
-        <div class="detail__fact">
-          <dt class="u-mono">Salaire</dt>
+        <div class="facts__item">
+          <dt>Salaire</dt>
           <dd>{{ job.salary ?? 'Non communiqué' }}</dd>
         </div>
-        <div class="detail__fact">
-          <dt class="u-mono">Publiée le</dt>
-          <dd>{{ job.publishedAt ? (job.publishedAt | date: 'dd/MM/yyyy') : 'Date inconnue' }}</dd>
+        <div class="facts__item">
+          <dt>Publiée le</dt>
+          <dd class="u-num">
+            {{ job.publishedAt ? (job.publishedAt | date: 'dd/MM/yyyy') : 'Date inconnue' }}
+          </dd>
         </div>
       </dl>
-
-      <!-- Primary action: the original ad. -->
-      <a class="btn btn--primary detail__apply" [href]="job.url" target="_blank" rel="noopener">
-        Voir l'offre sur {{ job.sourceLabel }}
-        <app-icon name="external" />
-      </a>
 
       <!-- Snippet-only sources: say why the text below is short. -->
       @if (!job.hasFullDescription) {
@@ -84,25 +85,25 @@
 
       <!-- The ad itself. -->
       @if (job.description) {
-        <section class="detail__section">
-          <h2 class="detail__section-title u-mono">L'offre</h2>
+        <section class="offer__section">
+          <h2 class="u-section-title">L'offre</h2>
           <app-prose [text]="job.description" />
         </section>
       }
 
       <!-- Company presentation, when the source separates it. -->
       @if (job.companyDescription) {
-        <section class="detail__section">
-          <h2 class="detail__section-title u-mono">L'entreprise</h2>
+        <section class="offer__section">
+          <h2 class="u-section-title">L'entreprise</h2>
           <app-prose [text]="job.companyDescription" />
         </section>
       }
 
       <!-- Same offer on other boards, listed by host. -->
       @if (alternatives().length) {
-        <section class="detail__section">
-          <h2 class="detail__section-title u-mono">Également publiée sur</h2>
-          <ul class="detail__alternatives">
+        <section class="offer__section">
+          <h2 class="u-section-title">Également publiée sur</h2>
+          <ul class="offer__alternatives">
             @for (alternative of alternatives(); track alternative.url) {
               <li>
                 <a
@@ -121,4 +122,14 @@
       }
     </article>
   }
-</main>
+</div>
+
+<!-- The one thing to do with an offer, kept under the thumb. -->
+@if (job(); as job) {
+  <footer class="sheet__foot">
+    <a class="btn btn--primary sheet__apply" [href]="job.url" target="_blank" rel="noopener">
+      Voir l'offre sur {{ job.sourceLabel }}
+      <app-icon name="external" />
+    </a>
+  </footer>
+}

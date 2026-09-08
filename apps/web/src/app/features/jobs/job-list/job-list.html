@@ -1,128 +1,151 @@
-<!-- Sticky top bar: title, new-offers toggle, refresh status, then the tab strip. -->
-<header class="topbar">
-  <div class="topbar__row">
-    <!-- Application title. -->
-    <h1 class="brand">Offres d'emploi</h1>
+<!-- Header: who we are, when the sources were last read, and the way to read them again. -->
+<header class="head">
+  <div class="head__row">
+    <app-brand />
 
-    <!-- Pushes the right-hand controls to the edge. -->
-    <span class="topbar__spacer"></span>
+    <span class="head__spacer"></span>
 
-    <!-- "N nouvelles": toggles the filter on offers seen since the previous visit. -->
-    @if (newCount() > 0) {
-      <button
-        type="button"
-        class="pulse"
-        [class.pulse--on]="onlyNew()"
-        [attr.aria-pressed]="onlyNew()"
-        (click)="toggleOnlyNew()"
-      >
-        <span class="pulse__dot" aria-hidden="true"></span>
-        {{ newCount() }} nouvelle{{ newCount() > 1 ? 's' : '' }}
-      </button>
-    }
-
-    <!-- The button sits with the timestamp it refreshes, not alone at the far edge. -->
-    <div class="topbar__status">
-      <!-- Transient refresh outcome, otherwise the last ingestion time. -->
-      <p class="topbar__stamp" aria-live="polite">
-        @if (refreshMessage(); as message) {
-          <span class="topbar__stamp-fresh">{{ message }}</span>
-        } @else if (lastIngestionAt(); as updated) {
-          Mis à jour {{ updated | date: 'dd/MM à HH:mm' }}
-        }
-      </p>
-
-      <!-- Manual ingestion; turns red when a source is down, spins while running. -->
-      <button
-        type="button"
-        class="icon-btn topbar__refresh"
-        [class.topbar__refresh--degraded]="sourcesDegraded()"
-        [class.topbar__refresh--spinning]="refreshing()"
-        aria-label="Rechercher de nouvelles offres"
-        [attr.title]="sourceStatusLabel() || null"
-        [disabled]="refreshing()"
-        (click)="refreshJobs()"
-      >
-        <app-icon name="refresh" />
-      </button>
-    </div>
-  </div>
-
-  <!-- Segmented control: one button per tab, the thumb slides to the active index. -->
-  <div class="topbar__row topbar__row--filters">
-    <div class="segments" role="tablist" [style.--segments-index]="tabIndex()">
-      <span class="segments__thumb" aria-hidden="true"></span>
-      @for (segment of segments(); track segment.tab) {
-        <button
-          type="button"
-          role="tab"
-          class="segments__item"
-          [class.segments__item--on]="segment.tab === currentTab()"
-          [attr.aria-selected]="segment.tab === currentTab()"
-          (click)="selectTab(segment.tab)"
-        >
-          <span class="segments__label">{{ segment.label }}</span>
-          <span class="segments__count">{{ segment.count }}</span>
-        </button>
+    <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
+    <p class="head__stamp u-num" aria-live="polite">
+      <span class="u-hidden-visually">Dernière synchronisation :</span>
+      @if (refreshMessage(); as message) {
+        <span class="head__stamp-fresh">{{ message }}</span>
+      } @else if (refreshing()) {
+        Recherche en cours…
+      } @else {
+        {{ lastIngestionAt() | syncLabel }}
       }
-    </div>
+    </p>
+
+    <!-- Manual ingestion; turns red when a source is down, spins while running. -->
+    <button
+      type="button"
+      class="icon-btn head__refresh"
+      [class.head__refresh--degraded]="sourcesDegraded()"
+      [class.head__refresh--spinning]="refreshing()"
+      aria-label="Rechercher de nouvelles offres"
+      [attr.title]="sourceStatusLabel() || null"
+      [disabled]="refreshing()"
+      (click)="refreshJobs()"
+    >
+      <app-icon name="refresh" />
+    </button>
   </div>
+
+  <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
+  @if (!compact()) {
+    <div class="head__row head__row--tabs">
+      <app-job-tabs [items]="tabItems()" [current]="currentTab()" (selected)="selectTab($event)" />
+    </div>
+  }
 
   <!-- Thin progress line under the bar while anything loads. -->
   <div class="scan" [class.scan--on]="loading() || refreshing()" aria-hidden="true"></div>
 </header>
 
-<!-- The feed itself. -->
-<main class="feed" [attr.aria-busy]="loading() || refreshing()">
-  <!-- Non-blocking warning when some sources failed during the last refresh. -->
-  @if (sourceWarning(); as warning) {
-    <p class="notice notice--alert">
-      <app-icon name="alert" />
-      <span>{{ warning }}</span>
-    </p>
-  }
+<div class="layout">
+  <!-- The feed itself. -->
+  <main class="feed" [attr.aria-busy]="loading() || refreshing()">
+    <!-- What changed since last time: the first thing to read, and the only accent on the page. -->
+    @if (newCount() > 0) {
+      <button
+        type="button"
+        class="fresh"
+        [class.fresh--on]="onlyNew()"
+        [attr.aria-pressed]="onlyNew()"
+        (click)="toggleOnlyNew()"
+      >
+        <span class="fresh__dot" aria-hidden="true"></span>
+        <span class="fresh__text">
+          <span class="u-num">{{ newCount() }}</span>
+          offre{{ newCount() > 1 ? 's' : '' }} depuis votre dernière visite
+        </span>
+        <span class="fresh__action">{{ onlyNew() ? 'Tout afficher' : 'Voir' }}</span>
+      </button>
+    }
 
-  <!-- Blocking error, empty state, or the rows. -->
-  @if (error(); as message) {
-    <div class="empty">
-      <p class="empty__title">{{ message }}</p>
-      <button type="button" class="btn btn--primary" (click)="reload()">Réessayer</button>
-    </div>
-  } @else if (jobs().length === 0 && !loading()) {
-    <!-- Empty state, worded per tab and per filter. -->
-    <div class="empty">
-      @if (onlyNew()) {
-        <p class="empty__title">Rien de nouveau depuis votre dernière visite.</p>
-        <p class="empty__hint">Les offres déjà vues sont toujours là.</p>
-        <button type="button" class="btn" (click)="toggleOnlyNew()">Voir toutes les offres</button>
-      } @else if (currentTab() === 'favorites') {
-        <p class="empty__title">Aucun favori.</p>
-        <p class="empty__hint">Touchez l'étoile d'une offre pour la garder ici.</p>
-      } @else {
-        <p class="empty__title">
-          {{ currentTab() === 'remote' ? 'Aucune offre en full remote.' : "Aucune offre pour l'instant." }}
-        </p>
-        <p class="empty__hint">Interrogez les sources pour remplir la liste.</p>
-        <button
-          type="button"
-          class="btn btn--primary"
-          [disabled]="refreshing()"
-          (click)="refreshJobs()"
-        >
-          Rechercher des offres
-        </button>
-      }
-    </div>
-  } @else {
-    <!-- One row per offer; the row emits, the list persists and reloads. -->
-    <div class="feed__list card">
-      @for (job of jobs(); track job.id) {
-        <app-job-row
-          [job]="job"
-          (favoriteToggled)="toggleFavorite($event)"
-          (hidden)="hideJob($event)"
-        />
-      }
-    </div>
-  }
-</main>
+    <!-- Non-blocking warning when some sources failed during the last refresh. -->
+    @if (sourceWarning(); as warning) {
+      <p class="notice notice--alert">
+        <app-icon name="alert" />
+        <span>{{ warning }}</span>
+      </p>
+    } @else if (sourcesDegraded()) {
+      <!-- A tooltip on the refresh button says this too, and a phone never shows tooltips. -->
+      <p class="notice">
+        <app-icon name="alert" />
+        <span>{{ sourceStatusLabel() }}</span>
+      </p>
+    }
+
+    <!-- Blocking error, empty state, or the rows. -->
+    @if (error(); as message) {
+      <div class="empty">
+        <p class="empty__title">{{ message }}</p>
+        <button type="button" class="btn btn--primary" (click)="reload()">Réessayer</button>
+      </div>
+    } @else if (jobs().length === 0 && !loading()) {
+      <!-- Empty state, worded per tab and per filter. -->
+      <div class="empty">
+        @if (onlyNew()) {
+          <p class="empty__title">Rien de nouveau depuis votre dernière visite.</p>
+          <p class="empty__hint">Les offres déjà vues sont toujours là.</p>
+          <button type="button" class="btn" (click)="toggleOnlyNew()">
+            Voir toutes les offres
+          </button>
+        } @else if (currentTab() === 'favorites') {
+          <p class="empty__title">Aucun favori.</p>
+          <p class="empty__hint">Touchez l'étoile d'une offre pour la garder ici.</p>
+        } @else {
+          <p class="empty__title">
+            {{
+              currentTab() === 'remote'
+                ? 'Aucune offre en full remote.'
+                : "Aucune offre pour l'instant."
+            }}
+          </p>
+          <p class="empty__hint">Interrogez les sources pour remplir la liste.</p>
+          <button
+            type="button"
+            class="btn btn--primary"
+            [disabled]="refreshing()"
+            (click)="refreshJobs()"
+          >
+            Rechercher des offres
+          </button>
+        }
+      </div>
+    } @else {
+      <!-- One row per offer; the row emits, the list persists and reloads. -->
+      <div class="feed__list">
+        @for (job of jobs(); track job.id) {
+          <app-job-row
+            [job]="job"
+            [selected]="job.id === selectedId()"
+            (favoriteToggled)="toggleFavorite($event)"
+            (hidden)="hideJob($event)"
+          />
+        }
+      </div>
+    }
+  </main>
+
+  <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
+  <aside class="panel" [class.panel--open]="detailOpen()">
+    <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
+
+    @if (!detailOpen()) {
+      <p class="panel__idle">Choisissez une offre pour la lire ici.</p>
+    }
+  </aside>
+</div>
+
+<!-- Thumb-height navigation, out of the way of the reading area. -->
+@if (compact()) {
+  <app-job-tabs
+    variant="bar"
+    [items]="tabItems()"
+    [current]="currentTab()"
+    (selected)="selectTab($event)"
+  />
+}

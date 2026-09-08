@@ -1,4 +1,4 @@
-/* Round glyph-only button. */
+/* Round glyph-only button, sized for a thumb on touch screens. */
 
 .icon-btn {
   display: grid;
@@ -13,13 +13,13 @@
   color: var(--ink-2);
   cursor: pointer;
   transition:
-    background-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s var(--ease);
+    background-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s var(--ease);
 }
 
 .icon-btn:hover {
-  background: var(--surface-sunken);
+  background: var(--surface-2);
   color: var(--ink);
 }
 
@@ -30,4 +30,11 @@
 .icon-btn:disabled {
   opacity: 0.4;
   pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
 }

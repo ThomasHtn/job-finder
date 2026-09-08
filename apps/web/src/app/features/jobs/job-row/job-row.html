@@ -6,7 +6,7 @@
       {{ job().title }}
     </a>
     @if (job().salary; as salary) {
-      <span class="job-row__salary">{{ salary }}</span>
+      <span class="job-row__salary u-num">{{ salary }}</span>
     }
   </div>
 
@@ -25,7 +25,7 @@
   }
 
   <!-- Provenance strip: source, unusual contract wording, date, "new" badge. -->
-  <p class="job-row__footer u-mono">
+  <p class="job-row__footer">
     <span class="job-row__source">{{ job().sourceLabel }}</span>
     @if (contract(); as contract) {
       <span class="job-row__contract">{{ contract }}</span>

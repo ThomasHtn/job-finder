@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { Brand } from '../../shared/brand/brand';
 import { Icon } from '../../shared/icon/icon';
 
 /**
@@ -10,7 +11,7 @@ import { Icon } from '../../shared/icon/icon';
  */
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Icon],
+  imports: [Brand, FormsModule, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.html',
   styleUrl: './login.scss',

@@ -1,16 +1,16 @@
 <!-- Centred panel with the single password field. -->
 <main class="login">
   <div class="login__panel">
-    <!-- Decorative mark above the title. -->
-    <span class="login__mark" aria-hidden="true"></span>
-    <h1 class="login__title">Offres d'emploi</h1>
-    <p class="login__lead">Entrez le mot de passe pour ouvrir votre veille.</p>
+    <app-brand class="login__brand" />
+
+    <h1 class="login__title">Votre veille d'offres</h1>
+    <p class="login__lead">Entrez le mot de passe pour l'ouvrir.</p>
 
     <!-- Submit on Enter or on the button. -->
     <form class="login__form" (ngSubmit)="submit()">
       <!-- Password field bound to the signal. -->
       <label class="login__field">
-        <span class="login__label u-mono">Mot de passe</span>
+        <span class="login__label">Mot de passe</span>
         <input
           class="login__input"
           type="password"

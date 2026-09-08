@@ -1,0 +1,17 @@
+<!-- One button per tab; the count is part of the label, not a decoration. -->
+@for (item of items(); track item.tab) {
+  <button
+    type="button"
+    role="tab"
+    class="job-tabs__item"
+    [class.job-tabs__item--on]="item.tab === current()"
+    [attr.aria-selected]="item.tab === current()"
+    (click)="selected.emit(item.tab)"
+  >
+    <app-icon class="job-tabs__icon" [name]="item.icon" />
+    <span class="job-tabs__text">
+      <span class="job-tabs__label">{{ item.label }}</span>
+      <span class="job-tabs__count u-num">{{ item.count }}</span>
+    </span>
+  </button>
+}

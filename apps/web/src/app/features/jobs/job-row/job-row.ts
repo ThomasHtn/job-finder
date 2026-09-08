@@ -21,6 +21,7 @@ import { DEFAULT_CONTRACT } from './job-row.constants';
     '[class.job-row--viewed]': 'job().isViewed',
     '[class.job-row--new]': 'isNew()',
     '[class.job-row--starred]': 'job().isFavorite',
+    '[class.job-row--selected]': 'selected()',
   },
 })
 export class JobRow {
@@ -33,6 +34,11 @@ export class JobRow {
    * The offer to render.
    */
   readonly job = input.required<JobSummary>();
+
+  /**
+   * True while this offer is the one open in the panel.
+   */
+  readonly selected = input(false);
 
   /**
    * Emits the offer id when the star is pressed.

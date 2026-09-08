@@ -11,6 +11,9 @@ export const ICON_NAMES = [
   'info',
   'alert',
   'lock',
+  'chevron-down',
+  'pin',
+  'remote',
 ] as const;
 
 /**

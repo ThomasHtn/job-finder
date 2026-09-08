@@ -10,7 +10,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--ground);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -20,12 +20,12 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: var(--signal-soft);
+  background: var(--accent-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -36,4 +36,9 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* Behind an open sheet: frozen, so the sheet is the only thing that scrolls. */
+body.is-sheet-open {
+  overflow: hidden;
 }

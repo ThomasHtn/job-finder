@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -12,35 +11,38 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
-  JOB_TABS,
   toJobTab,
   type JobListResponse,
+  type JobSummary,
   type JobTab,
   type SourceStatus,
 } from '@job-finder/shared';
-import { map } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { AppConfigService } from '../../../core/app-config.service';
 import { describeHttpError } from '../../../core/http/describe-http-error';
 import { LastVisitService } from '../../../core/last-visit.service';
+import { Viewport } from '../../../core/viewport';
+import { Brand } from '../../../shared/brand/brand';
 import { Icon } from '../../../shared/icon/icon';
+import { detailIdFromUrl } from '../detail-id-from-url';
 import { IngestionApi } from '../ingestion-api';
+import { JobPatchBus } from '../job-patch-bus';
 import { JobRow } from '../job-row/job-row';
+import { JobTabs } from '../job-tabs/job-tabs';
+import type { JobTabItem } from '../job-tabs/job-tab-item';
 import { JobsApi } from '../jobs-api';
-import {
-  AREA_LABEL_PLACEHOLDER,
-  NO_COUNTS,
-  REFRESH_MESSAGE_MS,
-} from './job-list.constants';
+import { SyncLabelPipe } from '../sync-label.pipe';
+import { AREA_LABEL_PLACEHOLDER, NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
 import { newOffersLabel } from './new-offers-label';
 
 /**
- * The feed: three tabs bound to the URL, manual refresh, and the "new since last visit" filter.
+ * The shell: the feed, its three tabs, and the panel one offer opens into.
  */
 @Component({
   selector: 'app-job-list',
-  imports: [DatePipe, Icon, JobRow],
+  imports: [Brand, Icon, JobRow, JobTabs, RouterOutlet, SyncLabelPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.html',
   styleUrl: './job-list.scss',
@@ -57,7 +59,7 @@ export class JobList {
   private readonly ingestion = inject(IngestionApi);
 
   /**
-   * Router, to reflect the tab in the URL.
+   * Router, to reflect the tab in the URL and to know which offer is open.
    */
   private readonly router = inject(Router);
 
@@ -67,9 +69,19 @@ export class JobList {
   private readonly lastVisit = inject(LastVisitService);
 
   /**
+   * Offers changed from inside the detail panel.
+   */
+  private readonly patches = inject(JobPatchBus);
+
+  /**
    * Ends every subscription with the component.
    */
   private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * True on phones: tabs move to the bottom bar and the detail opens as a sheet.
+   */
+  protected readonly compact = inject(Viewport).isCompact;
 
   /**
    * Bound from the `?tab=` query parameter, so the browser's back button restores it.
@@ -82,14 +94,25 @@ export class JobList {
   protected readonly currentTab = computed<JobTab>(() => toJobTab(this.tab()));
 
   /**
-   * Position of the tab, drives the sliding thumb of the segmented control.
+   * Id of the offer the URL has open, null when the panel is empty.
    */
-  protected readonly tabIndex = computed(() => JOB_TABS.indexOf(this.currentTab()));
+  protected readonly selectedId = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(() => detailIdFromUrl(this.router.url)),
+    ),
+    { initialValue: detailIdFromUrl(this.router.url) },
+  );
+
+  /**
+   * True while an offer is rendered in the panel.
+   */
+  protected readonly detailOpen = signal(false);
 
   /**
    * Name of the on-site tab, from the API config.
    */
-  protected readonly areaLabel = toSignal(
+  private readonly areaLabel = toSignal(
     inject(AppConfigService)
       .load()
       .pipe(map((config) => config.areaLabel)),
@@ -152,12 +175,12 @@ export class JobList {
   protected readonly lastIngestionAt = computed(() => this.data()?.lastIngestionAt ?? null);
 
   /**
-   * The segmented control entries: tab, label, count.
+   * The tab strip entries: where they lead, how they read, how many offers they hold.
    */
-  protected readonly segments = computed(() => [
-    { tab: 'local' as const, label: this.areaLabel(), count: this.counts().local },
-    { tab: 'remote' as const, label: 'Full remote', count: this.counts().remote },
-    { tab: 'favorites' as const, label: 'Favoris', count: this.counts().favorites },
+  protected readonly tabItems = computed<JobTabItem[]>(() => [
+    { tab: 'local', label: this.areaLabel(), count: this.counts().local, icon: 'pin' },
+    { tab: 'remote', label: 'Full remote', count: this.counts().remote, icon: 'remote' },
+    { tab: 'favorites', label: 'Favoris', count: this.counts().favorites, icon: 'star' },
   ]);
 
   /**
@@ -208,7 +231,8 @@ export class JobList {
   });
 
   /**
-   * Reloads whenever the tab changes, resetting the "new" filter; clears the timer on destroy.
+   * Reloads on tab change, folds in offers changed from the panel, and keeps the page behind
+   * an open sheet from scrolling under it.
    */
   constructor() {
     effect(() => {
@@ -216,18 +240,35 @@ export class JobList {
       untracked(() => {
         this.onlyNew.set(false);
         this.load(tab);
+        /* Another tab is another list: it starts at its first offer, not where the last one ended. */
+        window.scrollTo({ top: 0 });
       });
     });
+
+    effect(() => {
+      const patch = this.patches.lastPatch();
+      if (patch) untracked(() => this.applyPatch(patch));
+    });
+
+    effect(() => {
+      const locked = this.compact() && this.detailOpen();
+      document.body.classList.toggle('is-sheet-open', locked);
+    });
+
     this.loadStatus();
-    this.destroyRef.onDestroy(() => clearTimeout(this.refreshMessageTimer));
+    this.destroyRef.onDestroy(() => {
+      clearTimeout(this.refreshMessageTimer);
+      document.body.classList.remove('is-sheet-open');
+    });
   }
 
   /**
-   * Switches tab through the URL, so the effect above does the loading.
+   * Switches tab through the URL, so the effect above does the loading. Navigating to the feed
+   * itself closes the panel: an offer from the tab just left has nothing to sit next to.
    */
   protected selectTab(tab: JobTab): void {
     if (tab === this.currentTab()) return;
-    void this.router.navigate([], { queryParams: { tab }, replaceUrl: true });
+    void this.router.navigate(['/'], { queryParams: { tab }, replaceUrl: true });
   }
 
   /**
@@ -268,7 +309,9 @@ export class JobList {
         },
         error: (error: HttpErrorResponse) => {
           this.refreshing.set(false);
-          this.error.set(`Impossible de récupérer de nouvelles offres. ${describeHttpError(error)}`);
+          this.error.set(
+            `Impossible de récupérer de nouvelles offres. ${describeHttpError(error)}`,
+          );
         },
       });
   }
@@ -294,6 +337,24 @@ export class JobList {
   }
 
   /**
+   * Replaces one row in place, keeping the favourites count with it. Reloading instead would
+   * pull the open offer out from under the panel.
+   */
+  private applyPatch(patched: JobSummary): void {
+    this.data.update((current) => {
+      const previous = current?.jobs.find((job) => job.id === patched.id);
+      if (!current || !previous) return current;
+      const favorites =
+        current.counts.favorites + (patched.isFavorite ? 1 : 0) - (previous.isFavorite ? 1 : 0);
+      return {
+        ...current,
+        jobs: current.jobs.map((job) => (job.id === patched.id ? patched : job)),
+        counts: { ...current.counts, favorites },
+      };
+    });
+  }
+
+  /**
    * Fetches the source health for the tooltip and the degraded state.
    */
   private loadStatus(): void {
@@ -304,15 +365,12 @@ export class JobList {
   }
 
   /**
-   * Shown next to the last-updated date for a few seconds, then cleared.
+   * Shown in place of the sync time for a few seconds, then cleared.
    */
   private showRefreshMessage(message: string): void {
     clearTimeout(this.refreshMessageTimer);
     this.refreshMessage.set(message);
-    this.refreshMessageTimer = setTimeout(
-      () => this.refreshMessage.set(null),
-      REFRESH_MESSAGE_MS,
-    );
+    this.refreshMessageTimer = setTimeout(() => this.refreshMessage.set(null), REFRESH_MESSAGE_MS);
   }
 
   /**

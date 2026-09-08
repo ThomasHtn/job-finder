@@ -3,67 +3,70 @@
 :root {
   color-scheme: light dark;
 
-  --font-sans:
-    'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+  --font-sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
-  --ground: #f1f2f5;
+  --paper: #fbfcfd;
   --surface: #ffffff;
-  --surface-sunken: #e6e8ed;
-  --surface-hover: #f7f8fa;
+  --surface-2: #f1f4f6;
+  --surface-hover: #f6f8f9;
 
-  --ink: #14161a;
-  --ink-2: #565c66;
-  /* Tertiary still has to clear 4.5:1 on the ground: it carries real labels. */
-  --ink-3: #68707c;
+  --ink: #101822;
+  --ink-2: #545f6d;
+  /* Tertiary carries real labels: it still clears 4.5:1 on the paper. */
+  --ink-3: #6c7784;
 
-  --line: rgb(20 22 26 / 8%);
-  --line-strong: rgb(20 22 26 / 16%);
+  --line: rgb(16 24 34 / 9%);
+  --line-2: rgb(16 24 34 / 16%);
 
-  /* Port signal orange: reserved for positive attention (new, favourite, active). */
-  --signal: #e2551f;
-  --signal-ink: #b23f0f;
-  --signal-soft: rgb(226 85 31 / 10%);
+  /* Deep teal, spent on one thing only: what arrived since the last visit. */
+  --accent: #0e6e63;
+  --accent-ink: #0b5a51;
+  --accent-soft: rgb(14 110 99 / 9%);
 
-  --alert: #b3352a;
-  --alert-soft: rgb(179 53 42 / 9%);
+  --alert: #a8331f;
+  --alert-soft: rgb(168 51 31 / 9%);
 
-  --shadow-card: 0 1px 2px rgb(16 18 22 / 4%), 0 14px 30px -18px rgb(16 18 22 / 16%);
-  --shadow-thumb: 0 1px 1px rgb(16 18 22 / 5%), 0 3px 8px -2px rgb(16 18 22 / 14%);
+  /* One float shadow for the one floating thing: the detail sheet. */
+  --shadow-float: 0 1px 2px rgb(16 24 34 / 5%), 0 24px 48px -24px rgb(16 24 34 / 28%);
 
-  --radius-card: 16px;
-  --radius-control: 11px;
+  --r-lg: 14px;
+  --r-md: 10px;
+  --r-sm: 7px;
 
-  /* Apple-ish deceleration: fast out, long settle. */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --frost: saturate(180%) blur(20px);
 
-  --content-width: 53rem;
   --gutter: 1.5rem;
+  --header-h: 3.5rem;
+  --tabbar-h: 3.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #0c0d10;
-    --surface: #17191d;
-    --surface-sunken: #23262b;
-    --surface-hover: #1e2126;
+    --paper: #0d1013;
+    --surface: #14181c;
+    --surface-2: #1e242a;
+    --surface-hover: #1a1f24;
 
-    --ink: #f3f4f6;
-    --ink-2: #a4aab4;
-    --ink-3: #868d99;
+    --ink: #e9edf1;
+    --ink-2: #a0aab5;
+    --ink-3: #838e9a;
 
     --line: rgb(255 255 255 / 9%);
-    --line-strong: rgb(255 255 255 / 18%);
+    --line-2: rgb(255 255 255 / 18%);
 
-    --signal: #f2612f;
-    --signal-ink: #ff8154;
-    --signal-soft: rgb(242 97 47 / 14%);
+    --accent: #3fb8a6;
+    --accent-ink: #5cd0bd;
+    --accent-soft: rgb(63 184 166 / 14%);
 
-    --alert: #e2685c;
-    --alert-soft: rgb(226 104 92 / 12%);
+    --alert: #e2705f;
+    --alert-soft: rgb(226 112 95 / 12%);
 
-    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%), 0 14px 30px -18px rgb(0 0 0 / 60%);
-    --shadow-thumb: 0 1px 2px rgb(0 0 0 / 40%), 0 3px 8px -2px rgb(0 0 0 / 50%);
+    --shadow-float: 0 1px 2px rgb(0 0 0 / 50%), 0 24px 48px -24px rgb(0 0 0 / 80%);
+  }
+}
+
+@media (max-width: 63.99rem) {
+  :root {
+    --gutter: 1.125rem;
   }
 }

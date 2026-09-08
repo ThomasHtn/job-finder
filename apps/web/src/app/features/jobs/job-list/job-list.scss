@@ -1,33 +1,41 @@
-.topbar {
-  &__row--filters {
-    height: 3.25rem;
-    padding-bottom: 0.625rem;
-    align-items: flex-start;
-  }
+:host {
+  /* The header is two rows wide-screen, one on a phone; everything sticky measures from here. */
+  --head-total: calc(var(--header-h) + 2.75rem);
+  --shell-width: 74rem;
+  --panel-gap: 1.5rem;
 
-  // Date and its refresh read as one unit; the round button hangs into the
-  // gutter so its glyph lines up with the content edge, not its hit area.
-  &__status {
+  display: block;
+  min-height: 100dvh;
+}
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--line);
+
+  &__row {
     display: flex;
-    flex: none;
     align-items: center;
-    gap: 0.375rem;
-    margin-right: -0.5rem;
+    gap: 0.625rem;
+    max-width: var(--shell-width);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    height: var(--header-h);
   }
 
-  &__refresh {
-    --icon-size: 1.1875rem;
+  &__row--tabs {
+    height: 2.75rem;
+    align-items: flex-end;
   }
 
-  &__refresh--degraded {
-    color: var(--alert);
+  &__spacer {
+    flex: 1;
   }
 
-  &__refresh--spinning app-icon {
-    animation: topbar-spin 0.9s linear infinite;
-  }
-
-  // A sentence, not a data label: the mono caps belonged to the wrong register.
   &__stamp {
     margin: 0;
     font-size: 0.8125rem;
@@ -36,190 +44,200 @@
   }
 
   &__stamp-fresh {
-    color: var(--signal-ink);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  &__refresh {
+    --icon-size: 1.1875rem;
+
+    margin-right: -0.5rem;
+  }
+
+  &__refresh--degraded {
+    color: var(--alert);
+  }
+
+  &__refresh--spinning app-icon {
+    animation: head-spin 0.9s linear infinite;
   }
 }
 
-@keyframes topbar-spin {
+@keyframes head-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-.brand {
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.021em;
-}
-
-/* The page's one memorable control: how many offers landed since the last visit,
-   and a way to see only those. */
-.pulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4375rem;
-  flex: none;
-  padding: 0.3125rem 0.6875rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--ink);
-  font: 500 0.8125rem/1.2 var(--font-sans);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.18s var(--ease);
-
-  &:active {
-    transform: scale(0.96);
-  }
-
-  &__dot {
-    width: 0.4375rem;
-    height: 0.4375rem;
-    border-radius: 50%;
-    background: var(--signal);
-    animation: pulse-breathe 2.6s ease-in-out infinite;
-  }
-
-  // Pressed state stays ink: the orange is reserved for the marks it filters on.
-  &--on {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--surface);
-  }
-
-  &--on &__dot {
-    animation: none;
-  }
-}
-
-@keyframes pulse-breathe {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 var(--signal-soft);
-  }
-
-  50% {
-    box-shadow: 0 0 0 4px var(--signal-soft);
-  }
-}
-
-/* Sliding-thumb segmented control. */
-.segments {
-  position: relative;
+.layout {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  flex: 1;
-  max-width: 27rem;
-  padding: 3px;
-  border-radius: 12px;
-  background: var(--surface-sunken);
-
-  &__thumb {
-    position: absolute;
-    top: 3px;
-    bottom: 3px;
-    left: 3px;
-    width: calc((100% - 6px) / 3);
-    border-radius: 9px;
-    background: var(--surface);
-    box-shadow: var(--shadow-thumb);
-    transform: translateX(calc(var(--segments-index, 0) * 100%));
-    transition: transform 0.34s var(--ease);
-  }
-
-  &__item {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    min-width: 0;
-    padding: 0.4375rem 0.5rem;
-    border: 0;
-    border-radius: 9px;
-    background: none;
-    color: var(--ink-2);
-    font: 500 0.8125rem/1.2 var(--font-sans);
-    letter-spacing: -0.01em;
-    cursor: pointer;
-    transition: color 0.2s ease;
-
-    &--on {
-      color: var(--ink);
-    }
-  }
-
-  &__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__count {
-    flex: none;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    font-weight: 500;
-    color: var(--ink-3);
-  }
-
-  &__item--on &__count {
-    color: var(--signal-ink);
-  }
+  /* Reading and choosing get the same room: neither column is the leftover of the other. */
+  grid-template-columns: minmax(0, 1fr) minmax(21rem, 1fr);
+  align-items: start;
+  gap: 2rem;
+  max-width: var(--shell-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
 }
 
 .feed {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 1.75rem var(--gutter) 5rem;
+  min-width: 0;
+  padding: var(--panel-gap) 0 4rem;
 
   &__list {
-    overflow: hidden;
-    animation: feed-rise 0.42s var(--ease) both;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
   }
 }
 
-@keyframes feed-rise {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+/* The page's one memorable control: what landed since the last visit, and a way to see only that. */
+.fresh {
+  display: flex;
+  align-items: center;
+  gap: 0.6875rem;
+  width: 100%;
+  margin: 0 0 1rem;
+  padding: 0.8125rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font: 500 0.9375rem/1.35 var(--font-sans);
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+
+  &__dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__action {
+    flex: none;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Filter on: the banner drops its colour, since the rows it left are the coloured ones. */
+  &--on {
+    border-color: var(--line-2);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  &--on &__dot {
+    background: var(--ink-3);
   }
 }
 
-@media (max-width: 40rem) {
+.panel {
+  /* Keeps the same air under the header as the feed does, scrolled or not. */
+  position: sticky;
+  top: calc(var(--head-total) + var(--panel-gap));
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--head-total) - var(--panel-gap) * 2);
+  margin-top: var(--panel-gap);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+
+  /* Nothing open, nothing to frame: the invitation floats on the page itself. */
+  &:not(.panel--open) {
+    border-color: transparent;
+    background: none;
+  }
+
+  &__idle {
+    margin: auto;
+    padding: 2rem;
+    max-width: 20rem;
+    color: var(--ink-3);
+    font-size: 0.9375rem;
+    text-align: center;
+    text-wrap: balance;
+  }
+}
+
+@media (max-width: 63.99rem) {
   :host {
-    --gutter: 1rem;
+    --head-total: var(--header-h);
   }
 
-  .topbar__row--filters {
+  .layout {
+    display: block;
+    padding: 0;
+  }
+
+  .feed {
+    max-width: none;
+    padding: 1rem var(--gutter) calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 2rem);
+  }
+
+  /* The offer takes the whole screen, rising from the bottom the way a sheet does. */
+  .panel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
     height: auto;
-    padding-bottom: 0.625rem;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    visibility: hidden;
+    transform: translateY(100%);
+    transition:
+      transform 0.3s var(--ease),
+      visibility 0.3s;
+    overscroll-behavior: contain;
   }
 
-  .topbar__stamp {
+  .panel--open {
+    visibility: visible;
+    transform: none;
+  }
+
+  .panel__idle {
     display: none;
   }
+}
 
-  .segments {
-    max-width: none;
+/* On a phone the list runs edge to edge: the frame was costing reading width. */
+@media (max-width: 40rem) {
+  .feed {
+    padding-inline: 0;
   }
 
-  .segments__item {
-    gap: 0.25rem;
-    padding: 0.4375rem 0.375rem;
-    font-size: 0.75rem;
+  .fresh,
+  .notice {
+    width: auto;
+    margin-inline: var(--gutter);
   }
 
-  .pulse {
-    font-size: 0.75rem;
+  .feed__list {
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 26rem) {
+  .fresh {
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
   }
 }
