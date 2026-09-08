@@ -2,7 +2,7 @@ import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import type { Env } from '../config/env.js';
+import type { Env } from '../config/env.schema.js';
 import { IngestionService } from './ingestion.service.js';
 
 /**

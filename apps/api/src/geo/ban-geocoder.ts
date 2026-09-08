@@ -1,68 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { Coordinates } from './commuting-area.js';
-
-/**
- * Public endpoint of the French national address base (BAN).
- */
-const GEOCODER_URL = 'https://data.geopf.fr/geocodage/search';
-
-/**
- * Below this the BAN match is too loose to be trusted (wrong town, partial street).
- */
-const MIN_SCORE = 0.4;
-
-/**
- * Time given to the geocoder before the query counts as a miss.
- */
-const TIMEOUT_MS = 10_000;
-
-/**
- * Coordinates plus the town they resolve to.
- */
-export interface ResolvedLocation extends Coordinates {
-  /**
-   * Town name from the address base.
-   */
-  city: string | null;
-
-  /**
-   * Postal code from the address base.
-   */
-  postalCode: string | null;
-}
-
-/**
- * The parts of a BAN GeoJSON feature that are read.
- */
-export interface BanFeature {
-  /**
-   * GeoJSON order: [longitude, latitude].
-   */
-  geometry: { coordinates: [number, number] };
-
-  /**
-   * Match quality and the resolved town.
-   */
-  properties: { score: number; city?: string; postcode?: string };
-}
-
-/**
- * Turns the first BAN feature into a location, or null when it is missing or too weak.
- */
-export function parseBanResponse(body: {
-  features?: BanFeature[];
-}): ResolvedLocation | null {
-  const feature = body.features?.[0];
-  if (!feature || feature.properties.score < MIN_SCORE) return null;
-
-  const [longitude, latitude] = feature.geometry.coordinates;
-  return {
-    latitude,
-    longitude,
-    city: feature.properties.city ?? null,
-    postalCode: feature.properties.postcode ?? null,
-  };
-}
+import { GEOCODER_URL, TIMEOUT_MS } from './ban-geocoder.constants.js';
+import type { BanFeature, ResolvedLocation } from './ban-geocoder.types.js';
+import { parseBanResponse } from './parse-ban-response.js';
 
 /**
  * HTTP client for the French national address base. Never throws: a failure is a miss.

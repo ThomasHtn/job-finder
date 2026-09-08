@@ -1,0 +1,51 @@
+:host {
+  display: inline-grid;
+  place-items: center;
+  width: var(--icon-size, 1.25rem);
+  height: var(--icon-size, 1.25rem);
+}
+
+// The SVG is used as a mask so a single file follows the surrounding text colour.
+.icon {
+  width: 100%;
+  height: 100%;
+  background: currentcolor;
+  mask: var(--icon-url) center / contain no-repeat;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+}
+
+.icon--star {
+  --icon-url: url('/icons/star.svg');
+}
+
+.icon--star-filled {
+  --icon-url: url('/icons/star-filled.svg');
+}
+
+.icon--dismiss {
+  --icon-url: url('/icons/dismiss.svg');
+}
+
+.icon--refresh {
+  --icon-url: url('/icons/refresh.svg');
+}
+
+.icon--back {
+  --icon-url: url('/icons/back.svg');
+}
+
+.icon--external {
+  --icon-url: url('/icons/external.svg');
+}
+
+.icon--info {
+  --icon-url: url('/icons/info.svg');
+}
+
+.icon--alert {
+  --icon-url: url('/icons/alert.svg');
+}
+
+.icon--lock {
+  --icon-url: url('/icons/lock.svg');
+}

@@ -4,15 +4,13 @@ import {
   type SearchProfile,
 } from '../config/search-profile.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { BanGeocoder, type ResolvedLocation } from './ban-geocoder.js';
-import {
-  isWithinArea,
-  loadIsochrone,
-  type Area,
-  type Coordinates,
-} from './commuting-area.js';
+import { BanGeocoder } from './ban-geocoder.js';
+import type { ResolvedLocation } from './ban-geocoder.types.js';
+import type { Area, Coordinates } from './geo.types.js';
+import { isWithinArea } from './is-within-area.js';
+import { loadIsochrone } from './load-isochrone.js';
 
-export type { ResolvedLocation } from './ban-geocoder.js';
+export type { ResolvedLocation } from './ban-geocoder.types.js';
 
 /**
  * Facade over the isochrone check and the geocoder, with a database cache in front.

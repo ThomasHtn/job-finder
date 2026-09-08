@@ -1,0 +1,46 @@
+/* Text button, in its neutral and primary variants. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font: 500 0.9375rem/1.2 var(--font-sans);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.18s var(--ease),
+    opacity 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.btn--primary {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--ink) 88%, var(--ground));
+}
+
+/* A dimmed ink fill turns to mud: an unavailable primary reads as a flat tile instead. */
+.btn--primary:disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-3);
+  opacity: 1;
+}

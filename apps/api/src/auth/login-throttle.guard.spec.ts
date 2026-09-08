@@ -1,10 +1,7 @@
 import { HttpException, type ExecutionContext } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
-import {
-  LoginThrottleGuard,
-  MAX_ATTEMPTS,
-  WINDOW_MS,
-} from './login-throttle.guard.js';
+import { MAX_ATTEMPTS, WINDOW_MS } from './login-throttle.constants.js';
+import { LoginThrottleGuard } from './login-throttle.guard.js';
 
 /**
  * Builds a minimal execution context carrying the client address.

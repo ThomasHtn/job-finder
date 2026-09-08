@@ -1,44 +1,19 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IngestionSummary, JobSource, SourceStatus } from '@job-finder/shared';
-import type { Env } from '../config/env.js';
+import type { Env } from '../config/env.schema.js';
 import {
   SEARCH_PROFILE,
   type SearchProfile,
 } from '../config/search-profile.js';
 import { GeoService } from '../geo/geo.service.js';
-import {
-  JOB_SOURCE_CONNECTORS,
-  type JobSourceConnector,
-} from '../sources/source.types.js';
+import type { JobSourceConnector } from '../sources/job-source-connector.js';
+import { JOB_SOURCE_CONNECTORS } from '../sources/job-source-connectors.token.js';
+import { emptySummary } from './empty-summary.js';
+import { ALREADY_RUNNING, DAY_MS } from './ingestion.constants.js';
 import { IngestionRepository } from './ingestion.repository.js';
-import { prepareJob, type GeoPort } from './job-preparer.js';
-
-/**
- * Milliseconds in one day, for the purge threshold.
- */
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/**
- * Pseudo source name reported when a trigger is ignored because a run is in progress.
- */
-export const ALREADY_RUNNING = 'already-running';
-
-/**
- * Fresh summary, optionally pre-filled with skipped sources.
- */
-function emptySummary(skipped: string[] = []): IngestionSummary {
-  return {
-    fetched: 0,
-    kept: 0,
-    inserted: 0,
-    updated: 0,
-    merged: 0,
-    purged: 0,
-    skippedSources: skipped,
-    failedSources: [],
-  };
-}
+import { prepareJob } from './job-preparer.js';
+import type { GeoPort } from './job-preparer.types.js';
 
 /**
  * Orchestrates one ingestion: fetch, filter, persist, purge.

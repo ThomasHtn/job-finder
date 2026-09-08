@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client.js';
-import { hashPassword } from '../src/auth/secret.js';
+import { hashPassword } from '../src/auth/password-hash.js';
 
 /**
  * Sets (or clears) the shared app password in the database and revokes every session.

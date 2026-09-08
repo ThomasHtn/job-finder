@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseBanResponse } from './ban-geocoder.js';
+import { parseBanResponse } from './parse-ban-response.js';
 
 /**
  * Mapping of the BAN payload.

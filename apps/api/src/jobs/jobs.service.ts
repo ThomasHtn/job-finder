@@ -9,20 +9,7 @@ import type {
 import type { JobModel } from '../generated/prisma/models.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { toDetail, toSummary } from './job.mapper.js';
-
-/**
- * Prisma filter selecting the offers of one tab. Hidden offers never show anywhere.
- */
-function tabWhere(tab: JobTab) {
-  switch (tab) {
-    case 'local':
-      return { isRemote: false, isHidden: false };
-    case 'remote':
-      return { isRemote: true, isHidden: false };
-    case 'favorites':
-      return { isFavorite: true, isHidden: false };
-  }
-}
+import { tabWhere } from './tab-where.js';
 
 /**
  * Queries behind the /jobs routes.

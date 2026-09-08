@@ -1,0 +1,32 @@
+/* Quiet inline message: something the reader should know, not something they broke. */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0 0 1rem;
+  padding: 0.8125rem 1rem;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notice app-icon {
+  --icon-size: 1.0625rem;
+
+  flex: none;
+  margin-top: 0.0625rem;
+  color: var(--ink-3);
+}
+
+.notice--alert {
+  background: var(--alert-soft);
+  box-shadow: none;
+  color: var(--alert);
+}
+
+.notice--alert app-icon {
+  color: currentcolor;
+}

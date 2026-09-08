@@ -1,0 +1,42 @@
+/* Indeterminate progress: a single pass under the header, no chrome. */
+.scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.scan--on {
+  opacity: 1;
+}
+
+.scan::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, var(--signal), transparent);
+  animation: scan-sweep 1.3s var(--ease) infinite;
+}
+
+@keyframes scan-sweep {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan::after {
+    width: 100%;
+    background: var(--signal);
+    opacity: 0.5;
+  }
+}

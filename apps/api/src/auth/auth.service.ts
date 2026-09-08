@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { generateToken, hashToken, verifyPassword } from './secret.js';
+import { verifyPassword } from './password-hash.js';
+import { generateToken, hashToken } from './session-token.js';
 
 /**
  * How long a login stays valid.

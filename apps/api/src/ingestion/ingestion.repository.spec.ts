@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planMerge } from './ingestion.repository.js';
+import { planMerge } from './plan-merge.js';
 import { rawJob } from './test-fixtures.js';
 
 /**

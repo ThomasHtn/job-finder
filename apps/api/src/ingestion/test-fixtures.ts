@@ -1,5 +1,5 @@
 import type { SearchProfile } from '../config/search-profile.js';
-import type { RawJob } from '../sources/source.types.js';
+import type { RawJob } from '../sources/raw-job.js';
 
 /**
  * Profile used by the ingestion specs. Not shipped: only imported by *.spec.ts.
@@ -13,10 +13,12 @@ export const PROFILE: SearchProfile = {
   area: {
     label: 'Seine-Maritime',
     center: { latitude: 49.4938, longitude: 0.1077 },
-    driveMinutes: 55,
+    driveKm: 55,
     city: 'Le Havre',
     insee: '76351',
-    euresRegion: 'FRD2',
+    euresRegions: ['FRD2'],
+    apecLocation: '801',
+    freeWorkLocations: ['fr~normandie~~'],
   },
 };
 

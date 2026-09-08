@@ -3,12 +3,9 @@ import { RouterLink } from '@angular/router';
 import type { JobSummary } from '@job-finder/shared';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { Icon } from '../../../shared/icon/icon';
+import { rowPlaceLabel } from '../place-label';
 import { PublishedLabelPipe } from '../published-label.pipe';
-
-/**
- * Contract wording that every offer shares, hence not worth a slot in the row.
- */
-const DEFAULT_CONTRACT = 'CDI';
+import { DEFAULT_CONTRACT } from './job-row.constants';
 
 /**
  * One line of the feed: title, who and where, an excerpt, then the provenance strip.
@@ -66,12 +63,7 @@ export class JobRow {
   /**
    * "76 - LE HAVRE" like France Travail, or the closest the source allows.
    */
-  protected readonly place = computed(() => {
-    const { isRemote, city, postalCode } = this.job();
-    if (isRemote) return 'Full remote';
-    if (!city) return 'Lieu non précisé';
-    return postalCode ? `${postalCode.slice(0, 2)} - ${city}` : city;
-  });
+  protected readonly place = computed(() => rowPlaceLabel(this.job()));
 
   /**
    * Star pressed. The whole row is a link: the star must not open the detail.

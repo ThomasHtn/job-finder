@@ -1,10 +1,13 @@
 import type { ConfigService } from '@nestjs/config';
 import { describe, expect, it, vi } from 'vitest';
-import type { Env } from '../config/env.js';
-import type { JobSourceConnector, RawJob } from '../sources/source.types.js';
-import type { IngestionRepository, PersistOutcome } from './ingestion.repository.js';
-import { ALREADY_RUNNING, IngestionService } from './ingestion.service.js';
-import type { GeoPort } from './job-preparer.js';
+import type { Env } from '../config/env.schema.js';
+import type { JobSourceConnector } from '../sources/job-source-connector.js';
+import type { RawJob } from '../sources/raw-job.js';
+import type { IngestionRepository } from './ingestion.repository.js';
+import type { PersistOutcome } from './ingestion.types.js';
+import { ALREADY_RUNNING } from './ingestion.constants.js';
+import { IngestionService } from './ingestion.service.js';
+import type { GeoPort } from './job-preparer.types.js';
 import { PROFILE, rawJob } from './test-fixtures.js';
 
 /**

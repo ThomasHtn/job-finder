@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
-import type { Env } from './config/env.js';
+import type { Env } from './config/env.schema.js';
 
 /**
  * Builds the Nest application, applies the HTTP hardening and starts listening.

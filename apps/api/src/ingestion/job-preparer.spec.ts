@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { prepareJob, type GeoPort } from './job-preparer.js';
+import { prepareJob } from './job-preparer.js';
+import type { GeoPort } from './job-preparer.types.js';
 import { PROFILE, rawJob } from './test-fixtures.js';
 
 /**

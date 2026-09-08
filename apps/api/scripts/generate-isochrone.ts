@@ -1,6 +1,8 @@
 /**
  * One-shot: asks OpenRouteService for the area reachable by car from the
- * configured centre within SEARCH_AREA_DRIVE_MINUTES and freezes it in src/geo/.
+ * configured centre within SEARCH_AREA_DRIVE_KM and freezes it in src/geo/.
+ * Road distance rather than time: ORS caps time isochrones at 60 min, too short
+ * to reach Caen or Rouen from Le Havre.
  * The API is never called at runtime.
  *
  *   ORS_API_KEY=... npm run geo:isochrone
@@ -8,7 +10,7 @@
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
-import { validateEnv } from '../src/config/env.js';
+import { validateEnv } from '../src/config/validate-env.js';
 import { ISOCHRONE_FILENAME } from '../src/geo/commuting-area.js';
 
 config({ path: '../../.env', quiet: true });
@@ -21,7 +23,7 @@ if (!env.ORS_API_KEY) {
   process.exit(1);
 }
 
-const { center, driveMinutes } = env.searchProfile.area;
+const { center, driveKm } = env.searchProfile.area;
 const response = await fetch(
   'https://api.openrouteservice.org/v2/isochrones/driving-car',
   {
@@ -32,8 +34,8 @@ const response = await fetch(
     },
     body: JSON.stringify({
       locations: [[center.longitude, center.latitude]],
-      range: [driveMinutes * 60],
-      range_type: 'time',
+      range: [driveKm * 1000],
+      range_type: 'distance',
       /* Smooths the spiky raw output without meaningfully changing coverage. */
       smoothing: 15,
     }),
@@ -55,7 +57,7 @@ writeFileSync(target, `${JSON.stringify(geojson)}\n`);
 
 const points = geojson.features?.[0]?.geometry?.coordinates?.[0]?.length ?? 0;
 console.log(
-  `Wrote ${ISOCHRONE_FILENAME} (${driveMinutes} min, ${points} points) to ${target}`,
+  `Wrote ${ISOCHRONE_FILENAME} (${driveKm} km, ${points} points) to ${target}`,
 );
 console.log(
   'Commit this file: the API now filters offers locally, with no network call.',

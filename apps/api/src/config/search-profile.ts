@@ -14,9 +14,9 @@ export interface SearchArea {
   center: { latitude: number; longitude: number };
 
   /**
-   * Driving time the isochrone was generated for.
+   * Road distance the isochrone was generated for, in kilometres.
    */
-  driveMinutes: number;
+  driveKm: number;
 
   /**
    * City name understood by sources that search by place (Adzuna).
@@ -29,9 +29,19 @@ export interface SearchArea {
   insee: string;
 
   /**
-   * NUTS-2 region code, the only granularity EURES offers.
+   * NUTS-2 region codes, the only granularity EURES offers.
    */
-  euresRegion: string;
+  euresRegions: string[];
+
+  /**
+   * APEC macro-region id, the coarsest place filter its search accepts.
+   */
+  apecLocation: string;
+
+  /**
+   * Free-Work location keys, "fr~<region>~<department>~<city>".
+   */
+  freeWorkLocations: string[];
 }
 
 /**

@@ -1,0 +1,7 @@
+/* Raised surface holding one block of content. */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}

@@ -1,105 +1,33 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Env } from '../../config/env.js';
+import { sleep } from '../../common/sleep.js';
+import type { Env } from '../../config/env.schema.js';
 import {
   SEARCH_PROFILE,
   type SearchProfile,
 } from '../../config/search-profile.js';
-import type { JobSourceConnector, RawJob } from '../source.types.js';
-
-/**
- * OAuth2 client-credentials endpoint.
- */
-const TOKEN_URL =
-  'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire';
-/**
- * Offer search endpoint.
- */
-const SEARCH_URL =
-  'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
-/**
- * Scopes granted to the application.
- */
-const SCOPE = 'api_offresdemploiv2 o2dsoffre';
-
-/**
-
- * Straight-line km around the configured city, wider than the drive on purpose: the isochrone does the real cut.
-
- */
-const SEARCH_RADIUS_KM = 60;
-/**
- * Largest page the API accepts.
- */
-const PAGE_SIZE = 150;
-/**
- * Pages fetched around the configured city.
- */
-const LOCAL_MAX_PAGES = 7;
-/**
- * Nationwide remote sweep, kept short since the local filter does the sorting out.
- */
-const REMOTE_MAX_PAGES = 2;
-
-/**
-
- * The API rate-limits bursts, so requests are spaced out and 429s are retried.
-
- */
-const DELAY_BETWEEN_REQUESTS_MS = 400;
-const MAX_RETRIES = 3;
-const RETRY_BACKOFF_MS = 5_000;
-
-/**
- * Time given to one search request.
- */
-const SEARCH_TIMEOUT_MS = 20_000;
-
-/**
- * Time given to the token endpoint.
- */
-const TOKEN_TIMEOUT_MS = 15_000;
-
-/**
- * Tokens are refreshed this early so one never expires mid-run.
- */
-const TOKEN_REFRESH_MARGIN_S = 60;
-
-/**
- * Promise-based pause.
- */
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * OAuth2 token payload.
- */
-interface TokenResponse {
-  access_token: string;
-  expires_in: number;
-}
-
-/**
- * The fields read from one France Travail offer.
- */
-interface FranceTravailOffer {
-  id: string;
-  intitule: string;
-  description?: string;
-  dateCreation?: string;
-  typeContrat?: string;
-  typeContratLibelle?: string;
-  lieuTravail?: {
-    libelle?: string;
-    latitude?: number;
-    longitude?: number;
-    codePostal?: string;
-    commune?: string;
-  };
-  entreprise?: { nom?: string; description?: string };
-  salaire?: { libelle?: string };
-  origineOffre?: { urlOrigine?: string };
-  contexteTravail?: { conditionsExercice?: string[] };
-}
+import type { JobSourceConnector } from '../job-source-connector.js';
+import type { RawJob } from '../raw-job.js';
+import {
+  DELAY_BETWEEN_REQUESTS_MS,
+  LOCAL_MAX_PAGES,
+  MAX_RETRIES,
+  PAGE_SIZE,
+  REMOTE_MAX_PAGES,
+  RETRY_BACKOFF_MS,
+  SCOPE,
+  SEARCH_RADIUS_KM,
+  SEARCH_TIMEOUT_MS,
+  SEARCH_URL,
+  TOKEN_REFRESH_MARGIN_S,
+  TOKEN_TIMEOUT_MS,
+  TOKEN_URL,
+} from './france-travail.constants.js';
+import { toRawJob } from './france-travail.mapper.js';
+import type {
+  FranceTravailOffer,
+  TokenResponse,
+} from './france-travail.types.js';
 
 /**
  * France Travail connector: the richest source, full text and coordinates included.
@@ -168,7 +96,7 @@ export class FranceTravailSource implements JobSourceConnector {
       }
     }
 
-    return [...offers.values()].map((offer) => this.toRawJob(offer));
+    return [...offers.values()].map(toRawJob);
   }
 
   /**
@@ -219,9 +147,7 @@ export class FranceTravailSource implements JobSourceConnector {
   }
 
   /**
-
    * Spaces out calls and retries on 429, which the API returns readily on bursts.
-
    */
   private async searchRequest(params: URLSearchParams): Promise<Response> {
     let response!: Response;
@@ -283,49 +209,6 @@ export class FranceTravailSource implements JobSourceConnector {
   }
 
   /**
-   * France Travail offer to the source-agnostic shape.
-   */
-  private toRawJob(offer: FranceTravailOffer): RawJob {
-    const conditions = offer.contexteTravail?.conditionsExercice ?? [];
-    const place = offer.lieuTravail;
-
-    return {
-      source: 'FRANCE_TRAVAIL',
-      sourceId: offer.id,
-      sourceLabel: 'France Travail',
-      title: offer.intitule,
-      company: offer.entreprise?.nom ?? null,
-      companyDescription: offer.entreprise?.description ?? null,
-      description: offer.description ?? null,
-      /* The search endpoint already returns the full text, no detail call needed. */
-      hasFullDescription: Boolean(offer.description),
-      contractLabel: offer.typeContratLibelle ?? offer.typeContrat ?? null,
-      isPermanent: offer.typeContrat === 'CDI',
-      salary: offer.salaire?.libelle ?? null,
-      locationText: place?.libelle ?? null,
-      /* `commune` is an INSEE code, unusable in the UI: the label carries the name. */
-      city: cityFromLabel(place?.libelle),
-      postalCode: place?.codePostal ?? null,
-      latitude: place?.latitude ?? null,
-      longitude: place?.longitude ?? null,
-      /*
-       * The API mostly says "Possibilité de télétravail", which is partial: only an
-       * explicit full-remote wording counts, the text heuristic handles the rest.
-       */
-      isRemote: conditions.some((condition) =>
-        /t[ée]l[ée]travail (total|complet|(a|à) 100)|100 ?% t[ée]l[ée]travail|full remote/i.test(
-          condition,
-        ),
-      ),
-      isLocationApproximate: false,
-      url:
-        offer.origineOffre?.urlOrigine ??
-        `https://candidat.francetravail.fr/offres/recherche/detail/${offer.id}`,
-      publishedAt: offer.dateCreation ? new Date(offer.dateCreation) : null,
-    };
-  }
-
-  /**
    * OAuth client id, undefined when not configured.
    */
   private get clientId(): string | undefined {
@@ -338,24 +221,4 @@ export class FranceTravailSource implements JobSourceConnector {
   private get clientSecret(): string | undefined {
     return this.config.get('FT_CLIENT_SECRET', { infer: true });
   }
-}
-
-/**
-
- * Labels come as "76 - LE HAVRE" or plain "Le Havre"; keep only the town name.
-
- */
-function cityFromLabel(label: string | undefined): string | null {
-  if (!label) return null;
-  const name = label.replace(/^\s*\d{2,3}\s*-\s*/, '').trim();
-  if (!name) return null;
-  /* Most labels are fully uppercased, which reads badly in the UI. */
-  return name === name.toUpperCase()
-    ? name
-        .toLowerCase()
-        .replace(
-          /(^|[\s'-])([a-zà-ÿ])/g,
-          (_, sep: string, char: string) => sep + char.toUpperCase(),
-        )
-    : name;
 }

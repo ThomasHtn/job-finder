@@ -1,97 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { PreparedJob } from './job-preparer.js';
-
-/**
- * What happened to one prepared offer when it was written.
- */
-export type PersistOutcome = 'inserted' | 'updated' | 'merged';
-
-/**
- * Figures recorded on a finished IngestionRun.
- */
-export interface RunCounters {
-  /**
-   * Raw offers returned by the source.
-   */
-  fetched: number;
-
-  /**
-   * Offers that passed the filters.
-   */
-  kept: number;
-
-  /**
-   * Offers written for the first time.
-   */
-  inserted: number;
-
-  /**
-   * Offers already known from this source.
-   */
-  updated: number;
-}
-
-/**
- * Outcome of the last completed run of one source.
- */
-export interface FinishedRun {
-  /**
-   * When the run ended.
-   */
-  finishedAt: Date | null;
-
-  /**
-   * Failure message, null on success.
-   */
-  error: string | null;
-}
-
-/**
- * The columns of an existing offer that a merge reads.
- */
-interface Twin {
-  /**
-   * Database identifier of the twin.
-   */
-  id: string;
-
-  /**
-   * Current main link of the twin.
-   */
-  url: string;
-
-  /**
-   * Whether the twin already holds a full description.
-   */
-  hasFullDescription: boolean;
-
-  /**
-   * Links already collected from other sources.
-   */
-  alternativeUrls: string[];
-}
-
-/**
- * Decides what a merge changes on the twin: richest description wins, every link is kept.
- */
-export function planMerge(twin: Twin, job: PreparedJob) {
-  const upgrade = job.hasFullDescription && !twin.hasFullDescription;
-  const links = new Set([...twin.alternativeUrls, upgrade ? twin.url : job.url]);
-  links.delete(upgrade ? job.url : twin.url);
-
-  return {
-    alternativeUrls: [...links],
-    ...(upgrade
-      ? {
-          url: job.url,
-          description: job.description,
-          hasFullDescription: true,
-          sourceLabel: job.sourceLabel,
-        }
-      : {}),
-  };
-}
+import type {
+  FinishedRun,
+  PersistOutcome,
+  RunCounters,
+} from './ingestion.types.js';
+import type { PreparedJob } from './job-preparer.types.js';
+import { planMerge } from './plan-merge.js';
 
 /**
  * Every database access of the ingestion pipeline lives here.

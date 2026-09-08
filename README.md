@@ -7,7 +7,8 @@ détail et de rebondir vers l'annonce d'origine (pas de formulaire de recherche)
 - API NestJS + Prisma + PostgreSQL (`apps/api`), front Angular (`apps/web`), types partagés
   (`packages/shared`).
 - Trois onglets : zone de trajet, full remote, favoris.
-- Sources : France Travail et Adzuna (clés requises), ATS d'entreprises et EURES (sans clé).
+- Sources : France Travail et Adzuna (clés requises), ATS d'entreprises, EURES, APEC et
+  Free-Work (sans clé).
   Une source sans clé est simplement sautée. Les offres publiées sur plusieurs sources sont
   fusionnées, celles non revues depuis `INGESTION_STALE_DAYS` jours (30 par défaut) sont
   purgées sauf les favoris.
@@ -26,7 +27,7 @@ Clés API optionnelles : `FT_CLIENT_ID`/`FT_CLIENT_SECRET`
 
 La zone de trajet est un polygone isochrone figé dans le dépôt
 (`apps/api/src/geo/isochrone.geojson`). Après un changement de `SEARCH_AREA_CENTER` ou
-`SEARCH_AREA_DRIVE_MINUTES` : `npm run geo:isochrone` (nécessite `ORS_API_KEY`), puis
+`SEARCH_AREA_DRIVE_KM` : `npm run geo:isochrone` (nécessite `ORS_API_KEY`), puis
 commiter le fichier. Sans ce fichier, l'API retombe sur un rayon à vol d'oiseau.
 
 ## Lancement en local

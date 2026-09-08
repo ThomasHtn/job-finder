@@ -6,16 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import type { Request } from 'express';
-
-/**
- * Failed attempts tolerated per client before it is locked out.
- */
-export const MAX_ATTEMPTS = 5;
-
-/**
- * Sliding window over which the attempts are counted.
- */
-export const WINDOW_MS = 15 * 60 * 1000;
+import { MAX_ATTEMPTS, WINDOW_MS } from './login-throttle.constants.js';
 
 /**
  * Timestamps of the recent attempts of one client, oldest first.

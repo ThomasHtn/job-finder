@@ -1,29 +1,10 @@
 import type { SearchProfile } from '../config/search-profile.js';
-import type { Coordinates } from '../geo/commuting-area.js';
-import type { ResolvedLocation } from '../geo/ban-geocoder.js';
-import type { RawJob } from '../sources/source.types.js';
-import { detectPermanent, detectRemote, isWanted } from './classifier.js';
+import type { RawJob } from '../sources/raw-job.js';
+import { detectPermanent } from './classifier/detect-permanent.js';
+import { detectRemote } from './classifier/detect-remote.js';
+import { isWanted } from './classifier/is-wanted.js';
 import { computeDedupeHash } from './dedupe.js';
-
-/**
- * A raw offer that passed the filters, with its similarity key computed.
- */
-export type PreparedJob = RawJob & { dedupeHash: string };
-
-/**
- * The slice of GeoService the pipeline needs, so tests can fake it.
- */
-export interface GeoPort {
-  /**
-   * Free-form location to coordinates, null when unknown.
-   */
-  geocode(query: string): Promise<ResolvedLocation | null>;
-
-  /**
-   * True when the point is inside the commuting area.
-   */
-  isWithinArea(point: Coordinates): boolean;
-}
+import type { GeoPort, PreparedJob } from './job-preparer.types.js';
 
 /**
  * Applies the hard criteria. Returns null when the offer is out of scope.

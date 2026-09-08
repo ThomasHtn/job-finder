@@ -13,6 +13,8 @@ enum JobSourceType {
   ADZUNA
   ATS
   EURES
+  APEC
+  FREE_WORK
 }
 
 model Job {

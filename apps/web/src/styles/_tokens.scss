@@ -1,0 +1,69 @@
+/* Design tokens: the whole palette, both schemes. */
+
+:root {
+  color-scheme: light dark;
+
+  --font-sans:
+    'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+
+  --ground: #f1f2f5;
+  --surface: #ffffff;
+  --surface-sunken: #e6e8ed;
+  --surface-hover: #f7f8fa;
+
+  --ink: #14161a;
+  --ink-2: #565c66;
+  /* Tertiary still has to clear 4.5:1 on the ground: it carries real labels. */
+  --ink-3: #68707c;
+
+  --line: rgb(20 22 26 / 8%);
+  --line-strong: rgb(20 22 26 / 16%);
+
+  /* Port signal orange: reserved for positive attention (new, favourite, active). */
+  --signal: #e2551f;
+  --signal-ink: #b23f0f;
+  --signal-soft: rgb(226 85 31 / 10%);
+
+  --alert: #b3352a;
+  --alert-soft: rgb(179 53 42 / 9%);
+
+  --shadow-card: 0 1px 2px rgb(16 18 22 / 4%), 0 14px 30px -18px rgb(16 18 22 / 16%);
+  --shadow-thumb: 0 1px 1px rgb(16 18 22 / 5%), 0 3px 8px -2px rgb(16 18 22 / 14%);
+
+  --radius-card: 16px;
+  --radius-control: 11px;
+
+  /* Apple-ish deceleration: fast out, long settle. */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --frost: saturate(180%) blur(20px);
+
+  --content-width: 53rem;
+  --gutter: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0c0d10;
+    --surface: #17191d;
+    --surface-sunken: #23262b;
+    --surface-hover: #1e2126;
+
+    --ink: #f3f4f6;
+    --ink-2: #a4aab4;
+    --ink-3: #868d99;
+
+    --line: rgb(255 255 255 / 9%);
+    --line-strong: rgb(255 255 255 / 18%);
+
+    --signal: #f2612f;
+    --signal-ink: #ff8154;
+    --signal-soft: rgb(242 97 47 / 14%);
+
+    --alert: #e2685c;
+    --alert-soft: rgb(226 104 92 / 12%);
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%), 0 14px 30px -18px rgb(0 0 0 / 60%);
+    --shadow-thumb: 0 1px 2px rgb(0 0 0 / 40%), 0 3px 8px -2px rgb(0 0 0 / 50%);
+  }
+}

@@ -16,51 +16,24 @@ import { Router } from '@angular/router';
 import {
   JOB_TABS,
   toJobTab,
-  type JobCounts,
   type JobListResponse,
   type JobTab,
   type SourceStatus,
 } from '@job-finder/shared';
 import { map } from 'rxjs';
 import { AppConfigService } from '../../../core/app-config.service';
+import { describeHttpError } from '../../../core/http/describe-http-error';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { Icon } from '../../../shared/icon/icon';
 import { IngestionApi } from '../ingestion-api';
 import { JobRow } from '../job-row/job-row';
 import { JobsApi } from '../jobs-api';
-
-/**
- * How long the "N new offers" message stays next to the timestamp.
- */
-const REFRESH_MESSAGE_MS = 6000;
-
-/**
- * Label of the on-site tab until the config arrives.
- */
-const AREA_LABEL_PLACEHOLDER = 'Sur site';
-
-/**
- * Counts shown before the first response.
- */
-const NO_COUNTS: JobCounts = { local: 0, remote: 0, favorites: 0 };
-
-/**
- * Turns an HTTP failure into a message that says what actually went wrong.
- */
-function describeError(error: HttpErrorResponse): string {
-  if (error.status === 0) return "L'API est-elle démarrée ?";
-  if (error.status >= 500) return 'Le serveur a rencontré une erreur, réessayez plus tard.';
-  return `Erreur ${error.status}.`;
-}
-
-/**
- * "1 nouvelle offre" / "3 nouvelles offres".
- */
-function newOffersLabel(count: number): string {
-  if (count === 0) return 'Aucune nouvelle offre.';
-  const plural = count > 1 ? 's' : '';
-  return `${count} nouvelle${plural} offre${plural}.`;
-}
+import {
+  AREA_LABEL_PLACEHOLDER,
+  NO_COUNTS,
+  REFRESH_MESSAGE_MS,
+} from './job-list.constants';
+import { newOffersLabel } from './new-offers-label';
 
 /**
  * The feed: three tabs bound to the URL, manual refresh, and the "new since last visit" filter.
@@ -295,7 +268,7 @@ export class JobList {
         },
         error: (error: HttpErrorResponse) => {
           this.refreshing.set(false);
-          this.error.set(`Impossible de récupérer de nouvelles offres. ${describeError(error)}`);
+          this.error.set(`Impossible de récupérer de nouvelles offres. ${describeHttpError(error)}`);
         },
       });
   }
@@ -357,7 +330,7 @@ export class JobList {
           this.loading.set(false);
         },
         error: (error: HttpErrorResponse) => {
-          this.error.set(`Impossible de charger les offres. ${describeError(error)}`);
+          this.error.set(`Impossible de charger les offres. ${describeHttpError(error)}`);
           this.loading.set(false);
         },
       });

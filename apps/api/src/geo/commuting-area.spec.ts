@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { distanceKm, isWithinArea, loadIsochrone } from './commuting-area.js';
+import { distanceKm } from './distance-km.js';
+import { isWithinArea } from './is-within-area.js';
+import { loadIsochrone } from './load-isochrone.js';
 
 /**
  * Centre of the reference area.
