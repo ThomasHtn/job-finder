@@ -18,6 +18,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "geo:isochrone": "tsx scripts/generate-isochrone.ts",
+    "auth:set-password": "tsx scripts/set-password.ts",
     "lint": "oxlint src/ scripts/",
     "test": "vitest run",
     "test:watch": "vitest",

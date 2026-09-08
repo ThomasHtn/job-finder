@@ -2,41 +2,41 @@ import {
   BadRequestException,
   Body,
   Controller,
+  HttpCode,
   Post,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Env } from '../config/env.js';
+import { AuthService } from './auth.service.js';
 import { LoginThrottleGuard } from './login-throttle.guard.js';
 import { Public } from './public.decorator.js';
-import { secretsMatch } from './secret.js';
 
 /**
- * Password check used by the front before it stores the token.
+ * Login of the shared-password session.
  */
 @Controller('auth')
 export class AuthController {
   /**
-   * Only the environment is needed: there is no user store.
+   * Password and session store.
    */
-  constructor(private readonly config: ConfigService<Env, true>) {}
+  constructor(private readonly auth: AuthService) {}
 
   /**
-   * Validates the shared password. Always answers when no password is
-   * configured, since the guard lets everything through in that case too.
+   * Validates the password and returns the session token the front must send back.
    */
   @Public()
   @UseGuards(LoginThrottleGuard)
   @Post('login')
-  login(@Body('password') password: unknown): { ok: true } {
+  @HttpCode(200)
+  async login(@Body('password') password: unknown): Promise<{ token: string }> {
     if (typeof password !== 'string') {
       throw new BadRequestException('password must be a string');
     }
-    const expected = this.config.get('APP_PASSWORD', { infer: true });
-    if (expected && !secretsMatch(password, expected)) {
-      throw new UnauthorizedException('Wrong password');
+    if (!(await this.auth.isRequired())) {
+      throw new BadRequestException('No password configured');
     }
-    return { ok: true };
+    const token = await this.auth.login(password);
+    if (!token) throw new UnauthorizedException('Wrong password');
+    return { token };
   }
 }

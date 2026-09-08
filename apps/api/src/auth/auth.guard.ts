@@ -4,47 +4,44 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
-import type { Env } from '../config/env.js';
+import { AuthService } from './auth.service.js';
 import { IS_PUBLIC_KEY } from './public.decorator.js';
-import { secretsMatch } from './secret.js';
 
 /**
- * Header carrying the shared password on every protected request.
+ * Header carrying the session token on every protected request.
  */
 export const APP_TOKEN_HEADER = 'x-app-token';
 
 /**
- * Global guard: every route needs the app token unless marked @Public()
- * or unless no password is configured at all (open local dev).
+ * Global guard: every route needs a live session unless marked @Public()
+ * or unless no password has been set at all (open local dev).
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
   /**
-   * Reflector reads the @Public() metadata; config holds the expected password.
+   * Reflector reads the @Public() metadata; the service checks the session.
    */
   constructor(
     private readonly reflector: Reflector,
-    private readonly config: ConfigService<Env, true>,
+    private readonly auth: AuthService,
   ) {}
 
   /**
-   * Passes public routes and open deployments; otherwise the header must match.
+   * Passes public routes and open deployments; otherwise the token must match a session.
    */
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
     if (isPublic) return true;
 
-    const password = this.config.get('APP_PASSWORD', { infer: true });
-    if (!password) return true;
+    if (!(await this.auth.isRequired())) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
-    if (!secretsMatch(request.headers[APP_TOKEN_HEADER], password)) {
+    if (!(await this.auth.isValidToken(request.headers[APP_TOKEN_HEADER]))) {
       throw new UnauthorizedException('Invalid or missing app token');
     }
     return true;

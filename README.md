@@ -40,10 +40,11 @@ npm run dev        # API sur :3001, front sur :4201
 ```
 
 La base est vide au premier lancement (`INGESTION_ON_STARTUP=false` en dev), il faut lancer
-une première ingestion (header `x-app-token` seulement si `APP_PASSWORD` est renseigné) :
+une première ingestion (header `x-app-token` seulement si un mot de passe est défini, avec
+le jeton renvoyé par `POST /api/auth/login`) :
 
 ```bash
-curl -X POST -H "x-app-token: $APP_PASSWORD" http://localhost:3001/api/ingestion/run
+curl -X POST http://localhost:3001/api/ingestion/run
 ```
 
 ## Lancement avec Docker
@@ -91,8 +92,15 @@ npm run geo:isochrone  # régénère l'isochrone depuis le .env
 | `GET /api/ingestion/status` | état du dernier run de chaque source |
 | `GET /api/health` | état de l'API et de la base (public) |
 
-L'accès peut être protégé par un mot de passe unique (`APP_PASSWORD`) : le front affiche un
-écran de connexion et envoie le jeton dans le header `x-app-token`. Sans cette variable,
-aucune authentification. Le mot de passe doit faire au moins 8 caractères ; la comparaison
-est en temps constant et la route de connexion est limitée à 5 essais par quart d'heure et
-par adresse.
+L'accès peut être protégé par un mot de passe unique, stocké hashé (scrypt) en base :
+
+```bash
+npm run auth:set-password -- "mon-mot-de-passe"   # au moins 8 caractères
+npm run auth:set-password -- --clear              # retire le mot de passe : app ouverte
+```
+
+Sous Docker : `docker compose exec api npm run auth:set-password -- "..."`. Le front affiche
+alors un écran de connexion ; `POST /api/auth/login` renvoie un jeton de session aléatoire
+(valide 30 jours, stocké hashé en base) que le front envoie dans le header `x-app-token`.
+Changer le mot de passe révoque toutes les sessions. Sans mot de passe en base, aucune
+authentification. La route de connexion est limitée à 5 essais par quart d'heure et par adresse.

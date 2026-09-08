@@ -1,8 +1,7 @@
 import { Controller, Get, Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { AppConfig } from '@job-finder/shared';
+import { AuthService } from '../auth/auth.service.js';
 import { Public } from '../auth/public.decorator.js';
-import type { Env } from './env.js';
 import { SEARCH_PROFILE, type SearchProfile } from './search-profile.js';
 
 /**
@@ -11,10 +10,10 @@ import { SEARCH_PROFILE, type SearchProfile } from './search-profile.js';
 @Controller('config')
 export class ConfigController {
   /**
-   * Raw environment for the auth flag, search profile for the area label.
+   * Auth service for the login flag, search profile for the area label.
    */
   constructor(
-    private readonly config: ConfigService<Env, true>,
+    private readonly auth: AuthService,
     @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
   ) {}
 
@@ -23,10 +22,10 @@ export class ConfigController {
    */
   @Public()
   @Get()
-  get(): AppConfig {
+  async get(): Promise<AppConfig> {
     return {
       areaLabel: this.profile.area.label,
-      authRequired: Boolean(this.config.get('APP_PASSWORD', { infer: true })),
+      authRequired: await this.auth.isRequired(),
     };
   }
 }

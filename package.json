@@ -16,7 +16,8 @@
     "db:setup": "bash scripts/db-setup.sh",
     "db:migrate": "npm run db:migrate -w api",
     "db:studio": "npm run db:studio -w api",
-    "geo:isochrone": "npm run geo:isochrone -w api"
+    "geo:isochrone": "npm run geo:isochrone -w api",
+    "auth:set-password": "npm run auth:set-password -w api --"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -84,3 +84,20 @@ model IngestionRun {
 
   @@index([startedAt])
 }
+
+/// Single-row table holding the scrypt hash of the shared app password.
+/// No row means the app is open (no login screen).
+model AppPassword {
+  id        Int      @id @default(1)
+  hash      String
+  updatedAt DateTime @updatedAt
+}
+
+/// Login session. The browser holds the random token; only its SHA-256 is stored.
+model Session {
+  tokenHash String   @id
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

@@ -13,9 +13,9 @@ const STORAGE_KEY = 'job-finder-token';
  */
 interface LoginResponse {
   /**
-   * Always true: a wrong password answers 401 instead.
+   * Opaque session token to send back in the app token header.
    */
-  ok: true;
+  token: string;
 }
 
 /**
@@ -34,13 +34,14 @@ export class AuthService {
   readonly token = signal<string | null>(localStorage.getItem(STORAGE_KEY));
 
   /**
-   * Checks the password with the API and keeps it as the token on success.
+   * Checks the password with the API and keeps the returned session token.
+   * The password itself is never stored in the browser.
    */
   login(password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(apiUrl('auth/login'), { password }).pipe(
-      tap(() => {
-        localStorage.setItem(STORAGE_KEY, password);
-        this.token.set(password);
+      tap(({ token }) => {
+        localStorage.setItem(STORAGE_KEY, token);
+        this.token.set(token);
       }),
     );
   }

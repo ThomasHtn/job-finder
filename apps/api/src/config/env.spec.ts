@@ -42,16 +42,6 @@ describe('validateEnv', () => {
     expect(env.INGESTION_ON_STARTUP).toBe(false);
   });
 
-  it('refuses a short password but accepts an absent one', () => {
-    expect(() => validateEnv({ ...MINIMAL, APP_PASSWORD: 'abc' })).toThrow(
-      /APP_PASSWORD/,
-    );
-    expect(validateEnv({ ...MINIMAL, APP_PASSWORD: '' }).APP_PASSWORD).toBeUndefined();
-    expect(validateEnv({ ...MINIMAL, APP_PASSWORD: 'long-enough' }).APP_PASSWORD).toBe(
-      'long-enough',
-    );
-  });
-
   it('rejects malformed coordinates', () => {
     expect(() =>
       validateEnv({ ...MINIMAL, SEARCH_AREA_CENTER: 'Le Havre' }),

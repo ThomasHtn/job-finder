@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from '../auth/auth.module.js';
 import { ConfigController } from './config.controller.js';
 import { validateEnv, type Env } from './env.js';
 import { SEARCH_PROFILE } from './search-profile.js';
@@ -16,6 +17,8 @@ import { SEARCH_PROFILE } from './search-profile.js';
       envFilePath: ['../../.env'],
       validate: validateEnv,
     }),
+    /* The controller reports whether a password is set. */
+    AuthModule,
   ],
   controllers: [ConfigController],
   providers: [

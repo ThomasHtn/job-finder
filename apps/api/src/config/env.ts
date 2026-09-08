@@ -2,11 +2,6 @@ import { z } from 'zod';
 import type { SearchProfile } from './search-profile.js';
 
 /**
- * Shortest password accepted when one is configured.
- */
-const MIN_PASSWORD_LENGTH = 8;
-
-/**
  * "true"/"false" string, defaulting to false.
  */
 const booleanFromString = z
@@ -60,15 +55,6 @@ const rawSchema = z.object({
   DATABASE_URL: z.string().min(1),
   PORT: z.coerce.number().int().positive().default(3000),
   CORS_ORIGIN: z.string().default('http://localhost:4200'),
-
-  /**
-   * No password configured means the app stays open, same "skip if absent" pattern as the keys.
-   * When set, a trivially short value is refused rather than silently accepted.
-   */
-  APP_PASSWORD: optionalSecret.refine(
-    (value) => value === undefined || value.length >= MIN_PASSWORD_LENGTH,
-    `at least ${MIN_PASSWORD_LENGTH} characters when set`,
-  ),
 
   FT_CLIENT_ID: optionalSecret,
   FT_CLIENT_SECRET: optionalSecret,

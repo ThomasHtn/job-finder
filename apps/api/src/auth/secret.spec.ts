@@ -1,23 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { secretsMatch } from './secret.js';
+import { generateToken, hashPassword, hashToken, verifyPassword } from './secret.js';
 
 /**
- * Behaviour of the constant-time secret comparison.
+ * Behaviour of the password hashing and token helpers.
  */
-describe('secretsMatch', () => {
-  it('accepts the exact value', () => {
-    expect(secretsMatch('s3cret', 's3cret')).toBe(true);
+describe('password hashing', () => {
+  it('accepts the exact password and nothing else', () => {
+    const stored = hashPassword('s3cret-long');
+    expect(verifyPassword('s3cret-long', stored)).toBe(true);
+    expect(verifyPassword('s3cret-lon', stored)).toBe(false);
+    expect(verifyPassword('s3cret-long!', stored)).toBe(false);
+    expect(verifyPassword('', stored)).toBe(false);
   });
 
-  it('rejects a different value, whatever its length', () => {
-    expect(secretsMatch('s3cre', 's3cret')).toBe(false);
-    expect(secretsMatch('s3cret!', 's3cret')).toBe(false);
-    expect(secretsMatch('', 's3cret')).toBe(false);
+  it('salts: the same password gives different hashes', () => {
+    expect(hashPassword('s3cret-long')).not.toBe(hashPassword('s3cret-long'));
   });
 
-  it('rejects anything that is not a string', () => {
-    expect(secretsMatch(undefined, 's3cret')).toBe(false);
-    expect(secretsMatch(['s3cret'], 's3cret')).toBe(false);
-    expect(secretsMatch({ toString: () => 's3cret' }, 's3cret')).toBe(false);
+  it('rejects anything that is not a string or a malformed hash', () => {
+    const stored = hashPassword('s3cret-long');
+    expect(verifyPassword(undefined, stored)).toBe(false);
+    expect(verifyPassword(['s3cret-long'], stored)).toBe(false);
+    expect(verifyPassword('s3cret-long', 'plain')).toBe(false);
+  });
+});
+
+describe('session tokens', () => {
+  it('are random and hashed deterministically', () => {
+    const token = generateToken();
+    expect(token).toHaveLength(64);
+    expect(token).not.toBe(generateToken());
+    expect(hashToken(token)).toBe(hashToken(token));
+    expect(hashToken(token)).not.toBe(token);
   });
 });
