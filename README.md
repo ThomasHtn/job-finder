@@ -1,142 +1,215 @@
 # Job Finder
 
-Agrégateur personnel d'offres d'emploi en CDI. Le métier, les mots-clés et la zone de trajet
-sont décrits dans le `.env` : l'interface se contente de lister les offres, d'ouvrir leur
-détail et de rebondir vers l'annonce d'origine (pas de formulaire de recherche).
+**Votre veille emploi, déjà triée quand vous ouvrez l'application.**
 
-- API NestJS + Prisma + PostgreSQL (`apps/api`), front Angular (`apps/web`), types partagés
-  (`packages/shared`).
-- Trois onglets : zone de trajet, full remote, favoris.
-- Sources : France Travail et Adzuna (clés requises), ATS d'entreprises, EURES, APEC et
-  Free-Work (sans clé).
-  Une source sans clé est simplement sautée. Les offres publiées sur plusieurs sources sont
-  fusionnées, celles non revues depuis `INGESTION_STALE_DAYS` jours (30 par défaut) sont
-  purgées sauf les favoris.
-- L'ingestion tourne en cron (`INGESTION_CRON`, 2 h par défaut) et se déclenche aussi à la main.
+Un seul écran, uniquement des CDI, uniquement votre métier, uniquement là où vous acceptez
+d'aller travailler. Pas de formulaire, pas de filtres à re-cocher, pas d'alertes mail à
+trier : la sélection est faite avant que vous n'arriviez.
 
-## Configuration
+---
 
-Tout part du `.env` : `cp .env.example .env`, puis renseigner les clés et le profil de
-recherche. `.env.example` est commenté et contient un profil complet (développeur
-Angular/Java autour du Havre) qui sert de référence pour chaque variable.
+## Le problème
 
-Clés API optionnelles : `FT_CLIENT_ID`/`FT_CLIENT_SECRET`
-([francetravail.io](https://francetravail.io), souscrire à « Offres d'emploi v2 »),
-`ADZUNA_APP_ID`/`ADZUNA_APP_KEY` ([developer.adzuna.com](https://developer.adzuna.com)),
-`ORS_API_KEY` ([openrouteservice.org/dev](https://openrouteservice.org/dev)).
+Chercher un poste aujourd'hui, c'est répéter la même corvée site après site :
 
-La zone de trajet est un polygone isochrone figé dans le dépôt
-(`apps/api/src/geo/isochrone.geojson`). Après un changement de `SEARCH_AREA_CENTER` ou
-`SEARCH_AREA_DRIVE_KM` : `npm run geo:isochrone` (nécessite `ORS_API_KEY`), puis
-commiter le fichier. Sans ce fichier, l'API retombe sur un rayon à vol d'oiseau.
+> France Travail le matin, Adzuna le midi, l'APEC le soir, Free-Work quand on y pense,
+> et les pages « Carrières » des entreprises qu'on aimerait bien. Chaque fois : retaper le
+> métier, recocher « CDI », relimiter la zone, refaire défiler les mêmes annonces que
+> hier, tomber trois fois sur la même offre republiée par trois plateformes, et perdre
+> celle qu'on avait repérée la veille.
 
-## Lancement en local
+Une heure par jour de manutention, pour trois offres réellement nouvelles.
 
-Prérequis : Node >= 22 et un PostgreSQL installé sur la machine (pas de Docker en dev).
+## La réponse
+
+Job Finder fait cette tournée à votre place, toutes les deux heures, et ne garde que ce qui
+vous concerne :
+
+```
+  5 plateformes  ──┐
+                   ├──►  filtrage métier  ──►  filtrage CDI  ──►  filtrage zone  ──►  ┐
+ 46 sites carrière ┘                                                                  │
+                                                                                      ▼
+                                                              dédoublonnage entre sources
+                                                                                      │
+                                                                                      ▼
+                                                                    votre liste, déjà triée
+```
+
+Une annonce publiée sur trois plateformes n'apparaît qu'une fois, avec la description la
+plus complète des trois et les liens vers chaque version. Les offres qui disparaissent des
+sites disparaissent de votre liste. Vos favoris, eux, restent.
+
+## Ce que vous voyez
+
+Trois onglets, rien d'autre :
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Job Finder             Normandie · Full remote · Favoris (7) │
+│                                    Synchronisé il y a 40 min │
+├──────────────────────────────────────────────────────────────┤
+│ Développeur Full Stack Angular / Java             45 - 55 k€ │
+│ Doctolib · Rouen                                     [x] [*] │
+│ Rejoignez une équipe de 8 personnes sur le socle...          │
+│ Site carrière · il y a 2 h · NOUVEAU                         │
+├──────────────────────────────────────────────────────────────┤
+│ Ingénieur d'études logiciel (H/F)                            │
+│ Segula Technologies · Le Havre                       [x] [*] │
+│ Au sein du bureau d'études, vous participerez...             │
+│ France Travail · hier                                        │
+├──────────────────────────────────────────────────────────────┤
+│ Développeur Node.js — 100 % télétravail                      │
+│ Alan · Remote                                        [x] [*] │
+│ ...                                                          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+- **Normandie** (ou le nom de votre région) : les postes réellement accessibles depuis chez
+  vous, calculés en temps de trajet routier réel, pas en distance à vol d'oiseau.
+- **Full remote** : les postes 100 % à distance, où qu'ils soient.
+- **Favoris** : ce que vous avez mis de côté. Protégé, jamais purgé.
+
+Sur chaque ligne : le badge **NOUVEAU** sur ce qui est arrivé depuis votre dernière
+visite, une **étoile** (`[*]`) pour garder, une **croix** (`[x]`) pour ne plus jamais
+revoir l'annonce. Un clic ouvre le détail à côté de la liste, sans la faire disparaître ;
+un second clic vous envoie sur l'annonce d'origine pour postuler.
+
+## Une journée type
+
+| | |
+|---|---|
+| **8 h 02** | Vous ouvrez l'application depuis l'icône de votre écran d'accueil. |
+| **8 h 03** | 4 offres marquées NOUVEAU. Deux ne vous parlent pas : croix, croix. |
+| **8 h 05** | Une troisième vous intéresse : étoile. Vous postulez sur la quatrième. |
+| **8 h 06** | C'est fini. La veille de la journée est faite. |
+
+## Ce qui la distingue
+
+**Le filtre géographique est honnête.** La zone est un vrai contour de temps de trajet en
+voiture, pas un rayon de X km sur une carte. Un poste à 100 km par l'autoroute rentre, un
+poste à 60 km par des départementales ne rentre pas. Quand la source ne précise pas la
+commune, l'offre est gardée et signalée plutôt qu'écartée en silence.
+
+**Le tri est strict.** Les alternances, stages, missions freelance et postes de
+« business developer » ne franchissent jamais la porte. Une annonce qui ne mentionne aucune
+technologie de votre stack non plus.
+
+**Rien ne bouge sans vous.** Aucune candidature automatique, aucun message envoyé en votre
+nom, aucun profil déposé nulle part. L'application lit les offres publiques et vous les
+présente. Rien de plus.
+
+**C'est chez vous.** L'application tourne sur votre machine ou votre serveur, derrière un
+mot de passe unique. Vos favoris, vos offres masquées et votre historique ne quittent pas
+votre base de données. Aucun recruteur ne sait que vous regardez, aucun traqueur n'est
+chargé, aucune donnée n'est revendue.
+
+**Ça s'adapte à vous.** Le métier, les mots-clés, les technologies, la ville de référence et
+le rayon de trajet se décrivent en une page de configuration. Développeur Angular au Havre
+aujourd'hui, ingénieur d'affaires à Nantes demain : la même application, un fichier modifié.
+
+## Où elle vit
+
+Installée sur un serveur, elle s'ouvre depuis n'importe quel navigateur, sur ordinateur
+comme sur téléphone. Ajoutée à l'écran d'accueil, elle se comporte comme une application
+native : plein écran, sa propre icône, thème clair ou sombre selon votre système.
+
+## Les sources couvertes
+
+France Travail · Adzuna · APEC · EURES · Free-Work · et 46 sites carrière d'entreprises
+interrogés directement (Doctolib, Dataiku, Mirakl, Algolia, Alan, Qonto, Swile...).
+
+Une source indisponible ou non configurée est simplement sautée : les autres continuent de
+remplir la liste.
+
+---
+
+# Documentation technique
+
+Monorepo npm workspaces, Node >= 22 :
+
+| Workspace | Contenu |
+|---|---|
+| `apps/api` | NestJS 12 + Prisma 7 + PostgreSQL |
+| `apps/web` | Angular 22 (standalone, signals) |
+| `packages/shared` | les types d'API partagés par les deux (`@job-finder/shared`) |
+
+`packages/shared` est consommé compilé : `npm run build -w @job-finder/shared` doit avoir
+tourné au moins une fois avant le premier `npm run dev`.
+
+## Démarrer
+
+PostgreSQL sur la machine, pas de Docker en dev.
 
 ```bash
+cp .env.example .env   # clés + profil de recherche
 npm install
-npm run setup      # build du package partagé, création du rôle et de la base, migrations
-npm run dev        # API sur :3001, front sur :4201
+npm run setup          # build shared, création rôle + base, migrations
+npm run dev            # api :3001, web :4201
+curl -X POST http://localhost:3001/api/ingestion/run   # la base est vide au départ
 ```
-
-La base est vide au premier lancement (`INGESTION_ON_STARTUP=false` en dev), il faut lancer
-une première ingestion (header `x-app-token` seulement si un mot de passe est défini, avec
-le jeton renvoyé par `POST /api/auth/login`) :
 
 ```bash
-curl -X POST http://localhost:3001/api/ingestion/run
+npm run build                        # shared, puis api, puis web
+npm test / npm run test -w web       # tests api (vitest) / tests front
+npm run lint                         # oxlint sur l'api
+npm run db:migrate / npm run db:studio
+npm run geo:isochrone                # régénère la zone depuis le .env
+npm run auth:set-password -- <pwd>   # --clear pour retirer le mot de passe
 ```
 
-## Lancement avec Docker
+## Comment ça marche
+
+**Tout le domaine est dans le `.env`** (métier, mots-clés, stack, zone), validé par zod et
+exposé comme un `SearchProfile` injectable. Changer de métier ne demande aucun code.
+
+**Sources** (`apps/api/src/sources/`) : un contrat commun, `name` / `isEnabled()` /
+`fetchJobs(): Promise<RawJob[]>`. Clés absentes = source sautée, pas en échec. Les 46 boards
+ATS passent par un seul connecteur qui itère `sources/ats/companies.config.ts`.
+
+**Ingestion** (`ingestion/ingestion.service.ts`), sur cron et sur `POST /api/ingestion/run` :
+filtres (titre, stack, CDI, remote, zone) → upsert sur `(source, sourceId)`, avec fusion des
+doublons inter-sources via un `dedupeHash` (titre + entreprise + lieu) → purge des offres
+non revues depuis 30 jours, favoris exclus.
+
+**Zone de trajet** : un polygone isochrone généré une fois par OpenRouteService et commité
+(`geo/isochrone.geojson`), donc un simple point-in-polygon à l'ingestion. Le géocodage est
+caché en base, échecs compris.
+
+**Auth** : un seul mot de passe partagé, hashé (scrypt) en base, token de session dans le
+header `x-app-token`. Sans mot de passe en base, l'API passe tout en dev et répond 503 en
+production.
+
+**Front** : `job-list` porte les onglets et reste monté ; `job-detail` est une route enfant
+rendue dans son `<router-outlet>` (colonne ou feuille, décidé en CSS). Les changements faits
+dans le panneau remontent à la liste par `JobPatchBus` plutôt que par un rechargement.
+
+## Routes
+
+| Route | |
+|---|---|
+| `GET /api/config` | label de l'onglet local, présence d'un mot de passe (public) |
+| `POST /api/auth/login` | renvoie un token de session (public, 5 essais / 15 min) |
+| `GET /api/jobs?tab=local\|remote\|favorites` | liste + compteurs + dernière ingestion |
+| `GET /api/jobs/:id` | détail, marque l'offre consultée |
+| `PATCH /api/jobs/:id/favorite` · `/hide` | favori, masquage |
+| `POST /api/ingestion/run` · `GET /api/ingestion/status` | ingestion manuelle, état par source |
+| `GET /api/health` | api + base (public) |
+
+## Déploiement
+
+`docker-compose.yml` ne sert qu'au déployé : nginx sert le build Angular et proxifie `/api`.
+Migrations et première ingestion se lancent au démarrage du conteneur api.
 
 ```bash
-cp .env.example .env    # clés, profil, et un vrai POSTGRES_PASSWORD
-docker compose up -d --build
-```
-
-L'app est servie sur `http://localhost:8480` (`HTTP_PORT`). C'est le seul port publié, et
-seulement sur la loopback : l'API et PostgreSQL restent sur le réseau Docker du projet (deux
-blocs `ports` commentés dans `docker-compose.yml` permettent de les exposer ponctuellement).
-`CORS_ORIGIN` doit pointer vers l'URL réellement servie, port compris.
-
-Les migrations Prisma s'appliquent au démarrage du conteneur API et une première ingestion
-se lance toute seule (`INGESTION_ON_STARTUP=true`).
-
-Mise à jour : `git pull && docker compose up -d --build`.
-
-## Déploiement sur un serveur
-
-Le conteneur web n'écoute que sur `127.0.0.1:8480` : il faut un reverse proxy sur l'hôte
-pour terminer le TLS. Avec Caddy, qui obtient et renouvelle le certificat tout seul,
-`/etc/caddy/Caddyfile` tient en trois lignes :
-
-```
-jobs.exemple.fr {
-    reverse_proxy 127.0.0.1:8480
-}
-```
-
-Avec nginx + certbot à la place, le bloc `location /` doit poser
-`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` : c'est de cet en-tête que
-l'API tire l'adresse du client, dont dépend la limitation du nombre d'essais de connexion.
-
-Ordre du premier démarrage, le mot de passe étant à poser tout de suite :
-
-```bash
-cp .env.example .env                     # clés, profil, un vrai POSTGRES_PASSWORD,
-                                         # CORS_ORIGIN sur l'URL publique en https
+cp .env.example .env   # + vrai POSTGRES_PASSWORD, CORS_ORIGIN = URL publique https
 docker compose up -d --build
 docker compose exec api npm run auth:set-password -- "<mot de passe>"
 ```
 
-Tant qu'aucun mot de passe n'est en base, l'API déployée (`NODE_ENV=production`) répond 503
-sur toutes les routes protégées et le signale dans ses logs, plutôt que de servir l'app en
-accès libre. Seuls `/api/config`, `/api/auth/login` et `/api/health` restent publics.
+Seul `127.0.0.1:8480` est publié, donc un reverse proxy sur l'hôte termine le TLS (Caddy :
+`jobs.exemple.fr { reverse_proxy 127.0.0.1:8480 }`). Avec nginx, poser `X-Forwarded-For` :
+c'est de cet en-tête que dépend la limitation des essais de connexion.
 
-Côté machine, ouvrir uniquement 22, 80 et 443 (`ufw allow`), et garder `.env` en `chmod 600`.
-
-Une fois la base amorcée, `INGESTION_ON_STARTUP=false` évite de relancer une ingestion
-complète, et donc de consommer les quotas des sources, à chaque redémarrage du conteneur.
-
-## Commandes
-
-```bash
-npm run setup          # première installation : shared, rôle + base Postgres, migrations
-npm run dev            # API + front en watch
-npm run build          # build des trois workspaces
-npm test               # tests de l'API
-npm run test -w web    # tests du front
-npm run lint           # oxlint sur l'API
-npm run db:migrate     # migrations Prisma
-npm run db:studio      # explorateur de base Prisma
-npm run geo:isochrone  # régénère l'isochrone depuis le .env
-```
-
-## API
-
-| Route | Description |
-|---|---|
-| `GET /api/config` | label de l'onglet local et présence d'un mot de passe (public) |
-| `POST /api/auth/login` | vérifie le mot de passe (public) |
-| `GET /api/jobs?tab=local\|remote\|favorites` | liste avec compteurs et date de dernière ingestion |
-| `GET /api/jobs/:id` | détail, marque l'offre comme consultée |
-| `PATCH /api/jobs/:id/favorite` | bascule le favori |
-| `PATCH /api/jobs/:id/hide` | masque l'offre de tous les onglets |
-| `POST /api/ingestion/run` | déclenche une ingestion |
-| `GET /api/ingestion/status` | état du dernier run de chaque source |
-| `GET /api/health` | état de l'API et de la base (public) |
-
-L'accès peut être protégé par un mot de passe unique, stocké hashé (scrypt) en base :
-
-```bash
-npm run auth:set-password -- "mon-mot-de-passe"   # au moins 8 caractères
-npm run auth:set-password -- --clear              # retire le mot de passe : app ouverte
-```
-
-Sous Docker : `docker compose exec api npm run auth:set-password -- "..."`. Le front affiche
-alors un écran de connexion ; `POST /api/auth/login` renvoie un jeton de session aléatoire
-(valide 30 jours, stocké hashé en base) que le front envoie dans le header `x-app-token`.
-Changer le mot de passe révoque toutes les sessions. Sans mot de passe en base, l'app est
-ouverte en développement et refusée en production (503). La route de connexion est limitée à
-5 essais par quart d'heure et par adresse.
+Ensuite, repasser `INGESTION_ON_STARTUP=false` pour ne pas rejouer une ingestion complète à
+chaque redémarrage. Mise à jour : `git pull && docker compose up -d --build`.
