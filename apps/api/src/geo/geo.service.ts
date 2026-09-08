@@ -43,10 +43,12 @@ export class GeoService {
   }
 
   /**
-   * True when the point is inside the commuting area.
+   * True when the point is inside the commuting area. Without an isochrone, the configured
+   * drive doubles as the radius, so the fallback answers for the area actually asked for.
    */
   isWithinArea(point: Coordinates): boolean {
-    return isWithinArea(this.area, this.profile.area.center, point);
+    const { center, driveKm } = this.profile.area;
+    return isWithinArea(this.area, center, point, driveKm);
   }
 
   /**

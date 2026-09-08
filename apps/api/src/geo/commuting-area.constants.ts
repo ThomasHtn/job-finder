@@ -4,11 +4,6 @@
 export const ISOCHRONE_FILENAME = 'isochrone.geojson';
 
 /**
- * Straight-line stand-in for the driving time until the isochrone is generated.
- */
-export const FALLBACK_RADIUS_KM = 45;
-
-/**
  * Mean Earth radius used by the great-circle formula.
  */
 export const EARTH_RADIUS_KM = 6371;

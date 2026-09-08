@@ -30,6 +30,8 @@ function summary(overrides: Partial<JobSummary> = {}): JobSummary {
 }
 
 function create(job: JobSummary, previousVisitAt: string | null) {
+  /* Pinned, so the wording asserted below does not depend on the machine's browser language. */
+  localStorage.setItem('job-finder-locale', 'fr');
   TestBed.configureTestingModule({
     imports: [JobRow],
     providers: [provideRouter([]), { provide: LastVisitService, useValue: { previousVisitAt } }],

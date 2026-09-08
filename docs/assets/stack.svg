@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1210 520" width="1210" height="520" role="img" aria-label="Architecture : sources, api NestJS, PostgreSQL, web Angular et paquet partagé">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1210 520" width="1210" height="520" role="img" aria-label="Architecture: sources, NestJS api, PostgreSQL, Angular web and shared package">
   <style>
     text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     .bg { fill: #fbfcfd }
@@ -24,31 +24,31 @@
   <rect class="bg" width="1210" height="520" rx="26" />
 
   <rect x="470" y="56" width="340" height="66" rx="14" class="dash" />
-  <text class="ink2" x="640" y="97" font-size="21" text-anchor="middle">51 sources publiques</text>
+  <text class="ink2" x="640" y="97" font-size="21" text-anchor="middle">51 public sources</text>
   <path class="arrow" d="M640 130v34" />
   <path class="arrow" d="M634 158l6 6 6-6" />
-  <text class="ink3" x="658" y="152" font-size="17">toutes les 2 h</text>
+  <text class="ink3" x="658" y="152" font-size="17">every 2 h</text>
 
   <rect class="card" x="80" y="180" width="280" height="150" rx="16" />
   <rect x="80" y="180" width="280" height="150" rx="16" class="hair" />
   <text class="ink" x="112" y="224" font-size="23" font-weight="600" letter-spacing="-.3">apps/web</text>
-  <text class="ink3" x="112" y="254" font-size="18">Angular 22 et signals</text>
-  <text class="ink3" x="112" y="280" font-size="18">Trois onglets, un panneau</text>
-  <text class="ink3" x="112" y="306" font-size="18">Servi par Nginx</text>
+  <text class="ink3" x="112" y="254" font-size="18">Angular 22 and signals</text>
+  <text class="ink3" x="112" y="280" font-size="18">Three tabs, one panel</text>
+  <text class="ink3" x="112" y="306" font-size="18">Served by Nginx</text>
 
   <rect class="card" x="470" y="180" width="340" height="150" rx="16" />
   <rect x="470" y="180" width="340" height="150" rx="16" class="hair" />
   <text class="ink" x="502" y="224" font-size="23" font-weight="600" letter-spacing="-.3">apps/api</text>
-  <text class="ink3" x="502" y="254" font-size="18">NestJS 12 et Prisma 7</text>
-  <text class="ink3" x="502" y="280" font-size="18">Connecteurs, filtres, zone</text>
-  <text class="ink3" x="502" y="306" font-size="18">Mot de passe unique</text>
+  <text class="ink3" x="502" y="254" font-size="18">NestJS 12 and Prisma 7</text>
+  <text class="ink3" x="502" y="280" font-size="18">Connectors, filters, area</text>
+  <text class="ink3" x="502" y="306" font-size="18">Single password</text>
 
   <rect class="card" x="890" y="180" width="240" height="150" rx="16" />
   <rect x="890" y="180" width="240" height="150" rx="16" class="hair" />
   <text class="ink" x="922" y="224" font-size="23" font-weight="600" letter-spacing="-.3">PostgreSQL</text>
-  <text class="ink3" x="922" y="254" font-size="18">Offres et favoris</text>
+  <text class="ink3" x="922" y="254" font-size="18">Jobs and favorites</text>
   <text class="ink3" x="922" y="280" font-size="18">Sessions</text>
-  <text class="ink3" x="922" y="306" font-size="18">Cache de géocodage</text>
+  <text class="ink3" x="922" y="306" font-size="18">Geocoding cache</text>
 
   <path class="arrow" d="M372 255h76" />
   <path class="arrow" d="M442 249l6 6-6 6" />
@@ -62,5 +62,5 @@
   <path class="dash" d="M640 330v52" />
   <rect x="80" y="382" width="730" height="82" rx="16" class="dash" />
   <text class="ink" x="112" y="418" font-size="21" font-weight="600" letter-spacing="-.3">packages/shared</text>
-  <text class="ink3" x="112" y="446" font-size="18">Les types de l'API, compilés une fois et importés des deux côtés.</text>
+  <text class="ink3" x="112" y="446" font-size="18">The API types, compiled once and imported on both sides.</text>
 </svg>

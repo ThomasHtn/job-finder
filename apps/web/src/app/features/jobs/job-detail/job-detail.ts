@@ -16,6 +16,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import type { JobDetail as JobDetailDto } from '@job-finder/shared';
+import { I18n } from '../../../core/i18n/i18n.service';
 import { Viewport } from '../../../core/viewport';
 import { Icon } from '../../../shared/icon/icon';
 import { JobPatchBus } from '../job-patch-bus';
@@ -67,6 +68,11 @@ export class JobDetail {
   private readonly destroyRef = inject(DestroyRef);
 
   /**
+   * Wording of the language in use.
+   */
+  protected readonly t = inject(I18n).t;
+
+  /**
    * True on phones, where the panel is a sheet that can be dragged away.
    */
   protected readonly compact = inject(Viewport).isCompact;
@@ -111,7 +117,7 @@ export class JobDetail {
    */
   protected readonly place = computed(() => {
     const job = this.job();
-    return job ? detailPlaceLabel(job) : '';
+    return job ? detailPlaceLabel(job, this.t()) : '';
   });
 
   /**
@@ -204,9 +210,7 @@ export class JobDetail {
         },
         error: (error: HttpErrorResponse) => {
           this.error.set(
-            error.status === 404
-              ? 'Cette offre est introuvable.'
-              : 'Impossible de charger cette offre, réessayez plus tard.',
+            error.status === 404 ? this.t().detail.notFound : this.t().detail.loadFailed,
           );
           this.loading.set(false);
         },

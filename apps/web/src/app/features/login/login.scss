@@ -1,8 +1,15 @@
 .login {
+  position: relative;
   display: grid;
   place-items: center;
   min-height: 100dvh;
   padding: 1.5rem;
+
+  &__lang {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
 
   &__panel {
     width: 100%;

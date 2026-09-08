@@ -3,15 +3,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { I18n } from '../../core/i18n/i18n.service';
 import { Brand } from '../../shared/brand/brand';
 import { Icon } from '../../shared/icon/icon';
+import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 
 /**
  * Single-field password screen.
  */
 @Component({
   selector: 'app-login',
-  imports: [Brand, FormsModule, Icon],
+  imports: [Brand, FormsModule, Icon, LanguageToggle],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -31,6 +33,11 @@ export class Login {
    * Ends the request with the component.
    */
   private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * Wording of the language in use.
+   */
+  protected readonly t = inject(I18n).t;
 
   /**
    * Field value.
@@ -61,9 +68,7 @@ export class Login {
         next: () => this.router.navigateByUrl('/'),
         error: (error: { status?: number }) => {
           this.error.set(
-            error.status === 429
-              ? 'Trop de tentatives, réessayez dans quelques minutes.'
-              : 'Mot de passe incorrect.',
+            error.status === 429 ? this.t().login.throttled : this.t().login.wrongPassword,
           );
           this.loading.set(false);
         },

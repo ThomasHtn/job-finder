@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import type { Translations } from '../../core/i18n/translations';
 
 /**
  * Milliseconds in a minute, an hour and a day.
@@ -14,16 +15,17 @@ const DAY_MS = 24 * HOUR_MS;
 @Pipe({ name: 'syncLabel' })
 export class SyncLabelPipe implements PipeTransform {
   /**
-   * ISO date to its label; `now` is a parameter so tests are deterministic.
+   * ISO date to its label. The wording is an argument rather than an injection: a pure pipe
+   * only recomputes when its arguments change, and the language is one of them.
    */
-  transform(value: string | null, now: Date = new Date()): string {
-    if (!value) return 'Jamais synchronisé';
+  transform(value: string | null, text: Translations, now: Date = new Date()): string {
+    if (!value) return text.sync.never;
 
     const elapsed = now.getTime() - new Date(value).getTime();
-    if (elapsed < MINUTE_MS) return "À l'instant";
-    if (elapsed < HOUR_MS) return `Il y a ${Math.floor(elapsed / MINUTE_MS)} min`;
-    if (elapsed < DAY_MS) return `Il y a ${Math.floor(elapsed / HOUR_MS)} h`;
-    if (elapsed < 2 * DAY_MS) return 'Hier';
-    return `Le ${new Date(value).toLocaleDateString('fr-FR')}`;
+    if (elapsed < MINUTE_MS) return text.sync.justNow;
+    if (elapsed < HOUR_MS) return text.sync.minutesAgo(Math.floor(elapsed / MINUTE_MS));
+    if (elapsed < DAY_MS) return text.sync.hoursAgo(Math.floor(elapsed / HOUR_MS));
+    if (elapsed < 2 * DAY_MS) return text.sync.yesterday;
+    return text.sync.onDate(new Date(value).toLocaleDateString(text.tag));
   }
 }

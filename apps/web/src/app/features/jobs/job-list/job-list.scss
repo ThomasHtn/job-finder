@@ -37,10 +37,14 @@
   }
 
   &__stamp {
+    /* Truncates rather than pushing the buttons off a narrow screen. */
+    min-width: 0;
     margin: 0;
+    overflow: hidden;
     font-size: 0.8125rem;
     color: var(--ink-3);
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &__stamp-fresh {

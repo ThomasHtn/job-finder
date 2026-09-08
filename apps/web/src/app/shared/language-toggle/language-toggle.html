@@ -1,0 +1,10 @@
+<!-- The code names the language in use; the label, which is also the tooltip, names the switch. -->
+<button
+  type="button"
+  class="icon-btn lang"
+  [attr.aria-label]="label()"
+  [attr.title]="label()"
+  (click)="switchLanguage()"
+>
+  <span class="lang__code">{{ code() }}</span>
+</button>

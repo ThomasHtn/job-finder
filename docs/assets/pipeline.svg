@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" width="1400" height="520" role="img" aria-label="Entonnoir : 51 sources filtrées par métier, contrat, zone puis dédoublonnées">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" width="1400" height="520" role="img" aria-label="Funnel: 51 sources filtered by role, contract and area, then deduplicated">
   <style>
     text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     .bg { fill: #fbfcfd }
@@ -31,8 +31,8 @@
 
   <rect class="bg" width="1400" height="520" rx="26" />
 
-  <text class="ink" x="140" y="72" font-size="23" font-weight="600" letter-spacing="-.3">51 sources, toutes les deux heures</text>
-  <text class="ink3" x="140" y="98" font-size="17">5 plateformes et 46 sites carrière d'entreprises</text>
+  <text class="ink" x="140" y="72" font-size="23" font-weight="600" letter-spacing="-.3">51 sources, every two hours</text>
+  <text class="ink3" x="140" y="98" font-size="17">5 platforms and 46 company careers pages</text>
 
   <path class="funnel" d="M140 110 L1010 218 L1010 282 L140 390 Z" />
   <path class="edge" d="M140 110 L1010 218" />
@@ -54,16 +54,16 @@
   <path class="tick" d="M560 337.9V410" />
   <path class="tick" d="M780 310.5V410" />
   <path class="tick" d="M940 290.6V410" />
-  <text class="ink" x="340" y="437" font-size="20" text-anchor="middle">Votre métier</text>
-  <text class="ink" x="560" y="437" font-size="20" text-anchor="middle">CDI uniquement</text>
-  <text class="ink" x="780" y="437" font-size="20" text-anchor="middle">Zone de trajet</text>
-  <text class="ink" x="940" y="437" font-size="20" text-anchor="middle">Doublons</text>
-  <text class="ink3" x="140" y="480" font-size="17">Exemple d'une tournée : ce qui reste après chaque filtre.</text>
+  <text class="ink" x="340" y="437" font-size="20" text-anchor="middle">Your role</text>
+  <text class="ink" x="560" y="437" font-size="20" text-anchor="middle">Permanent only</text>
+  <text class="ink" x="780" y="437" font-size="20" text-anchor="middle">Commute area</text>
+  <text class="ink" x="940" y="437" font-size="20" text-anchor="middle">Duplicates</text>
+  <text class="ink3" x="140" y="480" font-size="17">One round, as an example: what is left after each filter.</text>
 
   <path class="arrow" d="M1022 250h26" />
   <path class="arrow" d="M1042 244l6 6-6 6" />
 
-  <text class="ink" x="1160" y="146" font-size="20" font-weight="600" text-anchor="middle">Votre liste</text>
+  <text class="ink" x="1160" y="146" font-size="20" font-weight="600" text-anchor="middle">Your list</text>
   <rect class="card" x="1060" y="170" width="200" height="190" rx="14" />
   <rect x="1060" y="170" width="200" height="190" rx="14" class="hair" />
   <rect class="acc" x="1084" y="198" width="96" height="7" rx="3.5" />

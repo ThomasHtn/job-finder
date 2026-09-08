@@ -5,10 +5,10 @@ import type { BanGeocoder } from './ban-geocoder.js';
 import { GeoService } from './geo.service.js';
 
 /**
- * Only the centre matters to these specs.
+ * Only the area matters to these specs.
  */
 const PROFILE = {
-  area: { center: { latitude: 49.4938, longitude: 0.1077 } },
+  area: { center: { latitude: 49.4938, longitude: 0.1077 }, driveKm: 100 },
 } as SearchProfile;
 
 /**

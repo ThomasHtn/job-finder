@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import type { Translations } from '../../core/i18n/translations';
 
 /**
  * Milliseconds in one day.
@@ -18,22 +19,22 @@ function startOfDay(date: Date): number {
 }
 
 /**
- * "Aujourd'hui", "Hier", "Il y a 3 jours", then the full date. The row's date slot needs no
- * "Publié" prefix: it repeats on every line and says nothing the position doesn't.
+ * "Today", "Yesterday", "3 days ago", then the full date. The row's date slot needs no
+ * "Published" prefix: it repeats on every line and says nothing the position doesn't.
  */
 @Pipe({ name: 'publishedLabel' })
 export class PublishedLabelPipe implements PipeTransform {
   /**
-   * ISO date to its label; `now` is a parameter so tests are deterministic.
+   * ISO date to its label; the wording is an argument so the language change reaches the pipe.
    */
-  transform(value: string | null, now: Date = new Date()): string {
+  transform(value: string | null, text: Translations, now: Date = new Date()): string {
     if (!value) return '';
     const published = new Date(value);
     const days = Math.round((startOfDay(now) - startOfDay(published)) / DAY_MS);
 
-    if (days <= 0) return "Aujourd'hui";
-    if (days === 1) return 'Hier';
-    if (days < RELATIVE_DAYS) return `Il y a ${days} jours`;
-    return published.toLocaleDateString('fr-FR');
+    if (days <= 0) return text.published.today;
+    if (days === 1) return text.published.yesterday;
+    if (days < RELATIVE_DAYS) return text.published.daysAgo(days);
+    return published.toLocaleDateString(text.tag);
   }
 }

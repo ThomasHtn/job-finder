@@ -1,16 +1,19 @@
 <!-- Centred panel with the single password field. -->
 <main class="login">
+  <!-- Reachable before the password: the screen has to read in the visitor's language too. -->
+  <app-language-toggle class="login__lang" />
+
   <div class="login__panel">
     <app-brand class="login__brand" />
 
-    <h1 class="login__title">Votre veille d'offres</h1>
-    <p class="login__lead">Entrez le mot de passe pour l'ouvrir.</p>
+    <h1 class="login__title">{{ t().login.title }}</h1>
+    <p class="login__lead">{{ t().login.lead }}</p>
 
     <!-- Submit on Enter or on the button. -->
     <form class="login__form" (ngSubmit)="submit()">
       <!-- Password field bound to the signal. -->
       <label class="login__field">
-        <span class="login__label">Mot de passe</span>
+        <span class="login__label">{{ t().login.password }}</span>
         <input
           class="login__input"
           type="password"
@@ -36,7 +39,7 @@
         type="submit"
         [disabled]="loading() || !password()"
       >
-        {{ loading() ? 'Vérification…' : 'Entrer' }}
+        {{ loading() ? t().login.checking : t().login.submit }}
       </button>
     </form>
   </div>

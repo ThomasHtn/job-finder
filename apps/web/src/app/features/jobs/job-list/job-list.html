@@ -1,21 +1,25 @@
 <!-- Header: who we are, when the sources were last read, and the way to read them again. -->
 <header class="head">
   <div class="head__row">
-    <app-brand />
+    <!-- The wordmark goes once the row has to hold two buttons: the mark alone still signs it. -->
+    <app-brand [showName]="!compact()" />
 
     <span class="head__spacer"></span>
 
     <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
     <p class="head__stamp u-num" aria-live="polite">
-      <span class="u-hidden-visually">Dernière synchronisation :</span>
+      <span class="u-hidden-visually">{{ t().head.lastSync }}</span>
       @if (refreshMessage(); as message) {
         <span class="head__stamp-fresh">{{ message }}</span>
       } @else if (refreshing()) {
-        Recherche en cours…
+        {{ t().head.searching }}
       } @else {
-        {{ lastIngestionAt() | syncLabel }}
+        {{ lastIngestionAt() | syncLabel: t() }}
       }
     </p>
+
+    <!-- Two languages, switched here rather than in a settings screen the app does not have. -->
+    <app-language-toggle />
 
     <!-- Manual ingestion; turns red when a source is down, spins while running. -->
     <button
@@ -23,7 +27,7 @@
       class="icon-btn head__refresh"
       [class.head__refresh--degraded]="sourcesDegraded()"
       [class.head__refresh--spinning]="refreshing()"
-      aria-label="Rechercher de nouvelles offres"
+      [attr.aria-label]="t().head.refresh"
       [attr.title]="sourceStatusLabel() || null"
       [disabled]="refreshing()"
       (click)="refreshJobs()"
@@ -58,9 +62,11 @@
         <span class="fresh__dot" aria-hidden="true"></span>
         <span class="fresh__text">
           <span class="u-num">{{ newCount() }}</span>
-          offre{{ newCount() > 1 ? 's' : '' }} depuis votre dernière visite
+          {{ t().feed.newSince(newCount()) }}
         </span>
-        <span class="fresh__action">{{ onlyNew() ? 'Tout afficher' : 'Voir' }}</span>
+        <span class="fresh__action">
+          {{ onlyNew() ? t().feed.showAll : t().feed.showOnlyNew }}
+        </span>
       </button>
     }
 
@@ -82,36 +88,34 @@
     @if (error(); as message) {
       <div class="empty">
         <p class="empty__title">{{ message }}</p>
-        <button type="button" class="btn btn--primary" (click)="reload()">Réessayer</button>
+        <button type="button" class="btn btn--primary" (click)="reload()">
+          {{ t().feed.retry }}
+        </button>
       </div>
     } @else if (jobs().length === 0 && !loading()) {
       <!-- Empty state, worded per tab and per filter. -->
       <div class="empty">
         @if (onlyNew()) {
-          <p class="empty__title">Rien de nouveau depuis votre dernière visite.</p>
-          <p class="empty__hint">Les offres déjà vues sont toujours là.</p>
+          <p class="empty__title">{{ t().feed.nothingNew }}</p>
+          <p class="empty__hint">{{ t().feed.nothingNewHint }}</p>
           <button type="button" class="btn" (click)="toggleOnlyNew()">
-            Voir toutes les offres
+            {{ t().feed.showEveryOffer }}
           </button>
         } @else if (currentTab() === 'favorites') {
-          <p class="empty__title">Aucun favori.</p>
-          <p class="empty__hint">Touchez l'étoile d'une offre pour la garder ici.</p>
+          <p class="empty__title">{{ t().feed.noFavorites }}</p>
+          <p class="empty__hint">{{ t().feed.noFavoritesHint }}</p>
         } @else {
           <p class="empty__title">
-            {{
-              currentTab() === 'remote'
-                ? 'Aucune offre en full remote.'
-                : "Aucune offre pour l'instant."
-            }}
+            {{ currentTab() === 'remote' ? t().feed.noRemote : t().feed.noOffers }}
           </p>
-          <p class="empty__hint">Interrogez les sources pour remplir la liste.</p>
+          <p class="empty__hint">{{ t().feed.noOffersHint }}</p>
           <button
             type="button"
             class="btn btn--primary"
             [disabled]="refreshing()"
             (click)="refreshJobs()"
           >
-            Rechercher des offres
+            {{ t().feed.fetchOffers }}
           </button>
         }
       </div>
@@ -135,7 +139,7 @@
     <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
 
     @if (!detailOpen()) {
-      <p class="panel__idle">Choisissez une offre pour la lire ici.</p>
+      <p class="panel__idle">{{ t().feed.idlePanel }}</p>
     }
   </aside>
 </div>

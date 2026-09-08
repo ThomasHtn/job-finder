@@ -12,7 +12,7 @@
     <button
       type="button"
       class="icon-btn sheet__close"
-      aria-label="Fermer l'offre"
+      [attr.aria-label]="t().detail.close"
       (click)="close()"
     >
       <app-icon [name]="compact() ? 'chevron-down' : 'dismiss'" />
@@ -25,7 +25,7 @@
         type="button"
         class="icon-btn sheet__star"
         [class.sheet__star--on]="job.isFavorite"
-        [attr.aria-label]="job.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        [attr.aria-label]="job.isFavorite ? t().row.removeFavorite : t().row.addFavorite"
         [attr.aria-pressed]="job.isFavorite"
         (click)="toggleFavorite()"
       >
@@ -43,31 +43,35 @@
   @if (error(); as message) {
     <div class="empty">
       <p class="empty__title">{{ message }}</p>
-      <button type="button" class="btn" (click)="close()">Revenir à la liste</button>
+      <button type="button" class="btn" (click)="close()">{{ t().detail.backToList }}</button>
     </div>
   } @else if (job(); as job) {
     <article class="offer">
       <!-- Title, company and place. -->
       <h1 class="offer__title">{{ job.title }}</h1>
       <p class="offer__meta">
-        <span class="offer__company">{{ job.company ?? 'Entreprise non précisée' }}</span>
+        <span class="offer__company">{{ job.company ?? t().row.unknownCompany }}</span>
         <span class="offer__place">{{ place() }}</span>
       </p>
 
       <!-- Key facts, on one band rather than in three boxes. -->
       <dl class="facts">
         <div class="facts__item">
-          <dt>Contrat</dt>
-          <dd>{{ job.contractLabel ?? 'CDI' }}</dd>
+          <dt>{{ t().detail.contract }}</dt>
+          <dd>{{ job.contractLabel ?? t().detail.defaultContract }}</dd>
         </div>
         <div class="facts__item">
-          <dt>Salaire</dt>
-          <dd>{{ job.salary ?? 'Non communiqué' }}</dd>
+          <dt>{{ t().detail.salary }}</dt>
+          <dd>{{ job.salary ?? t().detail.unknownSalary }}</dd>
         </div>
         <div class="facts__item">
-          <dt>Publiée le</dt>
+          <dt>{{ t().detail.publishedOn }}</dt>
           <dd class="u-num">
-            {{ job.publishedAt ? (job.publishedAt | date: 'dd/MM/yyyy') : 'Date inconnue' }}
+            {{
+              job.publishedAt
+                ? (job.publishedAt | date: t().detail.dateFormat)
+                : t().detail.unknownDate
+            }}
           </dd>
         </div>
       </dl>
@@ -76,17 +80,14 @@
       @if (!job.hasFullDescription) {
         <p class="notice">
           <app-icon name="info" />
-          <span
-            >Cette source ne publie qu'un extrait. L'annonce complète est sur le site
-            d'origine.</span
-          >
+          <span>{{ t().detail.excerptOnly }}</span>
         </p>
       }
 
       <!-- The ad itself. -->
       @if (job.description) {
         <section class="offer__section">
-          <h2 class="u-section-title">L'offre</h2>
+          <h2 class="u-section-title">{{ t().detail.offerSection }}</h2>
           <app-prose [text]="job.description" />
         </section>
       }
@@ -94,7 +95,7 @@
       <!-- Company presentation, when the source separates it. -->
       @if (job.companyDescription) {
         <section class="offer__section">
-          <h2 class="u-section-title">L'entreprise</h2>
+          <h2 class="u-section-title">{{ t().detail.companySection }}</h2>
           <app-prose [text]="job.companyDescription" />
         </section>
       }
@@ -102,7 +103,7 @@
       <!-- Same offer on other boards, listed by host. -->
       @if (alternatives().length) {
         <section class="offer__section">
-          <h2 class="u-section-title">Également publiée sur</h2>
+          <h2 class="u-section-title">{{ t().detail.alsoPublishedOn }}</h2>
           <ul class="offer__alternatives">
             @for (alternative of alternatives(); track alternative.url) {
               <li>
@@ -128,7 +129,7 @@
 @if (job(); as job) {
   <footer class="sheet__foot">
     <a class="btn btn--primary sheet__apply" [href]="job.url" target="_blank" rel="noopener">
-      Voir l'offre sur {{ job.sourceLabel }}
+      {{ t().detail.applyOn(job.sourceLabel) }}
       <app-icon name="external" />
     </a>
   </footer>

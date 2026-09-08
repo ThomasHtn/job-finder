@@ -12,10 +12,10 @@
 
   <!-- Company and place; region-only offers say so. -->
   <p class="job-row__meta">
-    <span class="job-row__company">{{ job().company ?? 'Entreprise non précisée' }}</span>
+    <span class="job-row__company">{{ job().company ?? t().row.unknownCompany }}</span>
     <span class="job-row__place">{{ place() }}</span>
     @if (job().isLocationApproximate && !job().isRemote) {
-      <span class="job-row__note">commune non précisée</span>
+      <span class="job-row__note">{{ t().row.approximateCity }}</span>
     }
   </p>
 
@@ -30,9 +30,9 @@
     @if (contract(); as contract) {
       <span class="job-row__contract">{{ contract }}</span>
     }
-    <span class="job-row__date">{{ job().publishedAt | publishedLabel }}</span>
+    <span class="job-row__date">{{ job().publishedAt | publishedLabel: t() }}</span>
     @if (isNew()) {
-      <span class="job-row__new">Nouveau</span>
+      <span class="job-row__new">{{ t().row.new }}</span>
     }
   </p>
 </div>
@@ -43,7 +43,7 @@
   <button
     type="button"
     class="icon-btn job-row__hide"
-    aria-label="Pas intéressé, masquer cette offre"
+    [attr.aria-label]="t().row.hide"
     (click)="hide($event)"
   >
     <app-icon name="dismiss" />
@@ -52,7 +52,7 @@
   <button
     type="button"
     class="icon-btn job-row__star"
-    [attr.aria-label]="job().isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+    [attr.aria-label]="job().isFavorite ? t().row.removeFavorite : t().row.addFavorite"
     [attr.aria-pressed]="job().isFavorite"
     (click)="toggleFavorite($event)"
   >

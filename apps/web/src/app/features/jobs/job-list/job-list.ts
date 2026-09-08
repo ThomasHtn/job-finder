@@ -22,10 +22,12 @@ import {
 import { filter, map } from 'rxjs';
 import { AppConfigService } from '../../../core/app-config.service';
 import { describeHttpError } from '../../../core/http/describe-http-error';
+import { I18n } from '../../../core/i18n/i18n.service';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { Viewport } from '../../../core/viewport';
 import { Brand } from '../../../shared/brand/brand';
 import { Icon } from '../../../shared/icon/icon';
+import { LanguageToggle } from '../../../shared/language-toggle/language-toggle';
 import { detailIdFromUrl } from '../detail-id-from-url';
 import { IngestionApi } from '../ingestion-api';
 import { JobPatchBus } from '../job-patch-bus';
@@ -34,15 +36,14 @@ import { JobTabs } from '../job-tabs/job-tabs';
 import type { JobTabItem } from '../job-tabs/job-tab-item';
 import { JobsApi } from '../jobs-api';
 import { SyncLabelPipe } from '../sync-label.pipe';
-import { AREA_LABEL_PLACEHOLDER, NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
-import { newOffersLabel } from './new-offers-label';
+import { NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
 
 /**
  * The shell: the feed, its three tabs, and the panel one offer opens into.
  */
 @Component({
   selector: 'app-job-list',
-  imports: [Brand, Icon, JobRow, JobTabs, RouterOutlet, SyncLabelPipe],
+  imports: [Brand, Icon, JobRow, JobTabs, LanguageToggle, RouterOutlet, SyncLabelPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.html',
   styleUrl: './job-list.scss',
@@ -79,6 +80,11 @@ export class JobList {
   private readonly destroyRef = inject(DestroyRef);
 
   /**
+   * Wording of the language in use; every string of the template comes from it.
+   */
+  protected readonly t = inject(I18n).t;
+
+  /**
    * True on phones: tabs move to the bottom bar and the detail opens as a sheet.
    */
   protected readonly compact = inject(Viewport).isCompact;
@@ -110,13 +116,13 @@ export class JobList {
   protected readonly detailOpen = signal(false);
 
   /**
-   * Name of the on-site tab, from the API config.
+   * Name of the on-site tab, from the API config; null until it arrives.
    */
-  private readonly areaLabel = toSignal(
+  private readonly areaLabel = toSignal<string | null>(
     inject(AppConfigService)
       .load()
-      .pipe(map((config) => config.areaLabel)),
-    { initialValue: AREA_LABEL_PLACEHOLDER },
+      .pipe(map((config): string | null => config.areaLabel)),
+    { initialValue: null },
   );
 
   /**
@@ -177,11 +183,24 @@ export class JobList {
   /**
    * The tab strip entries: where they lead, how they read, how many offers they hold.
    */
-  protected readonly tabItems = computed<JobTabItem[]>(() => [
-    { tab: 'local', label: this.areaLabel(), count: this.counts().local, icon: 'pin' },
-    { tab: 'remote', label: 'Full remote', count: this.counts().remote, icon: 'remote' },
-    { tab: 'favorites', label: 'Favoris', count: this.counts().favorites, icon: 'star' },
-  ]);
+  protected readonly tabItems = computed<JobTabItem[]>(() => {
+    const text = this.t();
+    return [
+      {
+        tab: 'local',
+        label: this.areaLabel() ?? text.tabs.areaPlaceholder,
+        count: this.counts().local,
+        icon: 'pin',
+      },
+      { tab: 'remote', label: text.tabs.remote, count: this.counts().remote, icon: 'remote' },
+      {
+        tab: 'favorites',
+        label: text.tabs.favorites,
+        count: this.counts().favorites,
+        icon: 'star',
+      },
+    ];
+  });
 
   /**
    * Every offer of the current tab, before the "new" filter.
@@ -220,14 +239,15 @@ export class JobList {
   protected readonly sourcesDegraded = computed(() => this.failedSources().length > 0);
 
   /**
-   * e.g. "3/4 sources disponibles" plus the down ones, shown as the refresh button's tooltip.
+   * e.g. "3/4 sources available" plus the down ones, shown as the refresh button's tooltip.
    */
   protected readonly sourceStatusLabel = computed(() => {
     const enabled = this.sourceStatus().filter((status) => status.enabled);
     if (enabled.length === 0) return '';
+    const text = this.t();
     const down = this.failedSources().map((status) => status.source);
-    const summary = `${enabled.length - down.length}/${enabled.length} sources disponibles`;
-    return down.length ? `${summary} - en échec : ${down.join(', ')}` : summary;
+    const summary = text.feed.sourcesAvailable(enabled.length - down.length, enabled.length);
+    return down.length ? text.feed.sourcesFailed(summary, down.join(', ')) : summary;
   });
 
   /**
@@ -300,18 +320,16 @@ export class JobList {
           this.refreshing.set(false);
           this.reload();
           this.loadStatus();
-          this.showRefreshMessage(newOffersLabel(summary.inserted));
+          this.showRefreshMessage(this.t().feed.newOffers(summary.inserted));
           if (summary.failedSources.length) {
             this.sourceWarning.set(
-              `Source(s) indisponible(s) : ${summary.failedSources.join(', ')}.`,
+              this.t().feed.sourcesUnavailable(summary.failedSources.join(', ')),
             );
           }
         },
         error: (error: HttpErrorResponse) => {
           this.refreshing.set(false);
-          this.error.set(
-            `Impossible de récupérer de nouvelles offres. ${describeHttpError(error)}`,
-          );
+          this.error.set(this.t().feed.refreshFailed(describeHttpError(error, this.t())));
         },
       });
   }
@@ -388,7 +406,7 @@ export class JobList {
           this.loading.set(false);
         },
         error: (error: HttpErrorResponse) => {
-          this.error.set(`Impossible de charger les offres. ${describeHttpError(error)}`);
+          this.error.set(this.t().feed.loadFailed(describeHttpError(error, this.t())));
           this.loading.set(false);
         },
       });

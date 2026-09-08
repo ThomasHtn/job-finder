@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { JobSummary } from '@job-finder/shared';
+import { I18n } from '../../../core/i18n/i18n.service';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { Icon } from '../../../shared/icon/icon';
 import { rowPlaceLabel } from '../place-label';
@@ -29,6 +30,11 @@ export class JobRow {
    * Previous visit timestamp, for the "new" badge.
    */
   private readonly lastVisit = inject(LastVisitService);
+
+  /**
+   * Wording of the language in use.
+   */
+  protected readonly t = inject(I18n).t;
 
   /**
    * The offer to render.
@@ -69,7 +75,7 @@ export class JobRow {
   /**
    * "76 - LE HAVRE" like France Travail, or the closest the source allows.
    */
-  protected readonly place = computed(() => rowPlaceLabel(this.job()));
+  protected readonly place = computed(() => rowPlaceLabel(this.job(), this.t()));
 
   /**
    * Star pressed. The whole row is a link: the star must not open the detail.

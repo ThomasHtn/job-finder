@@ -51,6 +51,8 @@ describe('JobList', () => {
   let http: HttpTestingController;
 
   beforeEach(async () => {
+    /* Pinned, so the wording asserted below does not depend on the machine's browser language. */
+    localStorage.setItem('job-finder-locale', 'fr');
     await TestBed.configureTestingModule({
       imports: [JobList],
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
@@ -206,6 +208,25 @@ describe('JobList', () => {
 
     expect(fixture.nativeElement.textContent).toContain('indisponible');
     expect(fixture.nativeElement.textContent).toContain('ADZUNA');
+  });
+
+  it('renders the whole shell in the language picked from the header', () => {
+    const fixture = create();
+    http.expectOne((req) => req.url === '/api/jobs').flush(response([summary()]));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Favoris');
+
+    (fixture.nativeElement.querySelector('.lang') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('Favorites');
+    expect(text).not.toContain('Favoris');
+    expect(fixture.nativeElement.querySelector('.head__refresh').getAttribute('aria-label')).toBe(
+      'Search for new offers',
+    );
+    expect(localStorage.getItem('job-finder-locale')).toBe('en');
   });
 
   it('shows a message when the API is unreachable', () => {
