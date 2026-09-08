@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
 import { normalize } from '../common/text.js';
 
-/** Strips gender markers, bracketed suffixes and punctuation, which vary between boards. */
+/**
+ * Strips gender markers, bracketed suffixes and punctuation, which vary between boards.
+ */
 function slugify(value: string | null | undefined): string {
   if (!value) return '';
   return normalize(value)

@@ -1,18 +1,30 @@
 import { z } from 'zod';
 import type { SearchProfile } from './search-profile.js';
 
+/**
+ * Shortest password accepted when one is configured.
+ */
+const MIN_PASSWORD_LENGTH = 8;
+
+/**
+ * "true"/"false" string, defaulting to false.
+ */
 const booleanFromString = z
   .enum(['true', 'false'])
   .default('false')
   .transform((value) => value === 'true');
 
-/** Optional credentials: a source with missing keys is skipped instead of failing the run. */
+/**
+ * Optional credentials: a source with missing keys is skipped instead of failing the run.
+ */
 const optionalSecret = z
   .string()
   .optional()
   .transform((value) => (value?.trim() ? value.trim() : undefined));
 
-/** Comma-separated list; entries are trimmed and blanks dropped. */
+/**
+ * Comma-separated list; entries are trimmed and blanks dropped.
+ */
 const csvList = z
   .string()
   .default('')
@@ -23,11 +35,16 @@ const csvList = z
       .filter(Boolean),
   );
 
+/**
+ * Comma-separated list that must hold at least one entry.
+ */
 const requiredCsvList = csvList.pipe(
   z.array(z.string()).min(1, 'at least one entry'),
 );
 
-/** "lat,lng" in decimal degrees. */
+/**
+ * "lat,lng" in decimal degrees.
+ */
 const coordinates = z
   .string()
   .regex(/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/, 'expected "lat,lng"')
@@ -36,13 +53,22 @@ const coordinates = z
     return { latitude, longitude };
   });
 
+/**
+ * Every variable read from the environment, before derivation.
+ */
 const rawSchema = z.object({
   DATABASE_URL: z.string().min(1),
   PORT: z.coerce.number().int().positive().default(3000),
   CORS_ORIGIN: z.string().default('http://localhost:4200'),
 
-  /** No password configured means the app stays open, same "skip if absent" pattern as the keys. */
-  APP_PASSWORD: optionalSecret,
+  /**
+   * No password configured means the app stays open, same "skip if absent" pattern as the keys.
+   * When set, a trivially short value is refused rather than silently accepted.
+   */
+  APP_PASSWORD: optionalSecret.refine(
+    (value) => value === undefined || value.length >= MIN_PASSWORD_LENGTH,
+    `at least ${MIN_PASSWORD_LENGTH} characters when set`,
+  ),
 
   FT_CLIENT_ID: optionalSecret,
   FT_CLIENT_SECRET: optionalSecret,
@@ -65,9 +91,15 @@ const rawSchema = z.object({
 
   INGESTION_CRON: z.string().default('0 0 */2 * * *'),
   INGESTION_ON_STARTUP: booleanFromString,
+  /**
+   * Offers not seen for this many days are purged, favourites excepted.
+   */
+  INGESTION_STALE_DAYS: z.coerce.number().int().positive().default(30),
 });
 
-/** The SEARCH_* variables are exposed as one typed object, see `SearchProfile`. */
+/**
+ * The SEARCH_* variables are exposed as one typed object, see `SearchProfile`.
+ */
 export const envSchema = rawSchema.transform((raw) => ({
   ...raw,
   searchProfile: {
@@ -87,8 +119,14 @@ export const envSchema = rawSchema.transform((raw) => ({
   } satisfies SearchProfile,
 }));
 
+/**
+ * Validated environment as injected through ConfigService.
+ */
 export type Env = z.infer<typeof envSchema>;
 
+/**
+ * Parses the environment and fails fast with every problem listed at once.
+ */
 export function validateEnv(raw: Record<string, unknown>): Env {
   const result = envSchema.safeParse(raw);
   if (!result.success) {

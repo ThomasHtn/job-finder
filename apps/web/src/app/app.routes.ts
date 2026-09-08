@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 
+/**
+ * Three screens, all lazy: login, the feed, and one offer.
+ */
 export const routes: Routes = [
   {
     path: 'login',

@@ -2,7 +2,9 @@ import { normalize } from '../common/text.js';
 import type { SearchProfile } from '../config/search-profile.js';
 import type { RawJob } from '../sources/source.types.js';
 
-/** Wording used by sources to flag a fully remote position. */
+/**
+ * Wording used by sources to flag a fully remote position.
+ */
 const REMOTE_PATTERNS = [
   'teletravail total',
   'teletravail complet',
@@ -17,16 +19,33 @@ const REMOTE_PATTERNS = [
   'totalement a distance',
 ] as const;
 
-/** Words that flip a remote mention, as in "pas de full remote" or "no remote work". */
+/**
+ * Words that flip a remote mention, as in "pas de full remote" or "no remote work".
+ */
 const NEGATION_BEFORE =
   /(\bpas (de |d'|d |en )?|\bsans |\baucune? |\bni |\bnon? |\bnot )$/;
 
+/**
+ * Characters inspected before a remote mention when looking for a negation.
+ */
+const NEGATION_LOOKBEHIND = 12;
+
+/**
+ * Wording of every contract that is not a permanent hire.
+ */
 const NON_PERMANENT =
   /\bcdd\b|\binterim\b|\bstage\b|\bstagiaire\b|\balternance\b|\bapprenti|\bfreelance\b|\bintern\b|internship|working student|fixed[ -]?term|temporary|\bcontractor\b|duree determinee|part[ -]?time/;
 
-/** English boards say "Full-time" or "Unlimited Contract" where French ones say CDI. */
+/**
+ * English boards say "Full-time" or "Unlimited Contract" where French ones say CDI.
+ */
 const PERMANENT =
   /\bcdi\b|permanent|unlimited contract|duree indeterminee|full[ -]?time|temps plein/;
+
+/**
+ * Below this length a truncated description has nothing to check the stack against.
+ */
+const THIN_DESCRIPTION_LENGTH = 40;
 
 /**
  * Word-boundary match for plain keywords, so "java" does not match "javascript".
@@ -43,16 +62,19 @@ function keywordRegex(keyword: string): RegExp {
     : new RegExp(escaped, 'g');
 }
 
+/**
+ * True when the normalized text contains the keyword.
+ */
 function matchesKeyword(text: string, keyword: string): boolean {
   return keywordRegex(keyword).test(text);
 }
 
+/**
+ * True when the normalized text contains at least one of the keywords.
+ */
 function matchesAny(text: string, keywords: readonly string[]): boolean {
   return keywords.some((keyword) => matchesKeyword(text, keyword));
 }
-
-/** Below this length a truncated description has nothing to check the stack against. */
-const THIN_DESCRIPTION_LENGTH = 40;
 
 /**
  * True when the offer is the trade described by the profile: the title looks
@@ -87,7 +109,10 @@ export function detectRemote(job: RawJob): boolean {
     [...haystack.matchAll(keywordRegex(pattern))].some(
       (match) =>
         !NEGATION_BEFORE.test(
-          haystack.slice(Math.max(0, match.index - 12), match.index),
+          haystack.slice(
+            Math.max(0, match.index - NEGATION_LOOKBEHIND),
+            match.index,
+          ),
         ),
     ),
   );
@@ -107,7 +132,9 @@ export function permanentFromLabel(
   return null;
 }
 
-/** Falls back to reading the text when the source does not state the contract type. */
+/**
+ * Falls back to reading the text when the source does not state the contract type.
+ */
 export function detectPermanent(job: RawJob): boolean {
   if (job.isPermanent !== null) return job.isPermanent;
 

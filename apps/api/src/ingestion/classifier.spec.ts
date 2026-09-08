@@ -8,6 +8,9 @@ import {
   permanentFromLabel,
 } from './classifier.js';
 
+/**
+ * Profile of the classifier specs, wider than the shared fixture on purpose.
+ */
 const PROFILE: SearchProfile = {
   keywords: ['développeur'],
   romeCode: null,
@@ -29,6 +32,9 @@ const PROFILE: SearchProfile = {
   },
 };
 
+/**
+ * Raw offer with a matching title and nothing else.
+ */
 function job(overrides: Partial<RawJob>): RawJob {
   return {
     source: 'FRANCE_TRAVAIL',
@@ -55,6 +61,9 @@ function job(overrides: Partial<RawJob>): RawJob {
   };
 }
 
+/**
+ * Trade and stack matching.
+ */
 describe('isWanted', () => {
   it('keeps a developer role mentioning a wanted technology', () => {
     expect(
@@ -140,6 +149,9 @@ describe('isWanted', () => {
   });
 });
 
+/**
+ * Full-remote detection from the wording.
+ */
 describe('detectRemote', () => {
   it('trusts the source flag', () => {
     expect(detectRemote(job({ isRemote: true }))).toBe(true);
@@ -187,6 +199,9 @@ describe('detectRemote', () => {
   });
 });
 
+/**
+ * Contract labels of the ATS boards.
+ */
 describe('permanentFromLabel', () => {
   it('reads French and English permanent labels', () => {
     expect(permanentFromLabel('CDI')).toBe(true);
@@ -204,6 +219,9 @@ describe('permanentFromLabel', () => {
   });
 });
 
+/**
+ * Permanent-contract detection with text fallback.
+ */
 describe('detectPermanent', () => {
   it('trusts the source when it states the contract', () => {
     expect(detectPermanent(job({ isPermanent: true }))).toBe(true);

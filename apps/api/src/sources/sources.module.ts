@@ -8,7 +8,9 @@ import {
   type JobSourceConnector,
 } from './source.types.js';
 
-/** One connector per source; the ingestion iterates over the list without knowing them. */
+/**
+ * One connector per source; the ingestion iterates over the list without knowing them.
+ */
 @Module({
   providers: [
     FranceTravailSource,

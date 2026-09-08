@@ -7,6 +7,9 @@ import { IngestionModule } from './ingestion/ingestion.module.js';
 import { JobsModule } from './jobs/jobs.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
+/**
+ * Root module: configuration and database are global, the rest is one module per feature.
+ */
 @Module({
   imports: [
     AppConfigModule,

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { excerpt } from './job.mapper.js';
 
+/**
+ * Feed excerpt derived from the full description.
+ */
 describe('excerpt', () => {
   it('returns null without a description', () => {
     expect(excerpt(null)).toBeNull();

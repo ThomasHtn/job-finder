@@ -1,7 +1,18 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+/**
+ * Milliseconds in one day.
+ */
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Days below which the label counts rather than dates.
+ */
+const RELATIVE_DAYS = 7;
+
+/**
+ * Local midnight of the date, as a timestamp.
+ */
 function startOfDay(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
@@ -12,6 +23,9 @@ function startOfDay(date: Date): number {
  */
 @Pipe({ name: 'publishedLabel' })
 export class PublishedLabelPipe implements PipeTransform {
+  /**
+   * ISO date to its label; `now` is a parameter so tests are deterministic.
+   */
   transform(value: string | null, now: Date = new Date()): string {
     if (!value) return '';
     const published = new Date(value);
@@ -19,7 +33,7 @@ export class PublishedLabelPipe implements PipeTransform {
 
     if (days <= 0) return "Aujourd'hui";
     if (days === 1) return 'Hier';
-    if (days < 7) return `Il y a ${days} jours`;
+    if (days < RELATIVE_DAYS) return `Il y a ${days} jours`;
     return published.toLocaleDateString('fr-FR');
   }
 }

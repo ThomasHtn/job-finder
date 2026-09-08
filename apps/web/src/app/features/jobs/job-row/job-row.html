@@ -1,4 +1,6 @@
+<!-- Text column: title, company and place, excerpt, provenance strip. -->
 <div class="job-row__body">
+  <!-- Title links to the detail; salary sits on the same line when known. -->
   <div class="job-row__head">
     <a class="job-row__title" [routerLink]="['/offres', job().id]" queryParamsHandling="preserve">
       {{ job().title }}
@@ -8,6 +10,7 @@
     }
   </div>
 
+  <!-- Company and place; region-only offers say so. -->
   <p class="job-row__meta">
     <span class="job-row__company">{{ job().company ?? 'Entreprise non précisée' }}</span>
     <span class="job-row__place">{{ place() }}</span>
@@ -16,10 +19,12 @@
     }
   </p>
 
+  <!-- First lines of the description. -->
   @if (job().excerpt; as excerpt) {
     <p class="job-row__excerpt">{{ excerpt }}</p>
   }
 
+  <!-- Provenance strip: source, unusual contract wording, date, "new" badge. -->
   <p class="job-row__footer u-mono">
     <span class="job-row__source">{{ job().sourceLabel }}</span>
     @if (contract(); as contract) {
@@ -32,7 +37,9 @@
   </p>
 </div>
 
+<!-- Action column: hide, then star. -->
 <div class="job-row__actions">
+  <!-- "Not interested". -->
   <button
     type="button"
     class="icon-btn job-row__hide"
@@ -41,6 +48,7 @@
   >
     <app-icon name="dismiss" />
   </button>
+  <!-- Favourite toggle, filled when starred. -->
   <button
     type="button"
     class="icon-btn job-row__star"

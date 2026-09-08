@@ -4,13 +4,15 @@ import { ConfigController } from './config.controller.js';
 import { validateEnv, type Env } from './env.js';
 import { SEARCH_PROFILE } from './search-profile.js';
 
-/** Loads and validates the environment, and exposes the search profile app-wide. */
+/**
+ * Loads and validates the environment, and exposes the search profile app-wide.
+ */
 @Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // Single .env at the repo root; ignored in Docker where vars come from the environment.
+      /* Single .env at the repo root; ignored in Docker where vars come from the environment. */
       envFilePath: ['../../.env'],
       validate: validateEnv,
     }),

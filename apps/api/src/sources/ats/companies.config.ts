@@ -1,10 +1,23 @@
+/**
+ * The four ATS whose public job APIs are supported.
+ */
 export type AtsProvider = 'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters';
 
+/**
+ * One company career site to poll.
+ */
 export interface CompanyConfig {
-  /** Display name, used in the source label shown in the UI. */
+  /**
+   * Display name, used in the source label shown in the UI.
+   */
   name: string;
+  /**
+   * Which ATS the company uses.
+   */
   provider: AtsProvider;
-  /** Board identifier in the ATS URL. */
+  /**
+   * Board identifier in the ATS URL.
+   */
   board: string;
 }
 
@@ -60,7 +73,7 @@ export const COMPANIES: CompanyConfig[] = [
   { name: 'Cheerz', provider: 'lever', board: 'cheerz' },
   { name: 'Shippeo', provider: 'smartrecruiters', board: 'shippeo' },
   { name: 'Dailymotion', provider: 'smartrecruiters', board: 'dailymotion' },
-  // Remote-first or remote-friendly, checked on 2026-09-04.
+  /* Remote-first or remote-friendly, checked on 2026-09-04. */
   { name: 'lemlist', provider: 'ashby', board: 'lemlist' },
   { name: 'Kestra', provider: 'ashby', board: 'kestra' },
   { name: 'Photoroom', provider: 'ashby', board: 'photoroom' },
@@ -70,8 +83,10 @@ export const COMPANIES: CompanyConfig[] = [
   { name: 'Gorgias', provider: 'ashby', board: 'gorgias' },
   { name: 'Pigment', provider: 'lever', board: 'pigment' },
   { name: '360Learning', provider: 'lever', board: '360learning' },
-  // French consulting/ESN firms: many CDI dev roles across French cities (not remote-only,
-  // not Paris-only), checked on 2026-09-06.
+  /*
+   * French consulting/ESN firms: many CDI dev roles across French cities (not remote-only,
+   * not Paris-only), checked on 2026-09-06.
+   */
   { name: 'SFEIR', provider: 'lever', board: 'sfeir' },
   { name: 'Ippon Technologies', provider: 'lever', board: 'ippon' },
   { name: 'Comet', provider: 'greenhouse', board: 'comet' },

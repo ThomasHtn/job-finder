@@ -34,7 +34,7 @@ const response = await fetch(
       locations: [[center.longitude, center.latitude]],
       range: [driveMinutes * 60],
       range_type: 'time',
-      // Smooths the spiky raw output without meaningfully changing coverage.
+      /* Smooths the spiky raw output without meaningfully changing coverage. */
       smoothing: 15,
     }),
   },

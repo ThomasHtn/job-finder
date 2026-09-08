@@ -9,7 +9,8 @@ détail et de rebondir vers l'annonce d'origine (pas de formulaire de recherche)
 - Trois onglets : zone de trajet, full remote, favoris.
 - Sources : France Travail et Adzuna (clés requises), ATS d'entreprises et EURES (sans clé).
   Une source sans clé est simplement sautée. Les offres publiées sur plusieurs sources sont
-  fusionnées, celles non revues depuis 30 jours sont purgées sauf les favoris.
+  fusionnées, celles non revues depuis `INGESTION_STALE_DAYS` jours (30 par défaut) sont
+  purgées sauf les favoris.
 - L'ingestion tourne en cron (`INGESTION_CRON`, 2 h par défaut) et se déclenche aussi à la main.
 
 ## Configuration
@@ -85,9 +86,13 @@ npm run geo:isochrone  # régénère l'isochrone depuis le .env
 | `GET /api/jobs?tab=local\|remote\|favorites` | liste avec compteurs et date de dernière ingestion |
 | `GET /api/jobs/:id` | détail, marque l'offre comme consultée |
 | `PATCH /api/jobs/:id/favorite` | bascule le favori |
+| `PATCH /api/jobs/:id/hide` | masque l'offre de tous les onglets |
 | `POST /api/ingestion/run` | déclenche une ingestion |
+| `GET /api/ingestion/status` | état du dernier run de chaque source |
 | `GET /api/health` | état de l'API et de la base (public) |
 
 L'accès peut être protégé par un mot de passe unique (`APP_PASSWORD`) : le front affiche un
 écran de connexion et envoie le jeton dans le header `x-app-token`. Sans cette variable,
-aucune authentification.
+aucune authentification. Le mot de passe doit faire au moins 8 caractères ; la comparaison
+est en temps constant et la route de connexion est limitée à 5 essais par quart d'heure et
+par adresse.

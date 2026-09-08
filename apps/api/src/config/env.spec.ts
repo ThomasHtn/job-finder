@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { validateEnv } from './env.js';
 
+/**
+ * Smallest environment that passes validation.
+ */
 const MINIMAL = {
   DATABASE_URL: 'postgresql://localhost/test',
   SEARCH_KEYWORDS: ' développeur , full stack,,',
@@ -30,6 +33,22 @@ describe('validateEnv', () => {
   it('rejects an empty keyword list', () => {
     expect(() => validateEnv({ ...MINIMAL, SEARCH_KEYWORDS: ' , ' })).toThrow(
       /SEARCH_KEYWORDS/,
+    );
+  });
+
+  it('applies the ingestion defaults', () => {
+    const env = validateEnv(MINIMAL);
+    expect(env.INGESTION_STALE_DAYS).toBe(30);
+    expect(env.INGESTION_ON_STARTUP).toBe(false);
+  });
+
+  it('refuses a short password but accepts an absent one', () => {
+    expect(() => validateEnv({ ...MINIMAL, APP_PASSWORD: 'abc' })).toThrow(
+      /APP_PASSWORD/,
+    );
+    expect(validateEnv({ ...MINIMAL, APP_PASSWORD: '' }).APP_PASSWORD).toBeUndefined();
+    expect(validateEnv({ ...MINIMAL, APP_PASSWORD: 'long-enough' }).APP_PASSWORD).toBe(
+      'long-enough',
     );
   });
 

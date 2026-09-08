@@ -1,12 +1,16 @@
+<!-- Top bar: back link and the favourite toggle. -->
 <header class="topbar">
   <div class="topbar__row">
+    <!-- Back to the feed, keeping the tab in the URL. -->
     <a class="topbar__back" routerLink="/" queryParamsHandling="preserve">
       <app-icon name="back" />
       Offres
     </a>
 
+    <!-- Pushes the star to the edge. -->
     <span class="topbar__spacer"></span>
 
+    <!-- Favourite toggle, only once the offer is loaded. -->
     @if (job(); as job) {
       <button
         type="button"
@@ -21,17 +25,21 @@
     }
   </div>
 
+  <!-- Thin progress line while loading. -->
   <div class="scan" [class.scan--on]="loading()" aria-hidden="true"></div>
 </header>
 
+<!-- The offer, or the error that replaced it. -->
 <main class="detail" [attr.aria-busy]="loading()">
   @if (error(); as message) {
+    <!-- Error state with a way back. -->
     <div class="empty">
       <p class="empty__title">{{ message }}</p>
       <a class="btn" routerLink="/" queryParamsHandling="preserve">Revenir à la liste</a>
     </div>
   } @else if (job(); as job) {
     <article class="detail__article">
+      <!-- Source, title, company and place. -->
       <header class="detail__header">
         <p class="detail__eyebrow u-mono">{{ job.sourceLabel }}</p>
         <h1 class="detail__title">{{ job.title }}</h1>
@@ -41,6 +49,7 @@
         </p>
       </header>
 
+      <!-- Key facts: contract, salary, publication date. -->
       <dl class="detail__facts card">
         <div class="detail__fact">
           <dt class="u-mono">Contrat</dt>
@@ -56,11 +65,13 @@
         </div>
       </dl>
 
+      <!-- Primary action: the original ad. -->
       <a class="btn btn--primary detail__apply" [href]="job.url" target="_blank" rel="noopener">
         Voir l'offre sur {{ job.sourceLabel }}
         <app-icon name="external" />
       </a>
 
+      <!-- Snippet-only sources: say why the text below is short. -->
       @if (!job.hasFullDescription) {
         <p class="notice">
           <app-icon name="info" />
@@ -71,6 +82,7 @@
         </p>
       }
 
+      <!-- The ad itself. -->
       @if (job.description) {
         <section class="detail__section">
           <h2 class="detail__section-title u-mono">L'offre</h2>
@@ -78,6 +90,7 @@
         </section>
       }
 
+      <!-- Company presentation, when the source separates it. -->
       @if (job.companyDescription) {
         <section class="detail__section">
           <h2 class="detail__section-title u-mono">L'entreprise</h2>
@@ -85,6 +98,7 @@
         </section>
       }
 
+      <!-- Same offer on other boards, listed by host. -->
       @if (alternatives().length) {
         <section class="detail__section">
           <h2 class="detail__section-title u-mono">Également publiée sur</h2>

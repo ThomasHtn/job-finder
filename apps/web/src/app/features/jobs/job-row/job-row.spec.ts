@@ -40,6 +40,9 @@ function create(job: JobSummary, previousVisitAt: string | null) {
   return fixture;
 }
 
+/**
+ * One feed row in isolation.
+ */
 describe('JobRow', () => {
   it('flags an offer first seen after the previous visit as new', () => {
     const fixture = create(

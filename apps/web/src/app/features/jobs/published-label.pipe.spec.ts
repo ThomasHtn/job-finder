@@ -1,5 +1,8 @@
 import { PublishedLabelPipe } from './published-label.pipe';
 
+/**
+ * Relative date labels.
+ */
 describe('PublishedLabelPipe', () => {
   const pipe = new PublishedLabelPipe();
   const now = new Date('2026-09-04T15:00:00');

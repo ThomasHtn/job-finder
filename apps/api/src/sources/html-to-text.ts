@@ -1,3 +1,6 @@
+/**
+ * Named entities met in ATS descriptions; numeric ones are decoded generically.
+ */
 const ENTITIES: Record<string, string> = {
   amp: '&',
   lt: '<',
@@ -19,6 +22,9 @@ const ENTITIES: Record<string, string> = {
   ndash: '–',
 };
 
+/**
+ * Replaces named, decimal and hexadecimal entities; unknown ones are left as is.
+ */
 function decodeEntities(text: string): string {
   return text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity: string) => {
     if (entity.startsWith('#x') || entity.startsWith('#X')) {

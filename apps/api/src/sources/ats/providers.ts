@@ -3,8 +3,14 @@ import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../source.types.js';
 import type { AtsProvider, CompanyConfig } from './companies.config.js';
 
+/**
+ * Time given to one ATS request.
+ */
 const TIMEOUT_MS = 20_000;
 
+/**
+ * GET returning the parsed JSON body, failing on any non-2xx status.
+ */
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     signal: AbortSignal.timeout(TIMEOUT_MS),
@@ -15,23 +21,37 @@ async function getJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** ATS boards are international; only French positions are worth ingesting. */
+/**
+
+ * ATS boards are international; only French positions are worth ingesting.
+
+ */
 function isFrance(...candidates: (string | null | undefined)[]): boolean {
   return candidates.some(
     (value) => value && /\bfrance\b|^fr$/i.test(value.trim()),
   );
 }
 
+/**
+ * Country names that mark a position as abroad.
+ */
 const FOREIGN_COUNTRIES =
   /\b(germany|deutschland|italy|italia|spain|espa[ñn]a|netherlands|belgium|belgique|portugal|united kingdom|england|ireland|poland|serbia|romania|sweden|denmark|switzerland|suisse|austria|united states|usa|canada|india|brazil|morocco|tunisia)\b/i;
 
-/** Guards against boards whose country metadata contradicts the office location. */
+/**
+
+ * Guards against boards whose country metadata contradicts the office location.
+
+ */
 function mentionsForeignCountry(location: string | null | undefined): boolean {
   return Boolean(
     location && FOREIGN_COUNTRIES.test(location) && !isFrance(location),
   );
 }
 
+/**
+ * Fields shared by every offer of one company.
+ */
 function base(
   company: CompanyConfig,
   provider: string,
@@ -39,6 +59,9 @@ function base(
   return { source: 'ATS', sourceLabel: `${company.name} (${provider})` };
 }
 
+/**
+ * The fields read from one Greenhouse job.
+ */
 interface GreenhouseJob {
   id: number;
   title: string;
@@ -50,6 +73,9 @@ interface GreenhouseJob {
   metadata?: { name: string; value: string | null }[];
 }
 
+/**
+ * Greenhouse board API; content comes as escaped HTML.
+ */
 async function fetchGreenhouse(company: CompanyConfig): Promise<RawJob[]> {
   const body = await getJson<{ jobs?: GreenhouseJob[] }>(
     `https://boards-api.greenhouse.io/v1/boards/${company.board}/jobs?content=true`,
@@ -58,8 +84,10 @@ async function fetchGreenhouse(company: CompanyConfig): Promise<RawJob[]> {
   return (body.jobs ?? [])
     .filter((job) => {
       if (mentionsForeignCountry(job.location?.name)) return false;
-      // When the board declares a country, trust it: the location string often
-      // lists several offices, including foreign ones.
+      /*
+       * When the board declares a country, trust it: the location string often
+       * lists several offices, including foreign ones.
+       */
       const country = job.metadata?.find((m) => /country/i.test(m.name))?.value;
       return country ? isFrance(country) : isFrance(job.location?.name);
     })
@@ -95,6 +123,9 @@ async function fetchGreenhouse(company: CompanyConfig): Promise<RawJob[]> {
     });
 }
 
+/**
+ * The fields read from one Lever posting.
+ */
 interface LeverJob {
   id: string;
   text: string;
@@ -107,6 +138,9 @@ interface LeverJob {
   categories?: { location?: string; commitment?: string };
 }
 
+/**
+ * Lever postings API; text comes pre-flattened.
+ */
 async function fetchLever(company: CompanyConfig): Promise<RawJob[]> {
   const jobs = await getJson<LeverJob[]>(
     `https://api.lever.co/v0/postings/${company.board}?mode=json`,
@@ -140,6 +174,9 @@ async function fetchLever(company: CompanyConfig): Promise<RawJob[]> {
     }));
 }
 
+/**
+ * The fields read from one Ashby job.
+ */
 interface AshbyJob {
   id: string;
   title: string;
@@ -159,6 +196,9 @@ interface AshbyJob {
   };
 }
 
+/**
+ * Ashby job-board API; the address is structured when present.
+ */
 async function fetchAshby(company: CompanyConfig): Promise<RawJob[]> {
   const body = await getJson<{ jobs?: AshbyJob[] }>(
     `https://api.ashbyhq.com/posting-api/job-board/${company.board}`,
@@ -194,6 +234,9 @@ async function fetchAshby(company: CompanyConfig): Promise<RawJob[]> {
     });
 }
 
+/**
+ * The fields read from one SmartRecruiters posting.
+ */
 interface SmartRecruitersPosting {
   id: string;
   name: string;
@@ -207,10 +250,16 @@ interface SmartRecruitersPosting {
   typeOfEmployment?: { id?: string; label?: string };
 }
 
+/**
+ * The description sections of one SmartRecruiters posting.
+ */
 interface SmartRecruitersDetail {
   jobAd?: { sections?: Record<string, { text?: string }> };
 }
 
+/**
+ * SmartRecruiters postings API, one extra call per offer for the description.
+ */
 async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJob[]> {
   const body = await getJson<{ content?: SmartRecruitersPosting[] }>(
     `https://api.smartrecruiters.com/v1/companies/${company.board}/postings?limit=100`,
@@ -222,7 +271,7 @@ async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJob[]> {
 
   return Promise.all(
     french.map(async (posting) => {
-      // The listing has no description, so it needs one extra call per offer.
+      /* The listing has no description, so it needs one extra call per offer. */
       const description = await fetchSmartRecruitersDescription(
         company.board,
         posting.id,
@@ -254,6 +303,9 @@ async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJob[]> {
   );
 }
 
+/**
+ * Concatenates the ad sections into plain text.
+ */
 async function fetchSmartRecruitersDescription(
   board: string,
   postingId: string,
@@ -274,11 +326,14 @@ async function fetchSmartRecruitersDescription(
       .join('\n\n');
     return text || null;
   } catch {
-    // A missing description only costs the in-app detail view, not the offer.
+    /* A missing description only costs the in-app detail view, not the offer. */
     return null;
   }
 }
 
+/**
+ * Fetcher per provider, looked up by the ATS connector.
+ */
 export const ATS_FETCHERS: Record<
   AtsProvider,
   (company: CompanyConfig) => Promise<RawJob[]>

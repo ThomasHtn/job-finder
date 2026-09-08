@@ -5,7 +5,14 @@ import { LastVisitService } from '../../../core/last-visit.service';
 import { Icon } from '../../../shared/icon/icon';
 import { PublishedLabelPipe } from '../published-label.pipe';
 
-/** One line of the feed: title, who and where, an excerpt, then the provenance strip. */
+/**
+ * Contract wording that every offer shares, hence not worth a slot in the row.
+ */
+const DEFAULT_CONTRACT = 'CDI';
+
+/**
+ * One line of the feed: title, who and where, an excerpt, then the provenance strip.
+ */
 @Component({
   selector: 'app-job-row',
   imports: [RouterLink, Icon, PublishedLabelPipe],
@@ -20,25 +27,45 @@ import { PublishedLabelPipe } from '../published-label.pipe';
   },
 })
 export class JobRow {
+  /**
+   * Previous visit timestamp, for the "new" badge.
+   */
   private readonly lastVisit = inject(LastVisitService);
 
+  /**
+   * The offer to render.
+   */
   readonly job = input.required<JobSummary>();
+
+  /**
+   * Emits the offer id when the star is pressed.
+   */
   readonly favoriteToggled = output<string>();
+
+  /**
+   * Emits the offer id when the hide button is pressed.
+   */
   readonly hidden = output<string>();
 
-  /** True when the offer first appeared after the previous time the feed was consulted. */
+  /**
+   * True when the offer first appeared after the previous time the feed was consulted.
+   */
   protected readonly isNew = computed(() => {
     const previous = this.lastVisit.previousVisitAt;
     return previous !== null && this.job().firstSeenAt > previous;
   });
 
-  /** Every offer aggregated here is permanent: only a different wording earns a slot. */
+  /**
+   * Every offer aggregated here is permanent: only a different wording earns a slot.
+   */
   protected readonly contract = computed(() => {
     const label = this.job().contractLabel;
-    return label && label.toUpperCase() !== 'CDI' ? label : null;
+    return label && label.toUpperCase() !== DEFAULT_CONTRACT ? label : null;
   });
 
-  /** "76 - LE HAVRE" like France Travail, or the closest the source allows. */
+  /**
+   * "76 - LE HAVRE" like France Travail, or the closest the source allows.
+   */
   protected readonly place = computed(() => {
     const { isRemote, city, postalCode } = this.job();
     if (isRemote) return 'Full remote';
@@ -46,13 +73,18 @@ export class JobRow {
     return postalCode ? `${postalCode.slice(0, 2)} - ${city}` : city;
   });
 
+  /**
+   * Star pressed. The whole row is a link: the star must not open the detail.
+   */
   protected toggleFavorite(event: Event): void {
-    // The whole row is a link: the star must not open the detail.
     event.preventDefault();
     event.stopPropagation();
     this.favoriteToggled.emit(this.job().id);
   }
 
+  /**
+   * Hide pressed; same event handling as the star.
+   */
   protected hide(event: Event): void {
     event.preventDefault();
     event.stopPropagation();

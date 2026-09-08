@@ -5,6 +5,9 @@ import { provideRouter } from '@angular/router';
 import type { JobListResponse, JobSummary } from '@job-finder/shared';
 import { JobList } from './job-list';
 
+/**
+ * A feed row with sensible defaults.
+ */
 function summary(overrides: Partial<JobSummary> = {}): JobSummary {
   return {
     id: 'job-1',
@@ -30,6 +33,9 @@ function summary(overrides: Partial<JobSummary> = {}): JobSummary {
   };
 }
 
+/**
+ * A list payload around the given rows.
+ */
 function response(jobs: JobSummary[]): JobListResponse {
   return {
     jobs,
@@ -38,6 +44,9 @@ function response(jobs: JobSummary[]): JobListResponse {
   };
 }
 
+/**
+ * Feed rendering and its round trips with the API.
+ */
 describe('JobList', () => {
   let http: HttpTestingController;
 

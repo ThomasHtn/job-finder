@@ -1,13 +1,19 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
+/**
+ * Names of the available glyphs.
+ */
 export type IconName =
   'star' | 'star-filled' | 'dismiss' | 'refresh' | 'back' | 'external' | 'info' | 'alert' | 'lock';
 
-/** Hairline 24px icon set, drawn inline so the stroke matches the type weight. */
+/**
+ * Hairline 24px icon set, drawn inline so the stroke matches the type weight.
+ */
 @Component({
   selector: 'app-icon',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- Shared stroke settings; each case draws one glyph. -->
     <svg
       viewBox="0 0 24 24"
       fill="none"
@@ -81,5 +87,8 @@ export type IconName =
   `,
 })
 export class Icon {
+  /**
+   * Glyph to draw.
+   */
   readonly name = input.required<IconName>();
 }

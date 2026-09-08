@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { computeDedupeHash } from './dedupe.js';
 
+/**
+ * Similarity key across boards.
+ */
 describe('computeDedupeHash', () => {
   it('matches the same offer republished with different gender markers', () => {
     expect(

@@ -4,6 +4,7 @@ import {
   type SearchProfile,
 } from '../config/search-profile.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { BanGeocoder, type ResolvedLocation } from './ban-geocoder.js';
 import {
   isWithinArea,
   loadIsochrone,
@@ -11,27 +12,29 @@ import {
   type Coordinates,
 } from './commuting-area.js';
 
-const GEOCODER_URL = 'https://data.geopf.fr/geocodage/search';
-/** Below this the BAN match is too loose to be trusted (wrong town, partial street). */
-const MIN_SCORE = 0.4;
+export type { ResolvedLocation } from './ban-geocoder.js';
 
-export interface ResolvedLocation extends Coordinates {
-  city: string | null;
-  postalCode: string | null;
-}
-
-interface BanFeature {
-  geometry: { coordinates: [number, number] };
-  properties: { score: number; city?: string; postcode?: string };
-}
-
+/**
+ * Facade over the isochrone check and the geocoder, with a database cache in front.
+ */
 @Injectable()
 export class GeoService {
+  /**
+   * Scoped logger.
+   */
   private readonly logger = new Logger(GeoService.name);
+
+  /**
+   * Isochrone loaded once at construction; null falls back to a radius.
+   */
   private readonly area: Area | null = loadIsochrone();
 
+  /**
+   * Warns at boot when the isochrone is missing, so the fallback is never silent.
+   */
   constructor(
     private readonly prisma: PrismaService,
+    private readonly geocoder: BanGeocoder,
     @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
   ) {
     if (!this.area) {
@@ -41,11 +44,16 @@ export class GeoService {
     }
   }
 
+  /**
+   * True when the point is inside the commuting area.
+   */
   isWithinArea(point: Coordinates): boolean {
     return isWithinArea(this.area, this.profile.area.center, point);
   }
 
-  /** Geocodes a free-form French location, caching both hits and misses. */
+  /**
+   * Geocodes a free-form French location, caching both hits and misses.
+   */
   async geocode(rawQuery: string): Promise<ResolvedLocation | null> {
     const query = rawQuery.trim().toLowerCase();
     if (!query) return null;
@@ -64,7 +72,7 @@ export class GeoService {
           };
     }
 
-    const resolved = await this.callGeocoder(query);
+    const resolved = await this.geocoder.resolve(query);
     await this.prisma.geocodeCache.create({
       data: {
         query,
@@ -75,35 +83,5 @@ export class GeoService {
       },
     });
     return resolved;
-  }
-
-  private async callGeocoder(query: string): Promise<ResolvedLocation | null> {
-    const url = `${GEOCODER_URL}?q=${encodeURIComponent(query)}&limit=1`;
-    try {
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(10_000),
-      });
-      if (!response.ok) {
-        this.logger.warn(`Geocoder returned ${response.status} for "${query}"`);
-        return null;
-      }
-
-      const body = (await response.json()) as { features?: BanFeature[] };
-      const feature = body.features?.[0];
-      if (!feature || feature.properties.score < MIN_SCORE) return null;
-
-      const [longitude, latitude] = feature.geometry.coordinates;
-      return {
-        latitude,
-        longitude,
-        city: feature.properties.city ?? null,
-        postalCode: feature.properties.postcode ?? null,
-      };
-    } catch (error) {
-      this.logger.warn(
-        `Geocoding failed for "${query}": ${(error as Error).message}`,
-      );
-      return null;
-    }
   }
 }

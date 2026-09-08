@@ -28,6 +28,10 @@ COPY --from=build /app/apps/api/prisma apps/api/prisma
 COPY --from=build /app/apps/api/prisma.config.ts apps/api/
 COPY --from=build /app/apps/api/package.json apps/api/
 
+# Nothing here needs root: run as the unprivileged user shipped with the image.
+RUN chown -R node:node /app
+USER node
+
 WORKDIR /app/apps/api
 EXPOSE 3000
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]

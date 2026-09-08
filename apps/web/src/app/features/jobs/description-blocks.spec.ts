@@ -8,6 +8,9 @@ function list(items: string[]) {
   return { items, text: '', lead: false };
 }
 
+/**
+ * Plain text to paragraphs and lists.
+ */
 describe('toDescriptionBlocks', () => {
   it('returns nothing without a description', () => {
     expect(toDescriptionBlocks(null)).toEqual([]);

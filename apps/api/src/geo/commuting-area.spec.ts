@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { distanceKm, isWithinArea, loadIsochrone } from './commuting-area.js';
 
+/**
+ * Centre of the reference area.
+ */
 const LE_HAVRE = { latitude: 49.4938, longitude: 0.1077 };
+/**
+ * Towns on both sides of the commuting boundary.
+ */
 const PLACES = {
   montivilliers: { latitude: 49.5453, longitude: 0.1897 },
   bolbec: { latitude: 49.5747, longitude: 0.4767 },
@@ -12,6 +18,9 @@ const PLACES = {
   openSea: { latitude: 49.65, longitude: -0.3 },
 };
 
+/**
+ * Haversine sanity checks.
+ */
 describe('distanceKm', () => {
   it('returns zero for the same point', () => {
     expect(distanceKm(LE_HAVRE, LE_HAVRE)).toBeLessThan(0.1);
@@ -23,6 +32,9 @@ describe('distanceKm', () => {
   });
 });
 
+/**
+ * Polygon check against the shipped isochrone.
+ */
 describe('isWithinArea with the committed isochrone', () => {
   const area = loadIsochrone();
 
@@ -48,6 +60,9 @@ describe('isWithinArea with the committed isochrone', () => {
   });
 });
 
+/**
+ * Radius fallback.
+ */
 describe('isWithinArea without an isochrone', () => {
   it('falls back to a radius around the centre', () => {
     expect(isWithinArea(null, LE_HAVRE, PLACES.bolbec)).toBe(true);

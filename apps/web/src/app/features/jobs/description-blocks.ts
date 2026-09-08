@@ -1,14 +1,36 @@
-/** One rendered block of a description: bullet items, or a paragraph when `items` is empty. */
+/**
+ * One rendered block of a description: bullet items, or a paragraph when `items` is empty.
+ */
 export interface DescriptionBlock {
+  /**
+   * Bullet items; empty for a paragraph.
+   */
   items: string[];
+
+  /**
+   * Paragraph text; empty for a list.
+   */
   text: string;
-  /** A line introducing what follows, so it can hug the block underneath it. */
+
+  /**
+   * A line introducing what follows, so it can hug the block underneath it.
+   */
   lead: boolean;
 }
 
+/**
+ * Characters sources use to open a bullet line.
+ */
 const BULLET = /^[-–—•*▪>]\s+/;
-/** A short line ending in a colon introduces what follows: it stands on its own. */
+
+/**
+ * A short line ending in a colon introduces what follows: it stands on its own.
+ */
 const LEAD_IN = /:$/;
+
+/**
+ * Longest line still treated as a lead-in.
+ */
 const LEAD_IN_MAX = 90;
 
 /**
@@ -22,11 +44,17 @@ export function toDescriptionBlocks(text: string | null): DescriptionBlock[] {
   let paragraph: string[] = [];
   let items: string[] = [];
 
+  /*
+   * Consecutive lines are re-flowed: most sources hard-wrap their text at a fixed width.
+   */
   const closeParagraph = (lead = false): void => {
-    // Consecutive lines are re-flowed: most sources hard-wrap their text at a fixed width.
     if (paragraph.length) blocks.push({ items: [], text: paragraph.join(' '), lead });
     paragraph = [];
   };
+
+  /*
+   * Flushes the pending bullet items as one list block.
+   */
   const closeList = (): void => {
     if (items.length) blocks.push({ items, text: '', lead: false });
     items = [];
