@@ -1,11 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type {
-  JobCounts,
-  JobDetail,
-  JobListResponse,
-  JobSummary,
-  JobTab,
-} from '@job-finder/shared';
+
+import type { JobCounts, JobDetail, JobListResponse, JobSummary, JobTab } from '@job-finder/shared';
+
 import type { JobModel } from '../generated/prisma/models.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { toDetail, toSummary } from './job.mapper.js';

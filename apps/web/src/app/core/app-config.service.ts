@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import type { AppConfig } from '@job-finder/shared';
+import { inject, Injectable } from '@angular/core';
+
 import { Observable, shareReplay } from 'rxjs';
+
+import type { AppConfig } from '@job-finder/shared';
+
 import { apiUrl } from './api-url';
 
 /**

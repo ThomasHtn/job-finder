@@ -3,10 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
-  ElementRef,
   computed,
+  DestroyRef,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
@@ -15,7 +15,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+
 import type { JobDetail as JobDetailDto } from '@job-finder/shared';
+
 import { I18n } from '../../../core/i18n/i18n.service';
 import { Viewport } from '../../../core/viewport';
 import { Icon } from '../../../shared/icon/icon';

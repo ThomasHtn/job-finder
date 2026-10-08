@@ -1,8 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../config/search-profile.js';
+
+import { SEARCH_PROFILE, type SearchProfile } from '../config/search-profile.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { BanGeocoder } from './ban-geocoder.js';
 import type { ResolvedLocation } from './ban-geocoder.types.js';

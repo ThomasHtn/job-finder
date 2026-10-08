@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import type { Translations } from '../../core/i18n/translations';
 
 /**

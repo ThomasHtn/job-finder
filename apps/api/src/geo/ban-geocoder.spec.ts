@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { parseBanResponse } from './parse-ban-response.js';
 
 /**
@@ -26,9 +27,7 @@ describe('parseBanResponse', () => {
   it('rejects weak matches', () => {
     expect(
       parseBanResponse({
-        features: [
-          { geometry: { coordinates: [0, 0] }, properties: { score: 0.2 } },
-        ],
+        features: [{ geometry: { coordinates: [0, 0] }, properties: { score: 0.2 } }],
       }),
     ).toBeNull();
   });

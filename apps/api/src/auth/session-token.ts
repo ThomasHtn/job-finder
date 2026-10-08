@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
+
 import { TOKEN_LENGTH } from './secret.constants.js';
 
 /**

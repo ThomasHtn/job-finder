@@ -1,9 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { sleep } from '../../common/sleep.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {
@@ -36,9 +34,7 @@ export class ApecSource implements JobSourceConnector {
   /**
    * Place and keywords come from the profile.
    */
-  constructor(
-    @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
-  ) {}
+  constructor(@Inject(SEARCH_PROFILE) private readonly profile: SearchProfile) {}
 
   /**
    * Public endpoint, no credentials needed.
@@ -73,18 +69,13 @@ export class ApecSource implements JobSourceConnector {
       }
     }
 
-    return [...offers.values()].map((offer) =>
-      toRawJob(offer, remoteIds.has(offer.numeroOffre)),
-    );
+    return [...offers.values()].map((offer) => toRawJob(offer, remoteIds.has(offer.numeroOffre)));
   }
 
   /**
    * One search, paged until a short page or the cap.
    */
-  private async search(
-    criteria: Record<string, unknown>,
-    maxPages: number,
-  ): Promise<ApecOffer[]> {
+  private async search(criteria: Record<string, unknown>, maxPages: number): Promise<ApecOffer[]> {
     const collected: ApecOffer[] = [];
 
     for (let page = 0; page < maxPages; page += 1) {

@@ -11,9 +11,7 @@ import type { GreenhouseJob } from './greenhouse.types.js';
 /**
  * Greenhouse board API; content comes as escaped HTML.
  */
-export async function fetchGreenhouse(
-  company: CompanyConfig,
-): Promise<RawJob[]> {
+export async function fetchGreenhouse(company: CompanyConfig): Promise<RawJob[]> {
   const body = await getJson<{ jobs?: GreenhouseJob[] }>(
     `https://boards-api.greenhouse.io/v1/boards/${company.board}/jobs?content=true`,
     TIMEOUT_MS,
@@ -30,9 +28,7 @@ export async function fetchGreenhouse(
       return country ? isFrance(country) : isFrance(job.location?.name);
     })
     .map((job) => {
-      const employmentType = job.metadata?.find((m) =>
-        /employment type/i.test(m.name),
-      )?.value;
+      const employmentType = job.metadata?.find((m) => /employment type/i.test(m.name))?.value;
       return {
         ...companyFields(company, 'Greenhouse'),
         sourceId: `greenhouse:${company.board}:${job.id}`,

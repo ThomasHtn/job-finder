@@ -12,9 +12,7 @@ import type { CapgeminiJob } from './capgemini.types.js';
  * text only, so the board is the office town and offers are pinned to it: the same ad
  * often lists a dozen French towns.
  */
-export async function fetchCapgemini(
-  company: CompanyConfig,
-): Promise<RawJob[]> {
+export async function fetchCapgemini(company: CompanyConfig): Promise<RawJob[]> {
   const params = new URLSearchParams({
     page: '1',
     size: '100',

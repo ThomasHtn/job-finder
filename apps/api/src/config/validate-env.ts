@@ -1,4 +1,4 @@
-import { envSchema, type Env } from './env.schema.js';
+import { type Env, envSchema } from './env.schema.js';
 
 /**
  * Parses the environment and fails fast with every problem listed at once.

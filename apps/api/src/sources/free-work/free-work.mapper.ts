@@ -1,12 +1,7 @@
 import { toNumber } from '../../common/to-number.js';
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
-import {
-  DEFAULT_JOB_SLUG,
-  DETAIL_URL,
-  FULL_REMOTE,
-  PERMANENT,
-} from './free-work.constants.js';
+import { DEFAULT_JOB_SLUG, DETAIL_URL, FULL_REMOTE, PERMANENT } from './free-work.constants.js';
 import type { FreeWorkJob } from './free-work.types.js';
 
 /**

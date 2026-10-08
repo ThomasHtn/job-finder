@@ -1,8 +1,9 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
+
 import { browserLocale } from './browser-locale';
 import { EN } from './en';
 import { FR } from './fr';
-import { toLocale, type Locale } from './locale';
+import { type Locale, toLocale } from './locale';
 import type { Translations } from './translations';
 
 /**

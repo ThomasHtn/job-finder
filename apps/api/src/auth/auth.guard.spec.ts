@@ -1,11 +1,13 @@
 import {
+  type ExecutionContext,
   ServiceUnavailableException,
   UnauthorizedException,
-  type ExecutionContext,
 } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import type { Reflector } from '@nestjs/core';
+
 import { describe, expect, it } from 'vitest';
+
 import type { Env } from '../config/env.schema.js';
 import { AuthGuard } from './auth.guard.js';
 import type { AuthService } from './auth.service.js';
@@ -72,8 +74,6 @@ describe('AuthGuard', () => {
   it('rejects a missing or stale token', async () => {
     const locked = guard({ nodeEnv: 'production', password: true });
     await expect(locked.canActivate(context())).rejects.toThrow(UnauthorizedException);
-    await expect(locked.canActivate(context('stale'))).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(locked.canActivate(context('stale'))).rejects.toThrow(UnauthorizedException);
   });
 });

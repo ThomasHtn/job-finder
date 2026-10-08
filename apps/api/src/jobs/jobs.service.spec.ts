@@ -1,5 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
+
 import { describe, expect, it, vi } from 'vitest';
+
 import type { PrismaService } from '../prisma/prisma.service.js';
 import { JobsService } from './jobs.service.js';
 

@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100%;
   background: var(--surface);
+
   // The sheet springs back from a drag; during one it tracks the finger with no easing.
   transition: transform 0.28s var(--ease);
 }
@@ -197,7 +198,7 @@
   }
 }
 
-@media (max-width: 63.99rem) {
+@media (width <= 63.99rem) {
   .sheet__handle {
     display: block;
     width: 2.25rem;

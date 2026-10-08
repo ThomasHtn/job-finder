@@ -179,7 +179,7 @@
   }
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   :host {
     --row-pad: 1rem;
 

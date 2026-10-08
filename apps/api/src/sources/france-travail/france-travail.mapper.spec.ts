@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { toRawJob } from './france-travail.mapper.js';
 
 /**

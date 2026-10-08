@@ -1,11 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { sleep } from '../../common/sleep.js';
 import type { Env } from '../../config/env.schema.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {
@@ -77,9 +75,7 @@ export class AdzunaSource implements JobSourceConnector {
         return results;
       } catch (error) {
         failures.push(error as Error);
-        this.logger.warn(
-          `Search ${JSON.stringify(criteria)} skipped: ${(error as Error).message}`,
-        );
+        this.logger.warn(`Search ${JSON.stringify(criteria)} skipped: ${(error as Error).message}`);
         return [];
       }
     };
@@ -92,10 +88,7 @@ export class AdzunaSource implements JobSourceConnector {
     }
     /* Nationwide sweep on the first (broadest) query only, to stay within the quota. */
     for (const phrase of REMOTE_PHRASES) {
-      for (const job of await collect(
-        { what: keywords[0], what_phrase: phrase },
-        'remote',
-      )) {
+      for (const job of await collect({ what: keywords[0], what_phrase: phrase }, 'remote')) {
         jobs.set(job.id, job);
         remoteIds.add(job.id);
       }
@@ -103,9 +96,7 @@ export class AdzunaSource implements JobSourceConnector {
 
     if (succeeded === 0 && failures.length > 0) throw failures[0];
 
-    return [...jobs.values()].map((job) =>
-      toRawJob(job, remoteIds.has(job.id)),
-    );
+    return [...jobs.values()].map((job) => toRawJob(job, remoteIds.has(job.id)));
   }
 
   /**

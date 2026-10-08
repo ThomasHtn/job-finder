@@ -5,7 +5,9 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
+
 import type { Request } from 'express';
+
 import { MAX_ATTEMPTS, WINDOW_MS } from './login-throttle.constants.js';
 
 /**
@@ -42,10 +44,7 @@ export class LoginThrottleGuard implements CanActivate {
 
     const recent = (this.attempts.get(key) ?? []).filter((at) => at > since);
     if (recent.length >= MAX_ATTEMPTS) {
-      throw new HttpException(
-        'Too many login attempts, retry later',
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
+      throw new HttpException('Too many login attempts, retry later', HttpStatus.TOO_MANY_REQUESTS);
     }
 
     recent.push(this.now());

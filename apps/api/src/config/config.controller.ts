@@ -1,5 +1,7 @@
 import { Controller, Get, Inject } from '@nestjs/common';
+
 import type { AppConfig } from '@job-finder/shared';
+
 import { AuthService } from '../auth/auth.service.js';
 import { Public } from '../auth/public.decorator.js';
 import { SEARCH_PROFILE, type SearchProfile } from './search-profile.js';

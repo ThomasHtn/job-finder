@@ -5,10 +5,7 @@ import { TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
 import { isFrance } from '../france-location.js';
-import type {
-  SmartRecruitersDetail,
-  SmartRecruitersPosting,
-} from './smartrecruiters.types.js';
+import type { SmartRecruitersDetail, SmartRecruitersPosting } from './smartrecruiters.types.js';
 
 /**
  * Ad sections concatenated into the description, in reading order.
@@ -23,9 +20,7 @@ const DESCRIPTION_SECTIONS = [
 /**
  * SmartRecruiters postings API, one extra call per offer for the description.
  */
-export async function fetchSmartRecruiters(
-  company: CompanyConfig,
-): Promise<RawJob[]> {
+export async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJob[]> {
   /* Only the first 100 postings come back: a large board needs its `filter` to reach the area. */
   const filter = company.filter ? `&${company.filter}` : '';
   const body = await getJson<{ content?: SmartRecruitersPosting[] }>(
@@ -33,9 +28,7 @@ export async function fetchSmartRecruiters(
     TIMEOUT_MS,
   );
 
-  const french = (body.content ?? []).filter((posting) =>
-    isFrance(posting.location?.country),
-  );
+  const french = (body.content ?? []).filter((posting) => isFrance(posting.location?.country));
 
   return Promise.all(
     french.map(async (posting) => {
@@ -60,9 +53,7 @@ export async function fetchSmartRecruiters(
         isRemote: posting.location?.remote === true,
         isLocationApproximate: false,
         url: `https://jobs.smartrecruiters.com/${company.board}/${posting.id}`,
-        publishedAt: posting.releasedDate
-          ? new Date(posting.releasedDate)
-          : null,
+        publishedAt: posting.releasedDate ? new Date(posting.releasedDate) : null,
       } satisfies RawJob;
     }),
   );
@@ -71,19 +62,14 @@ export async function fetchSmartRecruiters(
 /**
  * Concatenates the ad sections into plain text.
  */
-async function fetchDescription(
-  board: string,
-  postingId: string,
-): Promise<string | null> {
+async function fetchDescription(board: string, postingId: string): Promise<string | null> {
   try {
     const detail = await getJson<SmartRecruitersDetail>(
       `https://api.smartrecruiters.com/v1/companies/${board}/postings/${postingId}`,
       TIMEOUT_MS,
     );
     const sections = detail.jobAd?.sections ?? {};
-    const text = DESCRIPTION_SECTIONS.map((key) =>
-      htmlToText(sections[key]?.text),
-    )
+    const text = DESCRIPTION_SECTIONS.map((key) => htmlToText(sections[key]?.text))
       .filter(Boolean)
       .join('\n\n');
     return text || null;

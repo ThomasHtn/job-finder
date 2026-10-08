@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { computeDedupeHash } from './dedupe.js';
 
 /**
@@ -6,9 +7,7 @@ import { computeDedupeHash } from './dedupe.js';
  */
 describe('computeDedupeHash', () => {
   it('matches the same offer republished with different gender markers', () => {
-    expect(
-      computeDedupeHash('Développeur Full Stack H/F', 'Acme', 'Le Havre'),
-    ).toBe(
+    expect(computeDedupeHash('Développeur Full Stack H/F', 'Acme', 'Le Havre')).toBe(
       computeDedupeHash('Developpeur Full Stack (x/f/m)', 'ACME', 'le havre'),
     );
   });

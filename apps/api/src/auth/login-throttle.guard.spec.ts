@@ -1,5 +1,7 @@
-import { HttpException, type ExecutionContext } from '@nestjs/common';
+import { type ExecutionContext, HttpException } from '@nestjs/common';
+
 import { describe, expect, it } from 'vitest';
+
 import { MAX_ATTEMPTS, WINDOW_MS } from './login-throttle.constants.js';
 import { LoginThrottleGuard } from './login-throttle.guard.js';
 

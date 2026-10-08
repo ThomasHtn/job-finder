@@ -18,8 +18,7 @@ export function toRawJob(job: AdzunaJob, isRemote: boolean): RawJob {
     description: job.description ?? null,
     /* Adzuna only exposes a truncated snippet, so the UI must link out. */
     hasFullDescription: false,
-    contractLabel:
-      job.contract_type === 'permanent' ? 'CDI' : (job.contract_type ?? null),
+    contractLabel: job.contract_type === 'permanent' ? 'CDI' : (job.contract_type ?? null),
     isPermanent: job.contract_type === 'permanent',
     salary: formatSalary(job.salary_min, job.salary_max),
     locationText: job.location?.display_name ?? null,

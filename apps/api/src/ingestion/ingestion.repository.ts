@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service.js';
-import type {
-  FinishedRun,
-  PersistOutcome,
-  RunCounters,
-} from './ingestion.types.js';
+import type { FinishedRun, PersistOutcome, RunCounters } from './ingestion.types.js';
 import type { PreparedJob } from './job-preparer.types.js';
 import { planMerge } from './plan-merge.js';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+
 import type { SearchProfile } from '../config/search-profile.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import type { BanGeocoder } from './ban-geocoder.js';

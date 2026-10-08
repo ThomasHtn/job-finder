@@ -1,4 +1,5 @@
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+
 import { distanceKm } from './distance-km.js';
 import type { Area, Coordinates } from './geo.types.js';
 
@@ -13,7 +14,6 @@ export function isWithinArea(
   point: Coordinates,
   fallbackRadiusKm: number,
 ): boolean {
-  if (area)
-    return booleanPointInPolygon([point.longitude, point.latitude], area);
+  if (area) return booleanPointInPolygon([point.longitude, point.latitude], area);
   return distanceKm(center, point) <= fallbackRadiusKm;
 }

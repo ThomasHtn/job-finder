@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { sleep } from '../../common/sleep.js';
 import type { Env } from '../../config/env.schema.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {

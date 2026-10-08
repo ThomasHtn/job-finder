@@ -1,10 +1,6 @@
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
-import {
-  DETAILS_URL,
-  DIRECT_HIRE,
-  NON_PERMANENT_TEXT,
-} from './eures.constants.js';
+import { DETAILS_URL, DIRECT_HIRE, NON_PERMANENT_TEXT } from './eures.constants.js';
 import type { EuresJob } from './eures.types.js';
 
 /**
@@ -24,12 +20,8 @@ export function toRawJob(job: EuresJob, areaLabel: string): RawJob {
     companyDescription: null,
     description,
     hasFullDescription: Boolean(description),
-    contractLabel: isDirectHire
-      ? 'Embauche directe'
-      : (job.positionOfferingCode ?? null),
-    isPermanent:
-      isDirectHire &&
-      !NON_PERMANENT_TEXT.test(`${job.title} ${description ?? ''}`),
+    contractLabel: isDirectHire ? 'Embauche directe' : (job.positionOfferingCode ?? null),
+    isPermanent: isDirectHire && !NON_PERMANENT_TEXT.test(`${job.title} ${description ?? ''}`),
     salary: null,
     /* Only the region is known, so no geocoding is attempted. */
     locationText: null,

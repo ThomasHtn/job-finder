@@ -2,7 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+
 import type { JobListResponse, JobSummary } from '@job-finder/shared';
+
 import { JobList } from './job-list';
 
 /**

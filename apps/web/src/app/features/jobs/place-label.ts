@@ -1,4 +1,5 @@
 import type { JobDetail, JobSummary } from '@job-finder/shared';
+
 import type { Translations } from '../../core/i18n/translations';
 
 /**

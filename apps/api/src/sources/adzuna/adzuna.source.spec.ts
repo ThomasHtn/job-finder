@@ -1,5 +1,7 @@
 import type { ConfigService } from '@nestjs/config';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { Env } from '../../config/env.schema.js';
 import { PROFILE } from '../../ingestion/test-fixtures.js';
 import { AdzunaSource } from './adzuna.source.js';

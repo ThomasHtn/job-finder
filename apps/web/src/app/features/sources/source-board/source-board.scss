@@ -152,7 +152,7 @@
 }
 
 /* Edge to edge on a phone, like the feed. */
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .board {
     border-inline: 0;
     border-radius: 0;

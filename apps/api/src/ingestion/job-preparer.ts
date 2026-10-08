@@ -44,10 +44,6 @@ export async function prepareJob(
     longitude,
     city,
     postalCode,
-    dedupeHash: computeDedupeHash(
-      raw.title,
-      raw.company,
-      isRemote ? 'remote' : city,
-    ),
+    dedupeHash: computeDedupeHash(raw.title, raw.company, isRemote ? 'remote' : city),
   };
 }

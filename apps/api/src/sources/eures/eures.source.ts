@@ -1,9 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { sleep } from '../../common/sleep.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {
@@ -33,9 +31,7 @@ export class EuresSource implements JobSourceConnector {
   /**
    * Keywords and region come from the profile.
    */
-  constructor(
-    @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
-  ) {}
+  constructor(@Inject(SEARCH_PROFILE) private readonly profile: SearchProfile) {}
 
   /**
    * Always enabled.
@@ -57,9 +53,7 @@ export class EuresSource implements JobSourceConnector {
       }
     }
 
-    return [...jobs.values()].map((job) =>
-      toRawJob(job, this.profile.area.label),
-    );
+    return [...jobs.values()].map((job) => toRawJob(job, this.profile.area.label));
   }
 
   /**

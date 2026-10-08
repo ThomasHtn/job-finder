@@ -7,7 +7,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
+
 import type { Request } from 'express';
+
 import type { Env } from '../config/env.schema.js';
 import { AuthService } from './auth.service.js';
 import { IS_PUBLIC_KEY } from './public.decorator.js';
@@ -52,9 +54,7 @@ export class AuthGuard implements CanActivate {
 
     if (!(await this.auth.isRequired())) {
       if (!this.isDeployed) return true;
-      throw new ServiceUnavailableException(
-        'No app password configured, see auth:set-password',
-      );
+      throw new ServiceUnavailableException('No app password configured, see auth:set-password');
     }
 
     const request = context.switchToHttp().getRequest<Request>();

@@ -1,10 +1,12 @@
 import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+
 import {
-  toJobTab,
   type JobDetail,
   type JobListResponse,
   type JobSummary,
+  toJobTab,
 } from '@job-finder/shared';
+
 import { JobsService } from './jobs.service.js';
 
 /**

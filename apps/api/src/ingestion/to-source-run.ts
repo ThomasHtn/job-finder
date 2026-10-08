@@ -1,4 +1,5 @@
 import type { SourceRun } from '@job-finder/shared';
+
 import type { FinishedRun } from './ingestion.types.js';
 
 /**

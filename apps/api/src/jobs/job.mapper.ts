@@ -1,4 +1,5 @@
 import type { JobDetail, JobSummary } from '@job-finder/shared';
+
 import type { JobModel } from '../generated/prisma/models.js';
 import { excerpt } from './excerpt.js';
 

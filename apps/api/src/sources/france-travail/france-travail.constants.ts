@@ -7,8 +7,7 @@ export const TOKEN_URL =
 /**
  * Offer search endpoint.
  */
-export const SEARCH_URL =
-  'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
+export const SEARCH_URL = 'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
 
 /**
  * Scopes granted to the application.
@@ -69,8 +68,7 @@ export const TOKEN_REFRESH_MARGIN_S = 60;
 /**
  * Ad page an offer id resolves to, when the source gives no direct link.
  */
-export const DETAIL_URL =
-  'https://candidat.francetravail.fr/offres/recherche/detail';
+export const DETAIL_URL = 'https://candidat.francetravail.fr/offres/recherche/detail';
 
 /**
  * Explicit full-remote wording; the API's "Possibilité de télétravail" is only partial.

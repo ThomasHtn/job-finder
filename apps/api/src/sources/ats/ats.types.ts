@@ -2,12 +2,7 @@
  * The ATS (and single-company career APIs) whose public job feeds are supported.
  */
 export type AtsProvider =
-  | 'greenhouse'
-  | 'lever'
-  | 'ashby'
-  | 'smartrecruiters'
-  | 'talentsoft'
-  | 'capgemini';
+  'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters' | 'talentsoft' | 'capgemini';
 
 /**
  * One company career site to poll.

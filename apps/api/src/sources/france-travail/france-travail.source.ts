@@ -1,11 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { sleep } from '../../common/sleep.js';
 import type { Env } from '../../config/env.schema.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {
@@ -24,10 +22,7 @@ import {
   TOKEN_URL,
 } from './france-travail.constants.js';
 import { toRawJob } from './france-travail.mapper.js';
-import type {
-  FranceTravailOffer,
-  TokenResponse,
-} from './france-travail.types.js';
+import type { FranceTravailOffer, TokenResponse } from './france-travail.types.js';
 
 /**
  * France Travail connector: the richest source, full text and coordinates included.
@@ -74,10 +69,7 @@ export class FranceTravailSource implements JobSourceConnector {
         offers.set(offer.id, offer);
       }
       /* Nationwide, to catch fully remote offers located anywhere in France. */
-      for (const offer of await this.search(
-        { motsCles: `${query} télétravail` },
-        'remote',
-      )) {
+      for (const offer of await this.search({ motsCles: `${query} télétravail` }, 'remote')) {
         offers.set(offer.id, offer);
       }
     }
@@ -163,12 +155,8 @@ export class FranceTravailSource implements JobSourceConnector {
 
       const retryAfter = Number(response.headers.get('Retry-After'));
       const wait =
-        Number.isFinite(retryAfter) && retryAfter > 0
-          ? retryAfter * 1000
-          : RETRY_BACKOFF_MS;
-      this.logger.warn(
-        `Rate limited, waiting ${wait}ms (attempt ${attempt + 1}/${MAX_RETRIES})`,
-      );
+        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : RETRY_BACKOFF_MS;
+      this.logger.warn(`Rate limited, waiting ${wait}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
       await sleep(wait);
     }
 
@@ -179,8 +167,7 @@ export class FranceTravailSource implements JobSourceConnector {
    * Returns the cached token or fetches a new one.
    */
   private async getToken(): Promise<string> {
-    if (this.token && this.token.expiresAt > Date.now())
-      return this.token.value;
+    if (this.token && this.token.expiresAt > Date.now()) return this.token.value;
 
     const response = await fetch(TOKEN_URL, {
       method: 'POST',
@@ -195,9 +182,7 @@ export class FranceTravailSource implements JobSourceConnector {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `France Travail auth failed (${response.status}): ${await response.text()}`,
-      );
+      throw new Error(`France Travail auth failed (${response.status}): ${await response.text()}`);
     }
 
     const token = (await response.json()) as TokenResponse;

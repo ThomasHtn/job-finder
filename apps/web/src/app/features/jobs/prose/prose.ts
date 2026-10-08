@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+
 import { toDescriptionBlocks } from '../description/to-description-blocks';
 
 /**

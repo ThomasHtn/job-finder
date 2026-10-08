@@ -1,4 +1,4 @@
-import { JOB_TABS, toJobTab, type JobTab } from '@job-finder/shared';
+import { JOB_TABS, type JobTab, toJobTab } from '@job-finder/shared';
 
 /**
  * Tab of the shell that shows the sources instead of a list of offers. Web only: the API

@@ -1,5 +1,6 @@
 :host {
   display: block;
+
   // Reading text, not secondary information: full ink, generous leading, ~66-character measure.
   max-width: 36rem;
   color: var(--ink);
@@ -50,7 +51,7 @@
   }
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   :host {
     font-size: 1rem;
     line-height: 1.7;

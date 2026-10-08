@@ -1,11 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import type { IngestionSummary, JobSource, SourceStatus } from '@job-finder/shared';
+
 import type { Env } from '../config/env.schema.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../config/search-profile.js';
 import { GeoService } from '../geo/geo.service.js';
 import type { JobSourceConnector } from '../sources/job-source-connector.js';
 import { JOB_SOURCE_CONNECTORS } from '../sources/job-source-connectors.token.js';
@@ -64,9 +63,7 @@ export class IngestionService {
     try {
       for (const connector of this.connectors) {
         if (!connector.isEnabled()) {
-          this.logger.warn(
-            `Source ${connector.name} is not configured, skipping`,
-          );
+          this.logger.warn(`Source ${connector.name} is not configured, skipping`);
           summary.skippedSources.push(connector.name);
           continue;
         }
@@ -118,10 +115,7 @@ export class IngestionService {
    * Fetches one source, persists what passes the filters, and records the run.
    * Errors are captured on the run row and in the summary, never rethrown.
    */
-  private async runSource(
-    connector: JobSourceConnector,
-    summary: IngestionSummary,
-  ): Promise<void> {
+  private async runSource(connector: JobSourceConnector, summary: IngestionSummary): Promise<void> {
     const runId = await this.repository.startRun(connector.name);
 
     try {
@@ -152,9 +146,7 @@ export class IngestionService {
         inserted,
         updated,
       });
-      this.logger.log(
-        `${connector.name}: ${rawJobs.length} fetched, ${kept} kept`,
-      );
+      this.logger.log(`${connector.name}: ${rawJobs.length} fetched, ${kept} kept`);
     } catch (error) {
       const message = (error as Error).message;
       summary.failedSources.push(connector.name);

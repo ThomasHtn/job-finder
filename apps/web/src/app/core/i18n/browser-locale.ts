@@ -1,4 +1,4 @@
-import { FALLBACK_LOCALE, toLocale, type Locale } from './locale';
+import { FALLBACK_LOCALE, type Locale, toLocale } from './locale';
 
 /**
  * First of the reader's preferred languages the UI actually speaks.

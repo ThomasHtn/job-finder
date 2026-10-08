@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { distanceKm } from './distance-km.js';
 import { isWithinArea } from './is-within-area.js';
 import { loadIsochrone } from './load-isochrone.js';
@@ -68,12 +69,7 @@ describe('isWithinArea with the committed isochrone', () => {
   it('drops what the roads put out of reach, however close it looks', () => {
     /* Évreux fits in a 100 km circle and not in 100 km of road: the estuary sends the drive
        round by Tancarville. The sea point is 34 km out and reachable by no road at all. */
-    for (const place of [
-      PLACES.evreux,
-      PLACES.amiens,
-      PLACES.paris,
-      PLACES.openSea,
-    ]) {
+    for (const place of [PLACES.evreux, PLACES.amiens, PLACES.paris, PLACES.openSea]) {
       expect(isWithinArea(area, LE_HAVRE, place, DRIVE_KM)).toBe(false);
     }
   });
@@ -90,12 +86,7 @@ describe('isWithinArea with the committed isochrone', () => {
  */
 describe('isWithinArea without an isochrone', () => {
   it('falls back to the configured drive as a radius around the centre', () => {
-    for (const place of [
-      PLACES.bolbec,
-      PLACES.caen,
-      PLACES.rouen,
-      PLACES.dieppe,
-    ]) {
+    for (const place of [PLACES.bolbec, PLACES.caen, PLACES.rouen, PLACES.dieppe]) {
       expect(isWithinArea(null, LE_HAVRE, place, DRIVE_KM)).toBe(true);
     }
     for (const place of [PLACES.amiens, PLACES.paris]) {

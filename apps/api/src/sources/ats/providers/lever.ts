@@ -24,10 +24,7 @@ export async function fetchLever(company: CompanyConfig): Promise<RawJob[]> {
       title: job.text,
       company: company.name,
       companyDescription: null,
-      description:
-        [job.descriptionPlain, job.additionalPlain]
-          .filter(Boolean)
-          .join('\n\n') || null,
+      description: [job.descriptionPlain, job.additionalPlain].filter(Boolean).join('\n\n') || null,
       hasFullDescription: Boolean(job.descriptionPlain),
       contractLabel: job.categories?.commitment ?? null,
       isPermanent: permanentFromLabel(job.categories?.commitment),

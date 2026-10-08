@@ -100,12 +100,12 @@ the town, the offer is kept and flagged rather than dropped in silence.
 
 ## A typical day
 
-| | |
-|---|---|
-| **8:02** | You open the app from the icon on your home screen. |
+|          |                                                                 |
+| -------- | --------------------------------------------------------------- |
+| **8:02** | You open the app from the icon on your home screen.             |
 | **8:03** | Four offers flagged New. Two do not speak to you: cross, cross. |
-| **8:05** | A third one interests you: star. You apply to the fourth. |
-| **8:06** | Done. The day's watch is over. |
+| **8:05** | A third one interests you: star. You apply to the fourth.       |
+| **8:06** | Done. The day's watch is over.                                  |
 
 ## The sources covered
 
@@ -138,10 +138,10 @@ button in the header switches it at any time, including before the password scre
 
 npm workspaces monorepo, Node 22 or later.
 
-| Workspace | Contents |
-|---|---|
-| `apps/api` | NestJS 12, Prisma 7, PostgreSQL |
-| `apps/web` | Angular 22, standalone, signals |
+| Workspace         | Contents                                            |
+| ----------------- | --------------------------------------------------- |
+| `apps/api`        | NestJS 12, Prisma 7, PostgreSQL                     |
+| `apps/web`        | Angular 22, standalone, signals                     |
 | `packages/shared` | The API types shared by both (`@job-finder/shared`) |
 
 `packages/shared` is consumed compiled: `npm run build -w @job-finder/shared` must have run at
@@ -205,16 +205,16 @@ the panel travel back to the list through `JobPatchBus` rather than through a re
 
 ## Routes
 
-| Route | |
-|---|---|
-| `GET /api/config` | Local tab label, whether a password is set (public) |
-| `POST /api/auth/login` | Returns a session token (public, 5 attempts per 15 min) |
-| `GET /api/jobs?tab=local\|remote\|favorites` | List, counts, last ingestion |
-| `GET /api/jobs/:id` | Detail, marks the offer as viewed |
-| `PATCH /api/jobs/:id/favorite` and `/hide` | Favorite, hiding |
-| `POST /api/ingestion/run` | Manual ingestion |
-| `GET /api/ingestion/status` | State per source |
-| `GET /api/health` | Api and database (public) |
+| Route                                        |                                                         |
+| -------------------------------------------- | ------------------------------------------------------- |
+| `GET /api/config`                            | Local tab label, whether a password is set (public)     |
+| `POST /api/auth/login`                       | Returns a session token (public, 5 attempts per 15 min) |
+| `GET /api/jobs?tab=local\|remote\|favorites` | List, counts, last ingestion                            |
+| `GET /api/jobs/:id`                          | Detail, marks the offer as viewed                       |
+| `PATCH /api/jobs/:id/favorite` and `/hide`   | Favorite, hiding                                        |
+| `POST /api/ingestion/run`                    | Manual ingestion                                        |
+| `GET /api/ingestion/status`                  | State per source                                        |
+| `GET /api/health`                            | Api and database (public)                               |
 
 ## Deployment
 

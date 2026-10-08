@@ -10,10 +10,7 @@ import { fetchTalentsoft } from './talentsoft.js';
 /**
  * Fetcher per provider, looked up by the ATS connector.
  */
-export const ATS_FETCHERS: Record<
-  AtsProvider,
-  (company: CompanyConfig) => Promise<RawJob[]>
-> = {
+export const ATS_FETCHERS: Record<AtsProvider, (company: CompanyConfig) => Promise<RawJob[]>> = {
   greenhouse: fetchGreenhouse,
   lever: fetchLever,
   ashby: fetchAshby,

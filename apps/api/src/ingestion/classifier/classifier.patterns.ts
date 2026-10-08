@@ -18,8 +18,7 @@ export const REMOTE_PATTERNS = [
 /**
  * Words that flip a remote mention, as in "pas de full remote" or "no remote work".
  */
-export const NEGATION_BEFORE =
-  /(\bpas (de |d'|d |en )?|\bsans |\baucune? |\bni |\bnon? |\bnot )$/;
+export const NEGATION_BEFORE = /(\bpas (de |d'|d |en )?|\bsans |\baucune? |\bni |\bnon? |\bnot )$/;
 
 /**
  * Characters inspected before a remote mention when looking for a negation.

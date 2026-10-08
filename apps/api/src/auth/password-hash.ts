@@ -1,4 +1,5 @@
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
+
 import { KEY_LENGTH, SALT_LENGTH, SCRYPT_OPTIONS } from './secret.constants.js';
 
 /**

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { GeoModule } from '../geo/geo.module.js';
 import { SourcesModule } from '../sources/sources.module.js';
 import { IngestionController } from './ingestion.controller.js';

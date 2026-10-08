@@ -1,8 +1,7 @@
 /**
  * Public search endpoint of the EURES portal.
  */
-export const SEARCH_URL =
-  'https://europa.eu/eures/api/jv-searchengine/public/jv-search/search';
+export const SEARCH_URL = 'https://europa.eu/eures/api/jv-searchengine/public/jv-search/search';
 
 /**
  * Detail page linked from the UI.
@@ -37,5 +36,4 @@ export const DIRECT_HIRE = 'directhire';
 /**
  * Wording that disqualifies a direct hire from being permanent.
  */
-export const NON_PERMANENT_TEXT =
-  /\bcdd\b|int[ée]rim|\bstage\b|alternance|apprentissage/i;
+export const NON_PERMANENT_TEXT = /\bcdd\b|int[ée]rim|\bstage\b|alternance|apprentissage/i;

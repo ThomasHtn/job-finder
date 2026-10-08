@@ -5,8 +5,6 @@ import { MAX_ERROR_LENGTH } from './adzuna.constants.js';
  */
 export async function describeFailure(response: Response): Promise<string> {
   const body = (await response.text()).trim();
-  const detail = body.startsWith('<')
-    ? 'HTML error page'
-    : body.slice(0, MAX_ERROR_LENGTH);
+  const detail = body.startsWith('<') ? 'HTML error page' : body.slice(0, MAX_ERROR_LENGTH);
   return `Adzuna search failed (${response.status}): ${detail}`;
 }

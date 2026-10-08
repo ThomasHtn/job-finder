@@ -6,8 +6,7 @@ export const SEARCH_URL = 'https://www.apec.fr/cms/webservices/rechercheOffre';
 /**
  * Ad page an offer number resolves to.
  */
-export const DETAIL_URL =
-  'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre';
+export const DETAIL_URL = 'https://www.apec.fr/candidat/recherche-emploi.html/emploi/detail-offre';
 
 /**
  * Referential ids: APEC filters on numeric keys, not on labels.

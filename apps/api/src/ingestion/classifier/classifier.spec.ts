@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import type { SearchProfile } from '../../config/search-profile.js';
 import type { RawJob } from '../../sources/raw-job.js';
 import { detectPermanent, permanentFromLabel } from './detect-permanent.js';
@@ -11,12 +12,7 @@ import { isWanted } from './is-wanted.js';
 const PROFILE: SearchProfile = {
   keywords: ['développeur'],
   romeCode: null,
-  titleInclude: [
-    'developpeur',
-    'developer',
-    'ingenieur logiciel',
-    'full stack',
-  ],
+  titleInclude: ['developpeur', 'developer', 'ingenieur logiciel', 'full stack'],
   titleExclude: ['alternance', 'stage', 'business developer', 'commercial'],
   stackKeywords: ['angular', 'java', 'typescript', 'node.js', 'full stack'],
   area: {
@@ -65,42 +61,28 @@ function job(overrides: Partial<RawJob>): RawJob {
  */
 describe('isWanted', () => {
   it('keeps a developer role mentioning a wanted technology', () => {
-    expect(
-      isWanted(job({ description: 'Stack Angular et Java' }), PROFILE),
-    ).toBe(true);
+    expect(isWanted(job({ description: 'Stack Angular et Java' }), PROFILE)).toBe(true);
   });
 
   it('matches technologies in the title too', () => {
-    expect(isWanted(job({ title: 'Développeur Angular (H/F)' }), PROFILE)).toBe(
-      true,
-    );
+    expect(isWanted(job({ title: 'Développeur Angular (H/F)' }), PROFILE)).toBe(true);
   });
 
   it('drops an ad that mentions none of the wanted technologies', () => {
     expect(
-      isWanted(
-        job({ title: 'Développeur PHP', description: 'Symfony, Laravel' }),
-        PROFILE,
-      ),
+      isWanted(job({ title: 'Développeur PHP', description: 'Symfony, Laravel' }), PROFILE),
     ).toBe(false);
   });
 
   it('drops titles that are not developer roles', () => {
-    expect(
-      isWanted(job({ title: 'Chef de projet', description: 'Java' }), PROFILE),
-    ).toBe(false);
+    expect(isWanted(job({ title: 'Chef de projet', description: 'Java' }), PROFILE)).toBe(false);
   });
 
   it('drops excluded titles even when the stack matches', () => {
-    expect(
-      isWanted(job({ title: 'Développeur Java en alternance' }), PROFILE),
-    ).toBe(false);
-    expect(
-      isWanted(
-        job({ title: 'Business Developer', description: 'TypeScript' }),
-        PROFILE,
-      ),
-    ).toBe(false);
+    expect(isWanted(job({ title: 'Développeur Java en alternance' }), PROFILE)).toBe(false);
+    expect(isWanted(job({ title: 'Business Developer', description: 'TypeScript' }), PROFILE)).toBe(
+      false,
+    );
   });
 
   it('ignores accents and case', () => {
@@ -108,12 +90,9 @@ describe('isWanted', () => {
   });
 
   it('does not let "java" match "javascript"', () => {
-    expect(
-      isWanted(
-        job({ title: 'Développeur', description: 'JavaScript only' }),
-        PROFILE,
-      ),
-    ).toBe(false);
+    expect(isWanted(job({ title: 'Développeur', description: 'JavaScript only' }), PROFILE)).toBe(
+      false,
+    );
   });
 
   it('matches keywords carrying punctuation', () => {
@@ -157,44 +136,30 @@ describe('detectRemote', () => {
   });
 
   it('reads full remote wording in the text', () => {
-    expect(
-      detectRemote(job({ description: 'Poste en télétravail total.' })),
-    ).toBe(true);
+    expect(detectRemote(job({ description: 'Poste en télétravail total.' }))).toBe(true);
     expect(detectRemote(job({ description: '100% télétravail' }))).toBe(true);
     expect(detectRemote(job({ locationText: 'Full remote' }))).toBe(true);
   });
 
   it('ignores partial remote', () => {
-    expect(
-      detectRemote(
-        job({ description: 'Télétravail possible 2 jours par semaine.' }),
-      ),
-    ).toBe(false);
+    expect(detectRemote(job({ description: 'Télétravail possible 2 jours par semaine.' }))).toBe(
+      false,
+    );
   });
 
   it('ignores a negated mention', () => {
-    expect(
-      detectRemote(
-        job({ description: 'PAS DE FULL REMOTE NI SOUS TRAITANCE MERCI' }),
-      ),
-    ).toBe(false);
-    expect(
-      detectRemote(job({ description: 'Poste sans télétravail total.' })),
-    ).toBe(false);
-    expect(
-      detectRemote(job({ description: 'No full remote, hybrid only.' })),
-    ).toBe(false);
+    expect(detectRemote(job({ description: 'PAS DE FULL REMOTE NI SOUS TRAITANCE MERCI' }))).toBe(
+      false,
+    );
+    expect(detectRemote(job({ description: 'Poste sans télétravail total.' }))).toBe(false);
+    expect(detectRemote(job({ description: 'No full remote, hybrid only.' }))).toBe(false);
   });
 
   it('keeps a mention that is not negated, even next to a negation', () => {
-    expect(
-      detectRemote(
-        job({ description: 'Full remote possible, pas de déplacement.' }),
-      ),
-    ).toBe(true);
-    expect(
-      detectRemote(job({ description: "Pas d'astreinte. Télétravail total." })),
-    ).toBe(true);
+    expect(detectRemote(job({ description: 'Full remote possible, pas de déplacement.' }))).toBe(
+      true,
+    );
+    expect(detectRemote(job({ description: "Pas d'astreinte. Télétravail total." }))).toBe(true);
   });
 });
 
@@ -224,18 +189,14 @@ describe('permanentFromLabel', () => {
 describe('detectPermanent', () => {
   it('trusts the source when it states the contract', () => {
     expect(detectPermanent(job({ isPermanent: true }))).toBe(true);
-    expect(
-      detectPermanent(job({ isPermanent: false, description: 'CDI' })),
-    ).toBe(false);
+    expect(detectPermanent(job({ isPermanent: false, description: 'CDI' }))).toBe(false);
   });
 
   it('falls back to the text otherwise', () => {
     expect(detectPermanent(job({ contractLabel: 'CDI' }))).toBe(true);
-    expect(
-      detectPermanent(
-        job({ description: 'Contrat à durée déterminée de 6 mois' }),
-      ),
-    ).toBe(false);
+    expect(detectPermanent(job({ description: 'Contrat à durée déterminée de 6 mois' }))).toBe(
+      false,
+    );
     expect(detectPermanent(job({}))).toBe(false);
   });
 });

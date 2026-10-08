@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+
 import { prepareJob } from './job-preparer.js';
 import type { GeoPort } from './job-preparer.types.js';
 import { PROFILE, rawJob } from './test-fixtures.js';
@@ -44,11 +45,7 @@ describe('prepareJob', () => {
   });
 
   it('drops offers outside the commuting area', async () => {
-    const out = await prepareJob(
-      rawJob(),
-      PROFILE,
-      geo({ isWithinArea: () => false }),
-    );
+    const out = await prepareJob(rawJob(), PROFILE, geo({ isWithinArea: () => false }));
     expect(out).toBeNull();
   });
 

@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { COMPANIES } from './companies.config.js';
-import { ATS_FETCHERS } from './providers/ats-fetchers.js';
+
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
+import { COMPANIES } from './companies.config.js';
+import { ATS_FETCHERS } from './providers/ats-fetchers.js';
 
 /**
  * One connector for every company career site polled through a public ATS API.
@@ -26,9 +27,9 @@ export class AtsSource implements JobSourceConnector {
   }
 
   /**
-
+   *
    * One company failing must not cost the others, so failures are logged and skipped.
-
+   *
    */
   async fetchJobs(): Promise<RawJob[]> {
     const results = await Promise.allSettled(
@@ -41,9 +42,7 @@ export class AtsSource implements JobSourceConnector {
       if (result.status === 'fulfilled') {
         jobs.push(...result.value);
       } else {
-        this.logger.warn(
-          `${company.name} (${company.provider}) failed: ${result.reason}`,
-        );
+        this.logger.warn(`${company.name} (${company.provider}) failed: ${result.reason}`);
       }
     });
 

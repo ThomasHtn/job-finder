@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+
 import { I18n } from '../../core/i18n/i18n.service';
-import { SUPPORTED_LOCALES, type Locale } from '../../core/i18n/locale';
+import { type Locale, SUPPORTED_LOCALES } from '../../core/i18n/locale';
 
 /**
  * The language switch: one button, showing the language in use and swapping to the next one.

@@ -1,8 +1,8 @@
 import { permanentFromLabel } from '../../ingestion/classifier/detect-permanent.js';
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
-import { joobleId } from './jooble-id.js';
 import type { JoobleJob } from './jooble.types.js';
+import { joobleId } from './jooble-id.js';
 
 /**
  * Jooble result to the source-agnostic shape.

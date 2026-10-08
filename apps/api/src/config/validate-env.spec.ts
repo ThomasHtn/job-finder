@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { validateEnv } from './validate-env.js';
 
 /**
@@ -33,9 +34,7 @@ describe('validateEnv', () => {
   });
 
   it('rejects an empty keyword list', () => {
-    expect(() => validateEnv({ ...MINIMAL, SEARCH_KEYWORDS: ' , ' })).toThrow(
-      /SEARCH_KEYWORDS/,
-    );
+    expect(() => validateEnv({ ...MINIMAL, SEARCH_KEYWORDS: ' , ' })).toThrow(/SEARCH_KEYWORDS/);
   });
 
   it('applies the ingestion defaults', () => {
@@ -45,8 +44,6 @@ describe('validateEnv', () => {
   });
 
   it('rejects malformed coordinates', () => {
-    expect(() =>
-      validateEnv({ ...MINIMAL, SEARCH_AREA_CENTER: 'Le Havre' }),
-    ).toThrow(/lat,lng/);
+    expect(() => validateEnv({ ...MINIMAL, SEARCH_AREA_CENTER: 'Le Havre' })).toThrow(/lat,lng/);
   });
 });

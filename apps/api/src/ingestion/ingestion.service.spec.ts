@@ -1,28 +1,25 @@
 import type { ConfigService } from '@nestjs/config';
+
 import { describe, expect, it, vi } from 'vitest';
+
 import type { Env } from '../config/env.schema.js';
 import type { JobSourceConnector } from '../sources/job-source-connector.js';
 import type { RawJob } from '../sources/raw-job.js';
-import type { IngestionRepository } from './ingestion.repository.js';
-import type { FinishedRun, PersistOutcome } from './ingestion.types.js';
 import { ALREADY_RUNNING } from './ingestion.constants.js';
+import type { IngestionRepository } from './ingestion.repository.js';
 import { IngestionService } from './ingestion.service.js';
+import type { FinishedRun, PersistOutcome } from './ingestion.types.js';
 import type { GeoPort } from './job-preparer.types.js';
 import { PROFILE, rawJob } from './test-fixtures.js';
 
 /**
  * Connector stub answering a fixed list, or failing with the given error.
  */
-function connector(
-  name: string,
-  jobs: RawJob[] | Error,
-  enabled = true,
-): JobSourceConnector {
+function connector(name: string, jobs: RawJob[] | Error, enabled = true): JobSourceConnector {
   return {
     name,
     isEnabled: () => enabled,
-    fetchJobs: () =>
-      jobs instanceof Error ? Promise.reject(jobs) : Promise.resolve(jobs),
+    fetchJobs: () => (jobs instanceof Error ? Promise.reject(jobs) : Promise.resolve(jobs)),
   };
 }
 
@@ -114,10 +111,7 @@ describe('IngestionService.run', () => {
   });
 
   it('counts merged offers', async () => {
-    const summary = await service(
-      [connector('ft', [rawJob()])],
-      repository('merged'),
-    ).run();
+    const summary = await service([connector('ft', [rawJob()])], repository('merged')).run();
     expect(summary.merged).toBe(1);
     expect(summary.inserted).toBe(0);
   });

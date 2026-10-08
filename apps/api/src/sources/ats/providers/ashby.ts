@@ -17,9 +17,7 @@ export async function fetchAshby(company: CompanyConfig): Promise<RawJob[]> {
   );
 
   return (body.jobs ?? [])
-    .filter((job) =>
-      isFrance(job.address?.postalAddress?.addressCountry, job.location),
-    )
+    .filter((job) => isFrance(job.address?.postalAddress?.addressCountry, job.location))
     .map((job) => {
       const address = job.address?.postalAddress;
       return {

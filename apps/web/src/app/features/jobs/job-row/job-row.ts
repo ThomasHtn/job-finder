@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
 import type { JobSummary } from '@job-finder/shared';
+
 import { I18n } from '../../../core/i18n/i18n.service';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { Icon } from '../../../shared/icon/icon';

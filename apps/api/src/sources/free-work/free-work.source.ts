@@ -1,9 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { sleep } from '../../common/sleep.js';
-import {
-  SEARCH_PROFILE,
-  type SearchProfile,
-} from '../../config/search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import {
@@ -36,9 +34,7 @@ export class FreeWorkSource implements JobSourceConnector {
   /**
    * Place comes from the profile.
    */
-  constructor(
-    @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
-  ) {}
+  constructor(@Inject(SEARCH_PROFILE) private readonly profile: SearchProfile) {}
 
   /**
    * Public endpoint, no credentials needed.
@@ -71,9 +67,7 @@ export class FreeWorkSource implements JobSourceConnector {
   /**
    * One search, paged until a short page or the cap.
    */
-  private async search(
-    criteria: Record<string, string>,
-  ): Promise<FreeWorkJob[]> {
+  private async search(criteria: Record<string, string>): Promise<FreeWorkJob[]> {
     const collected: FreeWorkJob[] = [];
 
     for (let page = 1; page <= MAX_PAGES; page += 1) {

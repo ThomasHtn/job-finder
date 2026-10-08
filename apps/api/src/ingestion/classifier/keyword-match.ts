@@ -7,9 +7,7 @@ import { normalize } from '../../common/text.js';
  */
 export function keywordRegex(keyword: string): RegExp {
   const needle = normalize(keyword);
-  const escaped = needle
-    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    .replace(/ /g, '\\s+');
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+');
   return /^[a-z0-9 ]+$/.test(needle)
     ? new RegExp(`\\b${escaped}\\b`, 'g')
     : new RegExp(escaped, 'g');

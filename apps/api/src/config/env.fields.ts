@@ -32,9 +32,7 @@ export const csvList = z
 /**
  * Comma-separated list that must hold at least one entry.
  */
-export const requiredCsvList = csvList.pipe(
-  z.array(z.string()).min(1, 'at least one entry'),
-);
+export const requiredCsvList = csvList.pipe(z.array(z.string()).min(1, 'at least one entry'));
 
 /**
  * "lat,lng" in decimal degrees.

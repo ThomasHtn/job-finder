@@ -1,10 +1,6 @@
 import { normalize } from '../../common/text.js';
 import type { RawJob } from '../../sources/raw-job.js';
-import {
-  NEGATION_BEFORE,
-  NEGATION_LOOKBEHIND,
-  REMOTE_PATTERNS,
-} from './classifier.patterns.js';
+import { NEGATION_BEFORE, NEGATION_LOOKBEHIND, REMOTE_PATTERNS } from './classifier.patterns.js';
 import { keywordRegex } from './keyword-match.js';
 
 /**
@@ -13,17 +9,12 @@ import { keywordRegex } from './keyword-match.js';
  */
 export function detectRemote(job: RawJob): boolean {
   if (job.isRemote) return true;
-  const haystack = normalize(
-    `${job.title} ${job.locationText ?? ''} ${job.description ?? ''}`,
-  );
+  const haystack = normalize(`${job.title} ${job.locationText ?? ''} ${job.description ?? ''}`);
   return REMOTE_PATTERNS.some((pattern) =>
     [...haystack.matchAll(keywordRegex(pattern))].some(
       (match) =>
         !NEGATION_BEFORE.test(
-          haystack.slice(
-            Math.max(0, match.index - NEGATION_LOOKBEHIND),
-            match.index,
-          ),
+          haystack.slice(Math.max(0, match.index - NEGATION_LOOKBEHIND), match.index),
         ),
     ),
   );

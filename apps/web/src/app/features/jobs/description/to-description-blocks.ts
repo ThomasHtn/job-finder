@@ -1,5 +1,5 @@
-import type { DescriptionBlock } from './description-block';
 import { BULLET, LEAD_IN, LEAD_IN_MAX } from './description.constants';
+import type { DescriptionBlock } from './description-block';
 
 /**
  * Sources hand us one plain-text blob with meaningful newlines. Restore its structure so a

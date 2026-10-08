@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { planMerge } from './plan-merge.js';
 import { rawJob } from './test-fixtures.js';
 

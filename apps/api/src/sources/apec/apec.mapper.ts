@@ -33,8 +33,6 @@ export function toRawJob(offer: ApecOffer, isRemote: boolean): RawJob {
     isRemote,
     isLocationApproximate: false,
     url: `${DETAIL_URL}/${offer.numeroOffre}`,
-    publishedAt: offer.datePublication
-      ? new Date(offer.datePublication)
-      : null,
+    publishedAt: offer.datePublication ? new Date(offer.datePublication) : null,
   };
 }

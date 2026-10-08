@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import type { JobDetail, JobListResponse, JobSummary, JobTab } from '@job-finder/shared';
+import { inject, Injectable } from '@angular/core';
+
 import { Observable } from 'rxjs';
+
+import type { JobDetail, JobListResponse, JobSummary, JobTab } from '@job-finder/shared';
+
 import { apiUrl } from '../../core/api-url';
 
 /**

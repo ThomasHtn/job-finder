@@ -75,6 +75,7 @@
 
 .layout {
   display: grid;
+
   /* Reading and choosing get the same room: neither column is the leftover of the other. */
   grid-template-columns: minmax(0, 1fr) minmax(21rem, 1fr);
   align-items: start;
@@ -182,7 +183,7 @@
   }
 }
 
-@media (max-width: 63.99rem) {
+@media (width <= 63.99rem) {
   :host {
     --head-total: var(--header-h);
   }
@@ -225,7 +226,7 @@
 }
 
 /* On a phone the list runs edge to edge: the frame was costing reading width. */
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .feed {
     padding-inline: 0;
   }
@@ -242,7 +243,7 @@
   }
 }
 
-@media (max-width: 26rem) {
+@media (width <= 26rem) {
   .fresh {
     gap: 0.5rem;
     padding: 0.75rem 0.875rem;
