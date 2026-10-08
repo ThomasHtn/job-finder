@@ -163,14 +163,32 @@ curl -X POST http://localhost:3001/api/ingestion/run   # the database starts out
 
 ```bash
 npm run build                        # shared, then api, then web
-npm test                             # api tests (vitest)
-npm run test -w web                  # front-end tests
-npm run lint                         # oxlint on the api
+npm test                             # api then web tests (vitest)
+npm run check                        # everything CI runs: format, lint, typecheck, test, build
+npm run fix                          # Prettier, then every ESLint and Stylelint autofix
 npm run db:migrate                   # migrations, then Prisma client regeneration
 npm run db:studio                    # Prisma Studio
 npm run geo:isochrone                # regenerates the area from the .env
 npm run auth:set-password -- <pwd>   # --clear to remove the password
 ```
+
+## Code quality
+
+Everything below runs on its own: nobody has to remember it.
+
+| Tool                  | What it guards                                                               |
+| --------------------- | ---------------------------------------------------------------------------- |
+| Prettier              | One format for TypeScript, templates, SCSS, JSON, Markdown and YAML          |
+| ESLint (type-aware)   | Bugs (floating promises, unsafe `any`), import order, explicit visibility    |
+| `jsdoc/require-jsdoc` | No class, member, function, type or constant without its comment             |
+| angular-eslint        | Component conventions, template best practices and accessibility             |
+| Stylelint             | SCSS conventions, BEM class names, colours only from the design tokens       |
+| husky + lint-staged   | Fixes and checks the staged files on every commit                            |
+| GitHub Actions        | `format:check`, `lint`, `typecheck`, `test` and `build` on every push and PR |
+| Dependabot            | Weekly grouped npm updates, monthly Actions and Docker base images           |
+
+The conventions themselves (comments, one concern per file, layering) are in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## How it works
 
