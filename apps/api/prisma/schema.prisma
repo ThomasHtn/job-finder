@@ -15,6 +15,7 @@ enum JobSourceType {
   EURES
   APEC
   FREE_WORK
+  JOOBLE
 }
 
 model Job {

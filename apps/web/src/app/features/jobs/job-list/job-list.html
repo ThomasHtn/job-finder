@@ -39,7 +39,7 @@
   <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
   @if (!compact()) {
     <div class="head__row head__row--tabs">
-      <app-job-tabs [items]="tabItems()" [current]="currentTab()" (selected)="selectTab($event)" />
+      <app-job-tabs [items]="tabItems()" [current]="currentView()" (selected)="selectTab($event)" />
     </div>
   }
 
@@ -47,101 +47,114 @@
   <div class="scan" [class.scan--on]="loading() || refreshing()" aria-hidden="true"></div>
 </header>
 
-<div class="layout">
-  <!-- The feed itself. -->
-  <main class="feed" [attr.aria-busy]="loading() || refreshing()">
-    <!-- What changed since last time: the first thing to read, and the only accent on the page. -->
-    @if (newCount() > 0) {
-      <button
-        type="button"
-        class="fresh"
-        [class.fresh--on]="onlyNew()"
-        [attr.aria-pressed]="onlyNew()"
-        (click)="toggleOnlyNew()"
-      >
-        <span class="fresh__dot" aria-hidden="true"></span>
-        <span class="fresh__text">
-          <span class="u-num">{{ newCount() }}</span>
-          {{ t().feed.newSince(newCount()) }}
-        </span>
-        <span class="fresh__action">
-          {{ onlyNew() ? t().feed.showAll : t().feed.showOnlyNew }}
-        </span>
-      </button>
-    }
-
-    <!-- Non-blocking warning when some sources failed during the last refresh. -->
-    @if (sourceWarning(); as warning) {
-      <p class="notice notice--alert">
-        <app-icon name="alert" />
-        <span>{{ warning }}</span>
-      </p>
-    } @else if (sourcesDegraded()) {
-      <!-- A tooltip on the refresh button says this too, and a phone never shows tooltips. -->
-      <p class="notice">
-        <app-icon name="alert" />
-        <span>{{ sourceStatusLabel() }}</span>
-      </p>
-    }
-
-    <!-- Blocking error, empty state, or the rows. -->
-    @if (error(); as message) {
-      <div class="empty">
-        <p class="empty__title">{{ message }}</p>
-        <button type="button" class="btn btn--primary" (click)="reload()">
-          {{ t().feed.retry }}
+<div class="layout" [class.layout--single]="showingSources()">
+  @if (showingSources()) {
+    <!-- The sources replace the feed and need no panel beside them. -->
+    <main class="feed">
+      @if (statusFailed()) {
+        <p class="notice notice--alert">
+          <app-icon name="alert" />
+          <span>{{ t().sources.unavailable }}</span>
+        </p>
+      }
+      <app-source-board [statuses]="sourceStatus()" />
+    </main>
+  } @else {
+    <!-- The feed itself. -->
+    <main class="feed" [attr.aria-busy]="loading() || refreshing()">
+      <!-- What changed since last time: the first thing to read, and the only accent on the page. -->
+      @if (newCount() > 0) {
+        <button
+          type="button"
+          class="fresh"
+          [class.fresh--on]="onlyNew()"
+          [attr.aria-pressed]="onlyNew()"
+          (click)="toggleOnlyNew()"
+        >
+          <span class="fresh__dot" aria-hidden="true"></span>
+          <span class="fresh__text">
+            <span class="u-num">{{ newCount() }}</span>
+            {{ t().feed.newSince(newCount()) }}
+          </span>
+          <span class="fresh__action">
+            {{ onlyNew() ? t().feed.showAll : t().feed.showOnlyNew }}
+          </span>
         </button>
-      </div>
-    } @else if (jobs().length === 0 && !loading()) {
-      <!-- Empty state, worded per tab and per filter. -->
-      <div class="empty">
-        @if (onlyNew()) {
-          <p class="empty__title">{{ t().feed.nothingNew }}</p>
-          <p class="empty__hint">{{ t().feed.nothingNewHint }}</p>
-          <button type="button" class="btn" (click)="toggleOnlyNew()">
-            {{ t().feed.showEveryOffer }}
-          </button>
-        } @else if (currentTab() === 'favorites') {
-          <p class="empty__title">{{ t().feed.noFavorites }}</p>
-          <p class="empty__hint">{{ t().feed.noFavoritesHint }}</p>
-        } @else {
-          <p class="empty__title">
-            {{ currentTab() === 'remote' ? t().feed.noRemote : t().feed.noOffers }}
-          </p>
-          <p class="empty__hint">{{ t().feed.noOffersHint }}</p>
-          <button
-            type="button"
-            class="btn btn--primary"
-            [disabled]="refreshing()"
-            (click)="refreshJobs()"
-          >
-            {{ t().feed.fetchOffers }}
-          </button>
-        }
-      </div>
-    } @else {
-      <!-- One row per offer; the row emits, the list persists and reloads. -->
-      <div class="feed__list">
-        @for (job of jobs(); track job.id) {
-          <app-job-row
-            [job]="job"
-            [selected]="job.id === selectedId()"
-            (favoriteToggled)="toggleFavorite($event)"
-            (hidden)="hideJob($event)"
-          />
-        }
-      </div>
-    }
-  </main>
+      }
 
-  <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
-  <aside class="panel" [class.panel--open]="detailOpen()">
-    <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
+      <!-- Non-blocking warning when some sources failed during the last refresh. -->
+      @if (sourceWarning(); as warning) {
+        <p class="notice notice--alert">
+          <app-icon name="alert" />
+          <span>{{ warning }}</span>
+        </p>
+      } @else if (sourcesDegraded()) {
+        <!-- A tooltip on the refresh button says this too, and a phone never shows tooltips. -->
+        <p class="notice">
+          <app-icon name="alert" />
+          <span>{{ sourceStatusLabel() }}</span>
+        </p>
+      }
 
-    @if (!detailOpen()) {
-      <p class="panel__idle">{{ t().feed.idlePanel }}</p>
-    }
-  </aside>
+      <!-- Blocking error, empty state, or the rows. -->
+      @if (error(); as message) {
+        <div class="empty">
+          <p class="empty__title">{{ message }}</p>
+          <button type="button" class="btn btn--primary" (click)="reload()">
+            {{ t().feed.retry }}
+          </button>
+        </div>
+      } @else if (jobs().length === 0 && !loading()) {
+        <!-- Empty state, worded per tab and per filter. -->
+        <div class="empty">
+          @if (onlyNew()) {
+            <p class="empty__title">{{ t().feed.nothingNew }}</p>
+            <p class="empty__hint">{{ t().feed.nothingNewHint }}</p>
+            <button type="button" class="btn" (click)="toggleOnlyNew()">
+              {{ t().feed.showEveryOffer }}
+            </button>
+          } @else if (currentTab() === 'favorites') {
+            <p class="empty__title">{{ t().feed.noFavorites }}</p>
+            <p class="empty__hint">{{ t().feed.noFavoritesHint }}</p>
+          } @else {
+            <p class="empty__title">
+              {{ currentTab() === 'remote' ? t().feed.noRemote : t().feed.noOffers }}
+            </p>
+            <p class="empty__hint">{{ t().feed.noOffersHint }}</p>
+            <button
+              type="button"
+              class="btn btn--primary"
+              [disabled]="refreshing()"
+              (click)="refreshJobs()"
+            >
+              {{ t().feed.fetchOffers }}
+            </button>
+          }
+        </div>
+      } @else {
+        <!-- One row per offer; the row emits, the list persists and reloads. -->
+        <div class="feed__list">
+          @for (job of jobs(); track job.id) {
+            <app-job-row
+              [job]="job"
+              [selected]="job.id === selectedId()"
+              (favoriteToggled)="toggleFavorite($event)"
+              (hidden)="hideJob($event)"
+            />
+          }
+        </div>
+      }
+    </main>
+
+    <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
+    <aside class="panel" [class.panel--open]="detailOpen()">
+      <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
+
+      @if (!detailOpen()) {
+        <p class="panel__idle">{{ t().feed.idlePanel }}</p>
+      }
+    </aside>
+  }
 </div>
 
 <!-- Thumb-height navigation, out of the way of the reading area. -->
@@ -149,7 +162,7 @@
   <app-job-tabs
     variant="bar"
     [items]="tabItems()"
-    [current]="currentTab()"
+    [current]="currentView()"
     (selected)="selectTab($event)"
   />
 }

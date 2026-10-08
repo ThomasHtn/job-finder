@@ -109,9 +109,11 @@ the town, the offer is kept and flagged rather than dropped in silence.
 
 ## The sources covered
 
-France Travail, Adzuna, APEC, EURES, Free-Work, and 46 company careers sites queried directly
-(Doctolib, Dataiku, Mirakl, Algolia, Alan, Qonto, Swile and the others). A source that is
-unavailable or not configured is simply skipped: the others keep filling the list.
+France Travail (which also relays Indeed, DirectEmploi and its other partners), Adzuna, APEC,
+EURES, Free-Work, Jooble, and 49 company careers sites queried directly (Doctolib, Dataiku, Alan,
+Qonto, Swile, and in Normandy Sopra Steria, Matmut and Capgemini). A source that is unavailable or
+not configured is simply skipped: the others keep filling the list. The Sources tab shows each
+one's health, last successful sync, offer count and recent runs.
 
 ## Where it lives
 

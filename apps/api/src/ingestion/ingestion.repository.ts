@@ -47,14 +47,47 @@ export class IngestionRepository {
   }
 
   /**
-   * Last completed run of one source, success or failure.
+   * Latest completed runs of one source, success or failure, newest first.
    */
-  latestFinishedRun(source: string): Promise<FinishedRun | null> {
-    return this.prisma.ingestionRun.findFirst({
+  recentRuns(source: string, take: number): Promise<FinishedRun[]> {
+    return this.prisma.ingestionRun.findMany({
       where: { source, finishedAt: { not: null } },
       orderBy: { startedAt: 'desc' },
-      select: { finishedAt: true, error: true },
+      take,
+      select: {
+        startedAt: true,
+        finishedAt: true,
+        fetched: true,
+        kept: true,
+        inserted: true,
+        updated: true,
+        error: true,
+      },
     });
+  }
+
+  /**
+   * End of the last successful run of one source, null if it never succeeded.
+   */
+  async lastSuccessAt(source: string): Promise<Date | null> {
+    const run = await this.prisma.ingestionRun.findFirst({
+      where: { source, finishedAt: { not: null }, error: null },
+      orderBy: { startedAt: 'desc' },
+      select: { finishedAt: true },
+    });
+    return run?.finishedAt ?? null;
+  }
+
+  /**
+   * Visible offers per source, keyed by source name.
+   */
+  async countJobsBySource(): Promise<Map<string, number>> {
+    const groups = await this.prisma.job.groupBy({
+      by: ['source'],
+      where: { isHidden: false },
+      _count: { _all: true },
+    });
+    return new Map(groups.map((group) => [group.source, group._count._all]));
   }
 
   /**
@@ -85,10 +118,16 @@ export class IngestionRepository {
       where: {
         source_sourceId: { source: job.source, sourceId: job.sourceId },
       },
-      select: { id: true },
+      select: { id: true, alternativeUrls: true },
     });
     if (own) {
-      await this.prisma.job.update({ where: { id: own.id }, data });
+      /* Links merged in from other sources stay; the source's own ones are added. */
+      const links = new Set([...own.alternativeUrls, ...(job.alternativeUrls ?? [])]);
+      links.delete(job.url);
+      await this.prisma.job.update({
+        where: { id: own.id },
+        data: { ...data, alternativeUrls: [...links] },
+      });
       return 'updated';
     }
 
@@ -105,7 +144,12 @@ export class IngestionRepository {
     }
 
     await this.prisma.job.create({
-      data: { ...data, source: job.source, sourceId: job.sourceId },
+      data: {
+        ...data,
+        source: job.source,
+        sourceId: job.sourceId,
+        alternativeUrls: job.alternativeUrls ?? [],
+      },
     });
     return 'inserted';
   }

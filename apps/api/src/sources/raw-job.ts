@@ -100,6 +100,11 @@ export interface RawJob {
   url: string;
 
   /**
+   * Other links to the same ad the source knows about, e.g. the partner board France Travail relays.
+   */
+  alternativeUrls?: string[];
+
+  /**
    * Publication date on the source.
    */
   publishedAt: Date | null;

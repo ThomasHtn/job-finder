@@ -1,3 +1,5 @@
+import type { JobSource } from '@job-finder/shared';
+
 /**
  * French wording, and the shape every other dictionary follows.
  */
@@ -59,6 +61,40 @@ export const FR = {
     areaPlaceholder: 'Sur site',
     remote: 'Full remote',
     favorites: 'Favoris',
+    sources: 'Sources',
+  },
+
+  /**
+   * The sources tab: where offers come from, and when each place was last read.
+   */
+  sources: {
+    names: {
+      FRANCE_TRAVAIL: 'France Travail',
+      ADZUNA: 'Adzuna',
+      ATS: 'Sites carrière (ATS)',
+      EURES: 'EURES',
+      APEC: 'APEC',
+      FREE_WORK: 'Free-Work',
+      JOOBLE: 'Jooble',
+    } satisfies Record<JobSource, string>,
+    states: {
+      disabled: 'Non configurée',
+      never: 'Jamais interrogée',
+      ok: 'OK',
+      failed: 'En échec',
+    },
+    offers: (count: number) => `${count} offre${count > 1 ? 's' : ''}`,
+    lastSuccess: 'Dernier succès',
+    lastRun: 'Dernière exécution',
+    never: 'Jamais',
+    disabledHint: 'Identifiants absents du .env : la source est ignorée.',
+    figures: (fetched: number, kept: number, inserted: number) =>
+      `${fetched} récupérée${fetched > 1 ? 's' : ''}, ${kept} retenue${kept > 1 ? 's' : ''}, ` +
+      `${inserted} nouvelle${inserted > 1 ? 's' : ''}`,
+    history: (count: number) =>
+      `${count} dernière${count > 1 ? 's' : ''} exécution${count > 1 ? 's' : ''}`,
+    dateTimeFormat: 'dd/MM/yyyy HH:mm',
+    unavailable: "L'état des sources n'a pas pu être chargé.",
   },
 
   /**

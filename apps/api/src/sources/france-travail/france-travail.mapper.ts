@@ -36,6 +36,10 @@ export function toRawJob(offer: FranceTravailOffer): RawJob {
     isRemote: conditions.some((condition) => FULL_REMOTE_TEXT.test(condition)),
     isLocationApproximate: false,
     url: offer.origineOffre?.urlOrigine ?? `${DETAIL_URL}/${offer.id}`,
+    /* Offers relayed from a partner board (Indeed, DirectEmploi...) also link to the original ad. */
+    alternativeUrls: (offer.origineOffre?.partenaires ?? [])
+      .map((partner) => partner.url)
+      .filter((url): url is string => Boolean(url)),
     publishedAt: offer.dateCreation ? new Date(offer.dateCreation) : null,
   };
 }

@@ -42,4 +42,15 @@ describe('planMerge', () => {
     );
     expect(plan.alternativeUrls).not.toContain('https://twin.test');
   });
+
+  it('keeps the partner links the incoming offer carries', () => {
+    const job = {
+      ...rawJob({ hasFullDescription: false, alternativeUrls: ['https://partner.test/1'] }),
+      dedupeHash: 'h',
+    };
+    expect(planMerge({ ...twin, hasFullDescription: true }, job).alternativeUrls).toEqual([
+      'https://partner.test/1',
+      'https://example.test/1',
+    ]);
+  });
 });

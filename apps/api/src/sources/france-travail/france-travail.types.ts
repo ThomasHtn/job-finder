@@ -32,6 +32,9 @@ export interface FranceTravailOffer {
   };
   entreprise?: { nom?: string; description?: string };
   salaire?: { libelle?: string };
-  origineOffre?: { urlOrigine?: string };
+  origineOffre?: {
+    urlOrigine?: string;
+    partenaires?: { nom?: string; url?: string }[];
+  };
   contexteTravail?: { conditionsExercice?: string[] };
 }

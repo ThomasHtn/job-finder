@@ -8,6 +8,7 @@ export const JOB_SOURCES = [
   'EURES',
   'APEC',
   'FREE_WORK',
+  'JOOBLE',
 ] as const;
 
 /**

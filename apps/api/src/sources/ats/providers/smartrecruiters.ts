@@ -26,8 +26,10 @@ const DESCRIPTION_SECTIONS = [
 export async function fetchSmartRecruiters(
   company: CompanyConfig,
 ): Promise<RawJob[]> {
+  /* Only the first 100 postings come back: a large board needs its `filter` to reach the area. */
+  const filter = company.filter ? `&${company.filter}` : '';
   const body = await getJson<{ content?: SmartRecruitersPosting[] }>(
-    `https://api.smartrecruiters.com/v1/companies/${company.board}/postings?limit=100`,
+    `https://api.smartrecruiters.com/v1/companies/${company.board}/postings?limit=100${filter}`,
     TIMEOUT_MS,
   );
 

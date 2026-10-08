@@ -24,6 +24,7 @@ const rawSchema = z.object({
   FT_CLIENT_SECRET: optionalSecret,
   ADZUNA_APP_ID: optionalSecret,
   ADZUNA_APP_KEY: optionalSecret,
+  JOOBLE_API_KEY: optionalSecret,
   ORS_API_KEY: optionalSecret,
 
   SEARCH_KEYWORDS: requiredCsvList,

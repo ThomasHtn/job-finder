@@ -1,0 +1,60 @@
+<!-- One block per source: its health, its stock, and its recent runs. -->
+<ul class="board">
+  @for (status of statuses(); track status.source) {
+    @let state = stateOf(status);
+    <li class="source" [class]="'source--' + state">
+      <!-- Name, health, and how many offers it holds right now. -->
+      <div class="source__head">
+        <h2 class="source__name">{{ t().sources.names[status.source] }}</h2>
+        <span class="source__state">{{ t().sources.states[state] }}</span>
+        <span class="source__count u-num">{{ t().sources.offers(status.jobCount) }}</span>
+      </div>
+
+      <!-- When it last answered, and when it was last asked: they differ while it fails. -->
+      @if (state !== 'disabled') {
+        <dl class="source__facts">
+          <div class="source__fact">
+            <dt>{{ t().sources.lastSuccess }}</dt>
+            <dd>{{ status.lastSuccessAt | syncLabel: t() }}</dd>
+          </div>
+          <div class="source__fact">
+            <dt>{{ t().sources.lastRun }}</dt>
+            <dd class="u-num">
+              @if (status.lastRunAt; as at) {
+                {{ at | date: t().sources.dateTimeFormat }}
+              } @else {
+                {{ t().sources.never }}
+              }
+            </dd>
+          </div>
+        </dl>
+      }
+
+      <!-- Why the last run failed, or why the source never runs. -->
+      @if (status.error; as error) {
+        <p class="source__error">{{ error }}</p>
+      } @else if (state === 'disabled') {
+        <p class="source__hint">{{ t().sources.disabledHint }}</p>
+      }
+
+      <!-- Recent runs, folded: the head already says whether the last one went well. -->
+      @if (status.runs.length) {
+        <details class="source__history">
+          <summary>{{ t().sources.history(status.runs.length) }}</summary>
+          <ol class="runs">
+            @for (run of status.runs; track run.startedAt) {
+              <li class="run" [class.run--failed]="run.error">
+                <span class="run__date u-num">
+                  {{ run.finishedAt | date: t().sources.dateTimeFormat }}
+                </span>
+                <span class="run__result">
+                  {{ run.error ?? t().sources.figures(run.fetched, run.kept, run.inserted) }}
+                </span>
+              </li>
+            }
+          </ol>
+        </details>
+      }
+    </li>
+  }
+</ul>

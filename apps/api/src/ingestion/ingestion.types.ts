@@ -29,11 +29,16 @@ export interface RunCounters {
 }
 
 /**
- * Outcome of the last completed run of one source.
+ * A completed run of one source, with its figures.
  */
-export interface FinishedRun {
+export interface FinishedRun extends RunCounters {
   /**
-   * When the run ended.
+   * When the run started.
+   */
+  startedAt: Date;
+
+  /**
+   * When the run ended; never null once filtered on completion.
    */
   finishedAt: Date | null;
 

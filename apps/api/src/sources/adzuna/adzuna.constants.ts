@@ -32,6 +32,21 @@ export const SEARCH_RADIUS_KM = 100;
 export const TIMEOUT_MS = 20_000;
 
 /**
+ * Attempts made after a 5xx, 429 or timeout, which Adzuna returns intermittently.
+ */
+export const MAX_RETRIES = 2;
+
+/**
+ * Wait before the first retry, doubled on the next one.
+ */
+export const RETRY_BACKOFF_MS = 10_000;
+
+/**
+ * Longest error body kept on the run row.
+ */
+export const MAX_ERROR_LENGTH = 200;
+
+/**
  * Adzuna keeps ads alive for years; anything older is a zombie.
  */
 export const MAX_DAYS_OLD = 60;

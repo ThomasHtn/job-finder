@@ -40,6 +40,34 @@ export const EN: Translations = {
     areaPlaceholder: 'On site',
     remote: 'Full remote',
     favorites: 'Favorites',
+    sources: 'Sources',
+  },
+
+  sources: {
+    names: {
+      FRANCE_TRAVAIL: 'France Travail',
+      ADZUNA: 'Adzuna',
+      ATS: 'Career sites (ATS)',
+      EURES: 'EURES',
+      APEC: 'APEC',
+      FREE_WORK: 'Free-Work',
+      JOOBLE: 'Jooble',
+    },
+    states: {
+      disabled: 'Not configured',
+      never: 'Never queried',
+      ok: 'OK',
+      failed: 'Failing',
+    },
+    offers: (count) => `${count} offer${count > 1 ? 's' : ''}`,
+    lastSuccess: 'Last success',
+    lastRun: 'Last run',
+    never: 'Never',
+    disabledHint: 'No credentials in .env: the source is skipped.',
+    figures: (fetched, kept, inserted) => `${fetched} fetched, ${kept} kept, ${inserted} new`,
+    history: (count) => `Last ${count} run${count > 1 ? 's' : ''}`,
+    dateTimeFormat: 'dd/MM/yyyy HH:mm',
+    unavailable: 'The source status could not be loaded.',
   },
 
   feed: {

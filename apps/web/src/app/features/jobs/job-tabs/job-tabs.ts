@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import type { JobTab } from '@job-finder/shared';
 import { Icon } from '../../../shared/icon/icon';
+import type { ShellTab } from '../shell-tab';
 import type { JobTabItem } from './job-tab-item';
 
 /**
- * The three tabs, in the header on a wide screen and in the bottom bar on a phone.
+ * The tabs, in the header on a wide screen and in the bottom bar on a phone.
  */
 @Component({
   selector: 'app-job-tabs',
@@ -26,7 +26,7 @@ export class JobTabs {
   /**
    * Currently selected tab.
    */
-  readonly current = input.required<JobTab>();
+  readonly current = input.required<ShellTab>();
 
   /**
    * `inline` sits in the header, `bar` is fixed at the bottom of a phone screen.
@@ -36,5 +36,5 @@ export class JobTabs {
   /**
    * Emits the tab the reader pressed.
    */
-  readonly selected = output<JobTab>();
+  readonly selected = output<ShellTab>();
 }

@@ -6,7 +6,11 @@ import type { PreparedJob } from './job-preparer.types.js';
  */
 export function planMerge(twin: Twin, job: PreparedJob) {
   const upgrade = job.hasFullDescription && !twin.hasFullDescription;
-  const links = new Set([...twin.alternativeUrls, upgrade ? twin.url : job.url]);
+  const links = new Set([
+    ...twin.alternativeUrls,
+    ...(job.alternativeUrls ?? []),
+    upgrade ? twin.url : job.url,
+  ]);
   links.delete(upgrade ? job.url : twin.url);
 
   return {

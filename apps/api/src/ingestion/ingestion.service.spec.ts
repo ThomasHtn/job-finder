@@ -4,7 +4,7 @@ import type { Env } from '../config/env.schema.js';
 import type { JobSourceConnector } from '../sources/job-source-connector.js';
 import type { RawJob } from '../sources/raw-job.js';
 import type { IngestionRepository } from './ingestion.repository.js';
-import type { PersistOutcome } from './ingestion.types.js';
+import type { FinishedRun, PersistOutcome } from './ingestion.types.js';
 import { ALREADY_RUNNING } from './ingestion.constants.js';
 import { IngestionService } from './ingestion.service.js';
 import type { GeoPort } from './job-preparer.types.js';
@@ -34,7 +34,9 @@ function repository(outcome: PersistOutcome = 'inserted') {
     startRun: vi.fn(async () => 'run-1'),
     finishRun: vi.fn(async () => {}),
     failRun: vi.fn(async () => {}),
-    latestFinishedRun: vi.fn(async () => null),
+    recentRuns: vi.fn(async (): Promise<FinishedRun[]> => []),
+    lastSuccessAt: vi.fn(async (): Promise<Date | null> => null),
+    countJobsBySource: vi.fn(async () => new Map([['ft', 4]])),
     persistJob: vi.fn(async () => outcome),
     purgeStaleJobs: vi.fn(async () => 2),
   };
@@ -140,10 +142,22 @@ describe('IngestionService.run', () => {
  * Per-source health report.
  */
 describe('IngestionService.status', () => {
-  it('reports the last finished run per source', async () => {
+  it('reports the last finished run, last success and stock per source', async () => {
     const repo = repository();
+    const started = new Date('2026-09-01T09:59:00Z');
     const at = new Date('2026-09-01T10:00:00Z');
-    repo.latestFinishedRun.mockResolvedValueOnce({ finishedAt: at, error: null } as never);
+    const success = new Date('2026-08-31T10:00:00Z');
+    const run = {
+      startedAt: started,
+      finishedAt: at,
+      fetched: 5,
+      kept: 2,
+      inserted: 1,
+      updated: 1,
+      error: 'Adzuna search failed (503): HTML error page',
+    };
+    repo.recentRuns.mockResolvedValueOnce([run]);
+    repo.lastSuccessAt.mockResolvedValueOnce(success);
     const [ft, adz] = await service(
       [connector('ft', []), connector('adzuna', [], false)],
       repo,
@@ -153,9 +167,18 @@ describe('IngestionService.status', () => {
       source: 'ft',
       enabled: true,
       lastRunAt: at.toISOString(),
-      ok: true,
-      error: null,
+      ok: false,
+      error: run.error,
+      lastSuccessAt: success.toISOString(),
+      jobCount: 4,
+      runs: [
+        {
+          ...run,
+          startedAt: started.toISOString(),
+          finishedAt: at.toISOString(),
+        },
+      ],
     });
-    expect(adz).toMatchObject({ enabled: false, ok: false, lastRunAt: null });
+    expect(adz).toMatchObject({ enabled: false, ok: false, lastRunAt: null, jobCount: 0 });
   });
 });

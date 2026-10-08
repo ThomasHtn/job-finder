@@ -10,10 +10,11 @@ import { GeoService } from '../geo/geo.service.js';
 import type { JobSourceConnector } from '../sources/job-source-connector.js';
 import { JOB_SOURCE_CONNECTORS } from '../sources/job-source-connectors.token.js';
 import { emptySummary } from './empty-summary.js';
-import { ALREADY_RUNNING, DAY_MS } from './ingestion.constants.js';
+import { ALREADY_RUNNING, DAY_MS, RECENT_RUNS } from './ingestion.constants.js';
 import { IngestionRepository } from './ingestion.repository.js';
 import { prepareJob } from './job-preparer.js';
 import type { GeoPort } from './job-preparer.types.js';
+import { toSourceRun } from './to-source-run.js';
 
 /**
  * Orchestrates one ingestion: fetch, filter, persist, purge.
@@ -85,15 +86,19 @@ export class IngestionService {
   }
 
   /**
-   * Latest completed run per connector, so the UI can flag a partial list.
+   * Health and recent history per connector, for the degraded flag and the sources tab.
    */
   async status(): Promise<SourceStatus[]> {
+    const jobCounts = await this.repository.countJobsBySource();
+
     return Promise.all(
       this.connectors.map(async (connector) => {
         const enabled = connector.isEnabled();
-        const lastRun = enabled
-          ? await this.repository.latestFinishedRun(connector.name)
-          : null;
+        const [runs, lastSuccessAt] = await Promise.all([
+          this.repository.recentRuns(connector.name, RECENT_RUNS),
+          this.repository.lastSuccessAt(connector.name),
+        ]);
+        const lastRun = runs.at(0);
 
         return {
           source: connector.name as JobSource,
@@ -101,6 +106,9 @@ export class IngestionService {
           lastRunAt: lastRun?.finishedAt?.toISOString() ?? null,
           ok: enabled && !lastRun?.error,
           error: lastRun?.error ?? null,
+          lastSuccessAt: lastSuccessAt?.toISOString() ?? null,
+          jobCount: jobCounts.get(connector.name) ?? 0,
+          runs: runs.map(toSourceRun),
         };
       }),
     );

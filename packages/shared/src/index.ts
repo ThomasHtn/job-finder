@@ -11,5 +11,6 @@ export * from './job-list-response.js';
 export * from './job-source.js';
 export * from './job-summary.js';
 export * from './job-tab.js';
+export * from './source-run.js';
 export * from './source-status.js';
 export * from './to-job-tab.js';

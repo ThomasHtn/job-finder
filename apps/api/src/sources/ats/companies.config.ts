@@ -4,14 +4,14 @@ import type { CompanyConfig } from './ats.types.js';
  * Companies whose career site is polled directly. One line per company.
  * Every entry below was verified to answer on its public endpoint.
  *
- * Le Havre industry (HAROPA, Sidel, Safran Nacelles, TotalEnergies, Renault
- * Sandouville, Siemens Energy, Sanofi, EDF, Segula, Ortec) is deliberately
- * absent: they run Workday or SuccessFactors, which expose no public job API.
- * Their offers are picked up through France Travail instead. No Normandy tech
- * employer (Yousign, Saagie, Matmut...) answers on these four ATS either, so the
- * list is mostly Paris scale-ups and remote-first companies, useful for the
- * remote tab. The consulting firms (SFEIR, Ippon) are the exception: they
- * staff CDI roles across several French cities, not just Paris.
+ * Le Havre industry (Renault, Sanofi, Thales, TotalEnergies, Sidel, Ortec,
+ * Lubrizol...) does expose its career sites (Workday, Avature, SuccessFactors),
+ * but none of their Normandy postings were software roles when checked on
+ * 2026-10-08, so no adapter was written for them. Most entries are Paris
+ * scale-ups and remote-first companies, useful for the remote tab; the
+ * consulting firms staff CDI roles across several French cities. The Normandy
+ * employers at the end are narrowed to the area with `filter`, since their
+ * boards are too large (or capped) to be read whole.
  */
 export const COMPANIES: CompanyConfig[] = [
   { name: 'Doctolib', provider: 'greenhouse', board: 'doctolib' },
@@ -69,4 +69,21 @@ export const COMPANIES: CompanyConfig[] = [
   { name: 'SFEIR', provider: 'lever', board: 'sfeir' },
   { name: 'Ippon Technologies', provider: 'lever', board: 'ippon' },
   { name: 'Comet', provider: 'greenhouse', board: 'comet' },
+  /* Normandy employers with dev or IT CDI roles, checked on 2026-10-08. */
+  {
+    name: 'Sopra Steria',
+    provider: 'smartrecruiters',
+    board: 'SopraSteria1',
+    filter: 'country=fr&region=Normandy',
+  },
+  {
+    name: 'Matmut',
+    provider: 'talentsoft',
+    board: 'recrutement.matmut.fr',
+    /* 199 = Normandie, 2499 = information systems job family. */
+    filter: 'Rss_JobRegion=199&Rss_JobFamily=2499',
+  },
+  /* Rouen and Caen offices; the API only searches free text. */
+  { name: 'Capgemini', provider: 'capgemini', board: 'Isneauville' },
+  { name: 'Capgemini', provider: 'capgemini', board: 'Cormelles-le-Royal' },
 ];

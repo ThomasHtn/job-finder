@@ -1,5 +1,5 @@
-import type { JobTab } from '@job-finder/shared';
 import type { IconName } from '../../../shared/icon/icon-name';
+import type { ShellTab } from '../shell-tab';
 
 /**
  * One entry of the tab strip: where it leads, how it reads, and how many offers are behind it.
@@ -8,7 +8,7 @@ export interface JobTabItem {
   /**
    * Tab this entry selects.
    */
-  tab: JobTab;
+  tab: ShellTab;
 
   /**
    * Wording shown to the reader.
@@ -16,9 +16,9 @@ export interface JobTabItem {
   label: string;
 
   /**
-   * Offers currently in that tab.
+   * Offers currently in that tab, null for a tab that does not list offers.
    */
-  count: number;
+  count: number | null;
 
   /**
    * Glyph, only drawn in the bottom bar.

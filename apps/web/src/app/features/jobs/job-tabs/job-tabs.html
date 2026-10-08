@@ -11,7 +11,9 @@
     <app-icon class="job-tabs__icon" [name]="item.icon" />
     <span class="job-tabs__text">
       <span class="job-tabs__label">{{ item.label }}</span>
-      <span class="job-tabs__count u-num">{{ item.count }}</span>
+      @if (item.count !== null) {
+        <span class="job-tabs__count u-num">{{ item.count }}</span>
+      }
     </span>
   </button>
 }

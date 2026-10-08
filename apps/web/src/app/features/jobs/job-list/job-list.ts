@@ -35,15 +35,17 @@ import { JobRow } from '../job-row/job-row';
 import { JobTabs } from '../job-tabs/job-tabs';
 import type { JobTabItem } from '../job-tabs/job-tab-item';
 import { JobsApi } from '../jobs-api';
+import { SourceBoard } from '../../sources/source-board/source-board';
+import { SOURCES_TAB, toShellTab, type ShellTab } from '../shell-tab';
 import { SyncLabelPipe } from '../sync-label.pipe';
 import { NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
 
 /**
- * The shell: the feed, its three tabs, and the panel one offer opens into.
+ * The shell: the feed, its tabs, the sources, and the panel one offer opens into.
  */
 @Component({
   selector: 'app-job-list',
-  imports: [Brand, Icon, JobRow, JobTabs, LanguageToggle, RouterOutlet, SyncLabelPipe],
+  imports: [Brand, Icon, JobRow, JobTabs, LanguageToggle, RouterOutlet, SourceBoard, SyncLabelPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.html',
   styleUrl: './job-list.scss',
@@ -96,6 +98,16 @@ export class JobList {
 
   /**
    * Validated tab, defaulting when the URL carries garbage.
+   */
+  protected readonly currentView = computed<ShellTab>(() => toShellTab(this.tab()));
+
+  /**
+   * True while the sources tab replaces the feed.
+   */
+  protected readonly showingSources = computed(() => this.currentView() === SOURCES_TAB);
+
+  /**
+   * Offer list behind the current view; the sources tab keeps the default one for the counts.
    */
   protected readonly currentTab = computed<JobTab>(() => toJobTab(this.tab()));
 
@@ -161,6 +173,11 @@ export class JobList {
   protected readonly sourceStatus = signal<SourceStatus[]>([]);
 
   /**
+   * True when the last status request failed, so the sources tab is not left blank.
+   */
+  protected readonly statusFailed = signal(false);
+
+  /**
    * Narrows the feed to the offers that appeared since the previous visit.
    */
   protected readonly onlyNew = signal(false);
@@ -199,6 +216,7 @@ export class JobList {
         count: this.counts().favorites,
         icon: 'star',
       },
+      { tab: SOURCES_TAB, label: text.tabs.sources, count: null, icon: 'pulse' },
     ];
   });
 
@@ -256,10 +274,16 @@ export class JobList {
    */
   constructor() {
     effect(() => {
-      const tab = this.currentTab();
+      const view = this.currentView();
       untracked(() => {
         this.onlyNew.set(false);
-        this.load(tab);
+        if (view === SOURCES_TAB) {
+          this.loadStatus();
+          /* Landing straight on the sources still needs the tab counts. */
+          if (!this.data()) this.load(this.currentTab());
+        } else {
+          this.load(view);
+        }
         /* Another tab is another list: it starts at its first offer, not where the last one ended. */
         window.scrollTo({ top: 0 });
       });
@@ -286,8 +310,8 @@ export class JobList {
    * Switches tab through the URL, so the effect above does the loading. Navigating to the feed
    * itself closes the panel: an offer from the tab just left has nothing to sit next to.
    */
-  protected selectTab(tab: JobTab): void {
-    if (tab === this.currentTab()) return;
+  protected selectTab(tab: ShellTab): void {
+    if (tab === this.currentView()) return;
     void this.router.navigate(['/'], { queryParams: { tab }, replaceUrl: true });
   }
 
@@ -373,13 +397,19 @@ export class JobList {
   }
 
   /**
-   * Fetches the source health for the tooltip and the degraded state.
+   * Fetches the source health for the tooltip, the degraded state and the sources tab.
    */
   private loadStatus(): void {
     this.ingestion
       .status()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (statuses) => this.sourceStatus.set(statuses) });
+      .subscribe({
+        next: (statuses) => {
+          this.sourceStatus.set(statuses);
+          this.statusFailed.set(false);
+        },
+        error: () => this.statusFailed.set(true),
+      });
   }
 
   /**

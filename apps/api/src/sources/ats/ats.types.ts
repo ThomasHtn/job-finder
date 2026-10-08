@@ -1,7 +1,13 @@
 /**
- * The four ATS whose public job APIs are supported.
+ * The ATS (and single-company career APIs) whose public job feeds are supported.
  */
-export type AtsProvider = 'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters';
+export type AtsProvider =
+  | 'greenhouse'
+  | 'lever'
+  | 'ashby'
+  | 'smartrecruiters'
+  | 'talentsoft'
+  | 'capgemini';
 
 /**
  * One company career site to poll.
@@ -18,7 +24,12 @@ export interface CompanyConfig {
   provider: AtsProvider;
 
   /**
-   * Board identifier in the ATS URL.
+   * Board identifier in the ATS URL: a slug, a host (Talentsoft) or a search term (Capgemini).
    */
   board: string;
+
+  /**
+   * Extra query string narrowing a large board to the area, e.g. `region=Normandy`.
+   */
+  filter?: string;
 }

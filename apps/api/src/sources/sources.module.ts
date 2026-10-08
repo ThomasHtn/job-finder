@@ -5,6 +5,7 @@ import { AtsSource } from './ats/ats.source.js';
 import { EuresSource } from './eures/eures.source.js';
 import { FranceTravailSource } from './france-travail/france-travail.source.js';
 import { FreeWorkSource } from './free-work/free-work.source.js';
+import { JoobleSource } from './jooble/jooble.source.js';
 import type { JobSourceConnector } from './job-source-connector.js';
 import { JOB_SOURCE_CONNECTORS } from './job-source-connectors.token.js';
 
@@ -19,6 +20,7 @@ import { JOB_SOURCE_CONNECTORS } from './job-source-connectors.token.js';
     EuresSource,
     ApecSource,
     FreeWorkSource,
+    JoobleSource,
     {
       provide: JOB_SOURCE_CONNECTORS,
       useFactory: (...connectors: JobSourceConnector[]) => connectors,
@@ -29,6 +31,7 @@ import { JOB_SOURCE_CONNECTORS } from './job-source-connectors.token.js';
         EuresSource,
         ApecSource,
         FreeWorkSource,
+        JoobleSource,
       ],
     },
   ],
