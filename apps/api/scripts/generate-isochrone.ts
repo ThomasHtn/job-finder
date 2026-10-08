@@ -11,7 +11,7 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
 import { validateEnv } from '../src/config/validate-env.js';
-import { ISOCHRONE_FILENAME } from '../src/geo/commuting-area.js';
+import { ISOCHRONE_FILENAME } from '../src/geo/commuting-area.constants.js';
 
 config({ path: '../../.env', quiet: true });
 
