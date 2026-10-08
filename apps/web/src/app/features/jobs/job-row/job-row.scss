@@ -2,10 +2,7 @@
   --row-pad: 1.25rem;
 
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 0.75rem;
-  align-items: start;
+  display: block;
   padding: var(--row-pad);
   transition: background-color 0.14s ease;
 }
@@ -116,12 +113,21 @@
     overflow: hidden;
   }
 
+  &__bottom {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
   &__footer {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 0.875rem;
-    margin: 0.75rem 0 0;
+    margin: 0;
     color: var(--ink-3);
     font-size: 0.8125rem;
   }
@@ -137,12 +143,17 @@
     font-weight: 600;
   }
 
+  // Free text from the sources, sometimes a full sentence: capped so the title keeps most of the line.
   &__salary {
-    flex: none;
+    flex: 0 1 auto;
+    max-width: 40%;
     font-size: 0.8125rem;
     font-weight: 500;
+    line-height: 1.4;
     color: var(--ink-2);
-    white-space: nowrap;
+    text-align: end;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
   }
 
   // Above the stretched title link.
@@ -150,8 +161,11 @@
     position: relative;
     z-index: 1;
     display: flex;
+    flex: none;
     gap: 0.125rem;
-    margin: -0.375rem -0.5rem 0 0;
+
+    // The buttons are taller than the strip: let them overhang instead of padding the line.
+    margin: -0.5rem -0.5rem -0.5rem 0;
     opacity: 0;
     transition: opacity 0.14s ease;
   }
@@ -182,8 +196,6 @@
 @media (width <= 40rem) {
   :host {
     --row-pad: 1rem;
-
-    column-gap: 0.375rem;
   }
 
   // No room for a money column: the head dissolves so the salary can drop to the end.
@@ -199,7 +211,13 @@
   .job-row__salary {
     order: 1;
     align-self: flex-start;
+    max-width: none;
     margin-top: 0.5rem;
+    text-align: start;
+  }
+
+  .job-row__bottom {
+    order: 2;
   }
 
   .job-row__excerpt {

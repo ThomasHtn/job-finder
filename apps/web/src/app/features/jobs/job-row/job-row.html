@@ -1,4 +1,4 @@
-<!-- Text column: title, company and place, excerpt, provenance strip. -->
+<!-- Title and salary, company and place, excerpt, then provenance and actions. -->
 <div class="job-row__body">
   <!-- Title links to the detail; salary sits on the same line when known. -->
   <div class="job-row__head">
@@ -24,38 +24,40 @@
     <p class="job-row__excerpt">{{ excerpt }}</p>
   }
 
-  <!-- Provenance strip: source, unusual contract wording, date, "new" badge. -->
-  <p class="job-row__footer">
-    <span class="job-row__source">{{ job().sourceLabel }}</span>
-    @if (contract(); as contract) {
-      <span class="job-row__contract">{{ contract }}</span>
-    }
-    <span class="job-row__date">{{ job().publishedAt | publishedLabel: t() }}</span>
-    @if (isNew()) {
-      <span class="job-row__new">{{ t().row.new }}</span>
-    }
-  </p>
-</div>
-
-<!-- Action column: hide, then star. -->
-<div class="job-row__actions">
-  <!-- "Not interested". -->
-  <button
-    type="button"
-    class="icon-btn job-row__hide"
-    [attr.aria-label]="t().row.hide"
-    (click)="hide($event)"
-  >
-    <app-icon name="dismiss" />
-  </button>
-  <!-- Favourite toggle, filled when starred. -->
-  <button
-    type="button"
-    class="icon-btn job-row__star"
-    [attr.aria-label]="job().isFavorite ? t().row.removeFavorite : t().row.addFavorite"
-    [attr.aria-pressed]="job().isFavorite"
-    (click)="toggleFavorite($event)"
-  >
-    <app-icon [name]="job().isFavorite ? 'star-filled' : 'star'" />
-  </button>
+  <!-- Bottom line: provenance on the left, actions on the right, so the head keeps the full width. -->
+  <div class="job-row__bottom">
+    <!-- Provenance strip: source, unusual contract wording, date, "new" badge. -->
+    <p class="job-row__footer">
+      <span class="job-row__source">{{ job().sourceLabel }}</span>
+      @if (contract(); as contract) {
+        <span class="job-row__contract">{{ contract }}</span>
+      }
+      <span class="job-row__date">{{ job().publishedAt | publishedLabel: t() }}</span>
+      @if (isNew()) {
+        <span class="job-row__new">{{ t().row.new }}</span>
+      }
+    </p>
+    <!-- Actions: hide, then star. -->
+    <div class="job-row__actions">
+      <!-- "Not interested". -->
+      <button
+        type="button"
+        class="icon-btn job-row__hide"
+        [attr.aria-label]="t().row.hide"
+        (click)="hide($event)"
+      >
+        <app-icon name="dismiss" />
+      </button>
+      <!-- Favourite toggle, filled when starred. -->
+      <button
+        type="button"
+        class="icon-btn job-row__star"
+        [attr.aria-label]="job().isFavorite ? t().row.removeFavorite : t().row.addFavorite"
+        [attr.aria-pressed]="job().isFavorite"
+        (click)="toggleFavorite($event)"
+      >
+        <app-icon [name]="job().isFavorite ? 'star-filled' : 'star'" />
+      </button>
+    </div>
+  </div>
 </div>
