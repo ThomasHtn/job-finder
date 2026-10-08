@@ -12,7 +12,7 @@ import {
   TIMEOUT_MS,
 } from './eures.constants.js';
 import { toRawJob } from './eures.mapper.js';
-import type { EuresJob } from './eures.types.js';
+import type { EuresJob, EuresSearchResponse } from './eures.types.js';
 
 /**
  * EURES connector: region-level offers with no exact location.
@@ -98,7 +98,7 @@ export class EuresSource implements JobSourceConnector {
         break;
       }
 
-      const body = (await response.json()) as { jvs?: EuresJob[] };
+      const body = (await response.json()) as EuresSearchResponse;
       const results = body.jvs ?? [];
       collected.push(...results);
       if (results.length < RESULTS_PER_PAGE) break;

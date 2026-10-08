@@ -6,6 +6,7 @@ import type { Env } from '../../config/env.schema.js';
 import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
+import type { SearchScope } from '../search-scope.js';
 import {
   DELAY_BETWEEN_REQUESTS_MS,
   LOCAL_MAX_PAGES,
@@ -22,7 +23,12 @@ import {
   TOKEN_URL,
 } from './france-travail.constants.js';
 import { toRawJob } from './france-travail.mapper.js';
-import type { FranceTravailOffer, TokenResponse } from './france-travail.types.js';
+import type {
+  CachedToken,
+  FranceTravailOffer,
+  FranceTravailSearchResponse,
+  TokenResponse,
+} from './france-travail.types.js';
 
 /**
  * France Travail connector: the richest source, full text and coordinates included.
@@ -40,7 +46,7 @@ export class FranceTravailSource implements JobSourceConnector {
   /**
    * Cached bearer token with its expiry.
    */
-  private token: { value: string; expiresAt: number } | null = null;
+  private token: CachedToken | null = null;
 
   /**
    * Credentials from the environment, place and keywords from the profile.
@@ -96,7 +102,7 @@ export class FranceTravailSource implements JobSourceConnector {
    */
   private async search(
     criteria: Record<string, string>,
-    scope: 'local' | 'remote',
+    scope: SearchScope,
   ): Promise<FranceTravailOffer[]> {
     const maxPages = scope === 'local' ? LOCAL_MAX_PAGES : REMOTE_MAX_PAGES;
     const collected: FranceTravailOffer[] = [];
@@ -127,9 +133,7 @@ export class FranceTravailSource implements JobSourceConnector {
         break;
       }
 
-      const body = (await response.json()) as {
-        resultats?: FranceTravailOffer[];
-      };
+      const body = (await response.json()) as FranceTravailSearchResponse;
       const results = body.resultats ?? [];
       collected.push(...results);
       if (results.length < PAGE_SIZE) break;

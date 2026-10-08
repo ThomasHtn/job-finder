@@ -29,3 +29,13 @@ export interface BanFeature {
    */
   properties: { score: number; city?: string; postcode?: string };
 }
+
+/**
+ * Body of a BAN search, best match first.
+ */
+export interface BanResponse {
+  /**
+   * Candidate addresses; empty or missing when nothing matched.
+   */
+  features?: BanFeature[];
+}

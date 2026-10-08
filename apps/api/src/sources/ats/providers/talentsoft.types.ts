@@ -23,3 +23,13 @@ export interface TalentsoftItem {
    */
   category?: string[];
 }
+
+/**
+ * A Talentsoft RSS feed as parsed from XML: every level may be missing on an empty board.
+ */
+export interface TalentsoftFeed {
+  /**
+   * Root `<rss>` element, holding the single `<channel>` and its `<item>` list.
+   */
+  rss?: { channel?: { item?: TalentsoftItem[] } };
+}

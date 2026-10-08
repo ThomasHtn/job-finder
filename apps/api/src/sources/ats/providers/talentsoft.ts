@@ -6,7 +6,7 @@ import type { RawJob } from '../../raw-job.js';
 import { TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
-import type { TalentsoftItem } from './talentsoft.types.js';
+import type { TalentsoftFeed } from './talentsoft.types.js';
 import { stripReference, talentsoftReference } from './talentsoft-reference.js';
 
 /**
@@ -31,9 +31,7 @@ export async function fetchTalentsoft(company: CompanyConfig): Promise<RawJob[]>
     throw new Error(`${company.board} returned ${response.status}`);
   }
 
-  const feed = parser.parse(await response.text()) as {
-    rss?: { channel?: { item?: TalentsoftItem[] } };
-  };
+  const feed = parser.parse(await response.text()) as TalentsoftFeed;
   const items = feed.rss?.channel?.item ?? [];
 
   return items

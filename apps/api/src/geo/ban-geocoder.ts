@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { GEOCODER_URL, TIMEOUT_MS } from './ban-geocoder.constants.js';
-import type { BanFeature, ResolvedLocation } from './ban-geocoder.types.js';
+import type { BanResponse, ResolvedLocation } from './ban-geocoder.types.js';
 import { parseBanResponse } from './parse-ban-response.js';
 
 /**
@@ -27,7 +27,7 @@ export class BanGeocoder {
         this.logger.warn(`Geocoder returned ${response.status} for "${query}"`);
         return null;
       }
-      return parseBanResponse((await response.json()) as { features?: BanFeature[] });
+      return parseBanResponse((await response.json()) as BanResponse);
     } catch (error) {
       this.logger.warn(`Geocoding failed for "${query}": ${(error as Error).message}`);
       return null;

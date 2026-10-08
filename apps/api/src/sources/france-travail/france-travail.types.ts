@@ -81,3 +81,28 @@ export interface FranceTravailOffer {
    */
   contexteTravail?: { conditionsExercice?: string[] };
 }
+
+/**
+ * One page of a France Travail search; a 204 carries no body at all.
+ */
+export interface FranceTravailSearchResponse {
+  /**
+   * Offers of the page.
+   */
+  resultats?: FranceTravailOffer[];
+}
+
+/**
+ * Bearer token kept between calls, with the moment it must be renewed.
+ */
+export interface CachedToken {
+  /**
+   * The bearer token itself.
+   */
+  value: string;
+
+  /**
+   * Epoch milliseconds after which a new token is requested.
+   */
+  expiresAt: number;
+}

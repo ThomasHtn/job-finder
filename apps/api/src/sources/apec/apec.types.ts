@@ -43,3 +43,13 @@ export interface ApecOffer {
    */
   localisable?: boolean;
 }
+
+/**
+ * One page of an APEC search.
+ */
+export interface ApecSearchResponse {
+  /**
+   * Offers of the page; missing when the search matched nothing.
+   */
+  resultats?: ApecOffer[];
+}

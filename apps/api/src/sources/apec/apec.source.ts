@@ -15,7 +15,7 @@ import {
   TIMEOUT_MS,
 } from './apec.constants.js';
 import { toRawJob } from './apec.mapper.js';
-import type { ApecOffer } from './apec.types.js';
+import type { ApecOffer, ApecSearchResponse } from './apec.types.js';
 
 /**
  * APEC connector: executive-level offers, the densest French source for senior roles.
@@ -104,7 +104,7 @@ export class ApecSource implements JobSourceConnector {
         break;
       }
 
-      const body = (await response.json()) as { resultats?: ApecOffer[] };
+      const body = (await response.json()) as ApecSearchResponse;
       const results = body.resultats ?? [];
       collected.push(...results);
       if (results.length < PAGE_SIZE) break;

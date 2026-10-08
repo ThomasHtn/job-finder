@@ -51,3 +51,13 @@ export interface AdzunaJob {
    */
   contract_type?: string;
 }
+
+/**
+ * One page of an Adzuna search.
+ */
+export interface AdzunaSearchResponse {
+  /**
+   * Offers of the page; missing when the search matched nothing.
+   */
+  results?: AdzunaJob[];
+}

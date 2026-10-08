@@ -39,3 +39,13 @@ export interface JoobleJob {
    */
   updated?: string;
 }
+
+/**
+ * One page of a Jooble search.
+ */
+export interface JoobleSearchResponse {
+  /**
+   * Offers of the page; missing when the search matched nothing.
+   */
+  jobs?: JoobleJob[];
+}

@@ -1,10 +1,10 @@
 import { MIN_SCORE } from './ban-geocoder.constants.js';
-import type { BanFeature, ResolvedLocation } from './ban-geocoder.types.js';
+import type { BanResponse, ResolvedLocation } from './ban-geocoder.types.js';
 
 /**
  * Turns the first BAN feature into a location, or null when it is missing or too weak.
  */
-export function parseBanResponse(body: { features?: BanFeature[] }): ResolvedLocation | null {
+export function parseBanResponse(body: BanResponse): ResolvedLocation | null {
   const feature = body.features?.[0];
   if (!feature || feature.properties.score < MIN_SCORE) return null;
 

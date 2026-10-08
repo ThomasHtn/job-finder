@@ -15,7 +15,7 @@ import {
   TIMEOUT_MS,
 } from './jooble.constants.js';
 import { toRawJob } from './jooble.mapper.js';
-import type { JoobleJob } from './jooble.types.js';
+import type { JoobleJob, JoobleSearchResponse } from './jooble.types.js';
 
 /**
  * Jooble connector: an aggregator, snippet-only, kept for the boards it reaches that others miss.
@@ -79,7 +79,7 @@ export class JoobleSource implements JobSourceConnector {
       throw new Error(`Jooble search failed (${response.status})`);
     }
 
-    const body = (await response.json()) as { jobs?: JoobleJob[] };
+    const body = (await response.json()) as JoobleSearchResponse;
     return body.jobs ?? [];
   }
 

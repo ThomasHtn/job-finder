@@ -27,3 +27,13 @@ export interface EuresJob {
    */
   employer?: { name?: string | null };
 }
+
+/**
+ * One page of a EURES search.
+ */
+export interface EuresSearchResponse {
+  /**
+   * Job vacancies of the page; missing when the search matched nothing.
+   */
+  jvs?: EuresJob[];
+}

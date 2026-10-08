@@ -6,6 +6,7 @@ import type { Env } from '../../config/env.schema.js';
 import { SEARCH_PROFILE, type SearchProfile } from '../../config/search-profile.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
+import type { SearchScope } from '../search-scope.js';
 import {
   BASE_URL,
   MAX_DAYS_OLD,
@@ -19,7 +20,7 @@ import {
   TIMEOUT_MS,
 } from './adzuna.constants.js';
 import { toRawJob } from './adzuna.mapper.js';
-import type { AdzunaJob } from './adzuna.types.js';
+import type { AdzunaJob, AdzunaSearchResponse } from './adzuna.types.js';
 import { describeFailure } from './describe-failure.js';
 import { isTransientStatus } from './is-transient-status.js';
 
@@ -67,7 +68,7 @@ export class AdzunaSource implements JobSourceConnector {
     /* Runs one search, recording its failure instead of losing the other queries. */
     const collect = async (
       criteria: Record<string, string>,
-      scope: 'local' | 'remote',
+      scope: SearchScope,
     ): Promise<AdzunaJob[]> => {
       try {
         const results = await this.search(criteria, scope);
@@ -102,10 +103,7 @@ export class AdzunaSource implements JobSourceConnector {
   /**
    * One search, paged up to MAX_PAGES.
    */
-  private async search(
-    criteria: Record<string, string>,
-    scope: 'local' | 'remote',
-  ): Promise<AdzunaJob[]> {
+  private async search(criteria: Record<string, string>, scope: SearchScope): Promise<AdzunaJob[]> {
     const collected: AdzunaJob[] = [];
 
     for (let page = 1; page <= MAX_PAGES; page += 1) {
@@ -131,7 +129,7 @@ export class AdzunaSource implements JobSourceConnector {
         throw new Error(await describeFailure(response));
       }
 
-      const body = (await response.json()) as { results?: AdzunaJob[] };
+      const body = (await response.json()) as AdzunaSearchResponse;
       const results = body.results ?? [];
       collected.push(...results);
       if (results.length < RESULTS_PER_PAGE) break;
