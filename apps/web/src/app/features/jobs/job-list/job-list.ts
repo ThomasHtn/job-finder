@@ -17,25 +17,26 @@ import { filter, map } from 'rxjs';
 
 import { type JobListResponse, type JobSummary, type JobTab, toJobTab } from '@job-finder/shared';
 
-import { AppConfigService } from '../../../core/app-config.service';
-import { describeHttpError } from '../../../core/http/describe-http-error';
-import { I18n } from '../../../core/i18n/i18n.service';
-import { LastVisitService } from '../../../core/last-visit.service';
-import { Viewport } from '../../../core/viewport';
-import { Brand } from '../../../shared/brand/brand';
-import { Icon } from '../../../shared/icon/icon';
-import { LanguageToggle } from '../../../shared/language-toggle/language-toggle';
-import { SourceBoard } from '../../sources/source-board/source-board';
-import { SourceHealth } from '../../sources/source-health';
+import { AppConfigService } from '@core/app-config.service';
+import { describeHttpError } from '@core/http/describe-http-error';
+import { I18n } from '@core/i18n/i18n.service';
+import { IngestionApi } from '@core/ingestion-api';
+import { LastVisitService } from '@core/last-visit.service';
+import { Viewport } from '@core/viewport';
+import { SourceBoard } from '@features/sources/source-board/source-board';
+import { SourceHealth } from '@features/sources/source-health';
+import { Brand } from '@shared/brand/brand';
+import { Icon } from '@shared/icon/icon';
+import { LanguageToggle } from '@shared/language-toggle/language-toggle';
+import { SyncLabelPipe } from '@shared/sync-label/sync-label.pipe';
+
 import { detailIdFromUrl } from '../detail-id-from-url';
-import { IngestionApi } from '../ingestion-api';
 import { JobPatchBus } from '../job-patch-bus';
 import { JobRow } from '../job-row/job-row';
 import type { JobTabItem } from '../job-tabs/job-tab-item';
 import { JobTabs } from '../job-tabs/job-tabs';
 import { JobsApi } from '../jobs-api';
 import { type ShellTab, SOURCES_TAB, toShellTab } from '../shell-tab';
-import { SyncLabelPipe } from '../sync-label.pipe';
 import { applyJobPatch } from './apply-job-patch';
 import { buildTabItems } from './build-tab-items';
 import { NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';

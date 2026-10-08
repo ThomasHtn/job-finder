@@ -7,9 +7,10 @@ import {
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
+import { authInterceptor } from '@core/auth/auth.interceptor';
+import { I18n } from '@core/i18n/i18n.service';
+
 import { routes } from './app.routes';
-import { authInterceptor } from './core/auth/auth.interceptor';
-import { I18n } from './core/i18n/i18n.service';
 
 /**
  * Application providers: router with route params bound to inputs, HTTP with the auth header,

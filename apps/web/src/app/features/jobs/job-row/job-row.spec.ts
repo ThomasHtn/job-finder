@@ -3,7 +3,8 @@ import { provideRouter } from '@angular/router';
 
 import type { JobSummary } from '@job-finder/shared';
 
-import { LastVisitService } from '../../../core/last-visit.service';
+import { LastVisitService } from '@core/last-visit.service';
+
 import { JobRow } from './job-row';
 
 /**

@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 
 import type { SourceStatus } from '@job-finder/shared';
 
-import { I18n } from '../../../core/i18n/i18n.service';
-import { SyncLabelPipe } from '../../jobs/sync-label.pipe';
+import { I18n } from '@core/i18n/i18n.service';
+import { SyncLabelPipe } from '@shared/sync-label/sync-label.pipe';
+
 import { sourceState } from '../source-state';
 
 /**

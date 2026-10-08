@@ -1,4 +1,5 @@
-import type { IconName } from '../../../shared/icon/icon-name';
+import type { IconName } from '@shared/icon/icon-name';
+
 import type { ShellTab } from '../shell-tab';
 
 /**

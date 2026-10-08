@@ -172,14 +172,23 @@ export default defineConfig([
     },
   },
   ...[
+    ['apps/web/src/app/**/*.ts', []],
     ['apps/web/src/app/core/**/*.ts', ['@shared/*', '@features/*']],
     ['apps/web/src/app/shared/**/*.ts', ['@features/*']],
-  ].map(([files, group]) => ({
+  ].map(([files, forbidden]) => ({
     files: [files],
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [{ group, message: 'A layer never imports a layer above it.' }] },
+        {
+          patterns: [
+            /* Climbing out of a folder means crossing an area: say which one with an alias. */
+            { group: ['../../*'], message: 'Import through @core, @shared or @features.' },
+            ...(forbidden.length
+              ? [{ group: forbidden, message: 'A layer never imports a layer above it.' }]
+              : []),
+          ],
+        },
       ],
     },
   })),

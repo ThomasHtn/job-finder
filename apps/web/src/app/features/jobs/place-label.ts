@@ -1,6 +1,6 @@
 import type { JobDetail, JobSummary } from '@job-finder/shared';
 
-import type { Translations } from '../../core/i18n/translations';
+import type { Translations } from '@core/i18n/translations';
 
 /**
  * Feed line: "76 - LE HAVRE" like France Travail, or the closest the source allows.

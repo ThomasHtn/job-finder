@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 import type { JobDetail, JobListResponse, JobSummary, JobTab } from '@job-finder/shared';
 
-import { apiUrl } from '../../core/api-url';
+import { apiUrl } from '@core/api-url';
 
 /**
  * Calls behind the /jobs routes.

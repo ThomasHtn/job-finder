@@ -18,9 +18,10 @@ import { Router } from '@angular/router';
 
 import type { JobDetail as JobDetailDto } from '@job-finder/shared';
 
-import { I18n } from '../../../core/i18n/i18n.service';
-import { Viewport } from '../../../core/viewport';
-import { Icon } from '../../../shared/icon/icon';
+import { I18n } from '@core/i18n/i18n.service';
+import { Viewport } from '@core/viewport';
+import { Icon } from '@shared/icon/icon';
+
 import { JobPatchBus } from '../job-patch-bus';
 import { JobsApi } from '../jobs-api';
 import { detailPlaceLabel } from '../place-label';

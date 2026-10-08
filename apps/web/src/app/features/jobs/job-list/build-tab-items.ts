@@ -1,6 +1,7 @@
 import type { JobCounts } from '@job-finder/shared';
 
-import type { Translations } from '../../../core/i18n/translations';
+import type { Translations } from '@core/i18n/translations';
+
 import type { JobTabItem } from '../job-tabs/job-tab-item';
 import { SOURCES_TAB } from '../shell-tab';
 

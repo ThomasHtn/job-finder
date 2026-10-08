@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard } from './core/auth/auth.guard';
+import { authGuard } from '@core/auth/auth.guard';
 
 /**
  * Two screens: login, and the feed. One offer is a child of the feed, never a page of its own,

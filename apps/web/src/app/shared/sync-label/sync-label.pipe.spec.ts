@@ -1,5 +1,6 @@
-import { EN } from '../../core/i18n/en';
-import { FR } from '../../core/i18n/fr';
+import { EN } from '@core/i18n/en';
+import { FR } from '@core/i18n/fr';
+
 import { SyncLabelPipe } from './sync-label.pipe';
 
 /**

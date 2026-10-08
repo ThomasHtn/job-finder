@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { Icon } from '../../../shared/icon/icon';
+import { Icon } from '@shared/icon/icon';
+
 import type { ShellTab } from '../shell-tab';
 import type { JobTabItem } from './job-tab-item';
 

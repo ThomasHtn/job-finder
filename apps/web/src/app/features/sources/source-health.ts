@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import type { SourceStatus } from '@job-finder/shared';
 
-import { I18n } from '../../core/i18n/i18n.service';
-import { IngestionApi } from '../jobs/ingestion-api';
+import { I18n } from '@core/i18n/i18n.service';
+import { IngestionApi } from '@core/ingestion-api';
 
 /**
  * Health of every source, shared by the refresh button and the sources tab.
