@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module.js';
 import { ConfigController } from './config.controller.js';
 import type { Env } from './env.schema.js';
-import { SEARCH_PROFILE } from './search-profile.js';
+import { SEARCH_PROFILE, type SearchProfile } from './search-profile.js';
 import { validateEnv } from './validate-env.js';
 
 /**
@@ -26,8 +26,8 @@ import { validateEnv } from './validate-env.js';
   providers: [
     {
       provide: SEARCH_PROFILE,
-      useFactory: (config: ConfigService<Env, true>) =>
-        config.get('searchProfile', { infer: true }),
+      useFactory: (config: ConfigService<Env, true>): SearchProfile =>
+        config.get<SearchProfile>('searchProfile'),
       inject: [ConfigService],
     },
   ],

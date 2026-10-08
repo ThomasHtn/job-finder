@@ -18,7 +18,7 @@ export class IngestionController {
    * Manual trigger, mostly useful right after a deployment.
    */
   @Post('run')
-  run(): Promise<IngestionSummary> {
+  public run(): Promise<IngestionSummary> {
     return this.ingestion.run();
   }
 
@@ -26,7 +26,7 @@ export class IngestionController {
    * Lets the UI flag when the list is only partial because a source is down.
    */
   @Get('status')
-  status(): Promise<SourceStatus[]> {
+  public status(): Promise<SourceStatus[]> {
     return this.ingestion.status();
   }
 }

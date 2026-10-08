@@ -28,7 +28,7 @@ export class PublishedLabelPipe implements PipeTransform {
   /**
    * ISO date to its label; the wording is an argument so the language change reaches the pipe.
    */
-  transform(value: string | null, text: Translations, now: Date = new Date()): string {
+  public transform(value: string | null, text: Translations, now: Date = new Date()): string {
     if (!value) return '';
     const published = new Date(value);
     const days = Math.round((startOfDay(now) - startOfDay(published)) / DAY_MS);

@@ -23,7 +23,7 @@ export class JobsController {
    * Offers of one tab; an unknown tab silently falls back to the default one.
    */
   @Get()
-  list(@Query('tab') tab?: string): Promise<JobListResponse> {
+  public list(@Query('tab') tab?: string): Promise<JobListResponse> {
     return this.jobs.list(toJobTab(tab));
   }
 
@@ -31,7 +31,7 @@ export class JobsController {
    * Full offer; opening it also marks it as viewed.
    */
   @Get(':id')
-  detail(@Param('id') id: string): Promise<JobDetail> {
+  public detail(@Param('id') id: string): Promise<JobDetail> {
     return this.jobs.detail(id);
   }
 
@@ -39,7 +39,7 @@ export class JobsController {
    * Stars or un-stars the offer.
    */
   @Patch(':id/favorite')
-  toggleFavorite(@Param('id') id: string): Promise<JobSummary> {
+  public toggleFavorite(@Param('id') id: string): Promise<JobSummary> {
     return this.jobs.toggleFavorite(id);
   }
 
@@ -47,7 +47,7 @@ export class JobsController {
    * "Not interested": the offer leaves every tab.
    */
   @Patch(':id/hide')
-  hide(@Param('id') id: string): Promise<JobSummary> {
+  public hide(@Param('id') id: string): Promise<JobSummary> {
     return this.jobs.hide(id);
   }
 }

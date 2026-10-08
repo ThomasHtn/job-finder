@@ -13,7 +13,7 @@ export class LastVisitService {
   /**
    * ISO timestamp of the previous visit, null on the very first one.
    */
-  readonly previousVisitAt: string | null = localStorage.getItem(STORAGE_KEY);
+  public readonly previousVisitAt: string | null = localStorage.getItem(STORAGE_KEY);
 
   /**
    * Stamps the current visit right away, so a reload counts as a new visit.

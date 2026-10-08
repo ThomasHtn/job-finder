@@ -31,7 +31,7 @@ export class AdzunaSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'ADZUNA';
+  public readonly name = 'ADZUNA';
 
   /**
    * Scoped logger.
@@ -49,7 +49,7 @@ export class AdzunaSource implements JobSourceConnector {
   /**
    * Both keys are needed; without them the source is skipped.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return Boolean(this.appId && this.appKey);
   }
 
@@ -57,7 +57,7 @@ export class AdzunaSource implements JobSourceConnector {
    * Local pass on the first keywords, then a nationwide sweep for remote phrases.
    * A failing query is skipped; the source only fails when every query did.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const jobs = new Map<string, AdzunaJob>();
     /* Ids found by the remote sweep: the phrase matched in the full ad, not just the snippet. */
     const remoteIds = new Set<string>();

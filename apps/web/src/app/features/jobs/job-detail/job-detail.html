@@ -6,9 +6,12 @@
   (pointerup)="endDrag()"
   (pointercancel)="endDrag()"
 >
+  <!-- Grab handle, the visual cue for pulling the sheet down on a phone. -->
   <span class="sheet__handle" aria-hidden="true"></span>
 
+  <!-- The way back, then the offer origin and its star. -->
   <div class="sheet__bar-row">
+    <!-- A chevron on a phone, where the sheet slides down; a cross in the column. -->
     <button
       type="button"
       class="icon-btn sheet__close"
@@ -18,9 +21,11 @@
       <app-icon [name]="compact() ? 'chevron-down' : 'dismiss'" />
     </button>
 
+    <!-- Origin and star only once the offer has loaded. -->
     @if (job(); as job) {
       <p class="sheet__origin">{{ job.sourceLabel }}</p>
 
+      <!-- Favourite toggle, mirrored back to the row through the patch bus. -->
       <button
         type="button"
         class="icon-btn sheet__star"
@@ -105,6 +110,7 @@
         <section class="offer__section">
           <h2 class="u-section-title">{{ t().detail.alsoPublishedOn }}</h2>
           <ul class="offer__alternatives">
+            <!-- Each board opens in a new tab; the full URL shows on hover. -->
             @for (alternative of alternatives(); track alternative.url) {
               <li>
                 <a

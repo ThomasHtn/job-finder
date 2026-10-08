@@ -18,7 +18,7 @@ export class IngestionRepository {
   /**
    * Opens a run row for one source and returns its id.
    */
-  async startRun(source: string): Promise<string> {
+  public async startRun(source: string): Promise<string> {
     const run = await this.prisma.ingestionRun.create({ data: { source } });
     return run.id;
   }
@@ -26,7 +26,7 @@ export class IngestionRepository {
   /**
    * Closes a run with its figures.
    */
-  async finishRun(id: string, counters: RunCounters): Promise<void> {
+  public async finishRun(id: string, counters: RunCounters): Promise<void> {
     await this.prisma.ingestionRun.update({
       where: { id },
       data: { finishedAt: new Date(), ...counters },
@@ -36,7 +36,7 @@ export class IngestionRepository {
   /**
    * Closes a run with the error that stopped it.
    */
-  async failRun(id: string, error: string): Promise<void> {
+  public async failRun(id: string, error: string): Promise<void> {
     await this.prisma.ingestionRun.update({
       where: { id },
       data: { finishedAt: new Date(), error },
@@ -46,7 +46,7 @@ export class IngestionRepository {
   /**
    * Latest completed runs of one source, success or failure, newest first.
    */
-  recentRuns(source: string, take: number): Promise<FinishedRun[]> {
+  public recentRuns(source: string, take: number): Promise<FinishedRun[]> {
     return this.prisma.ingestionRun.findMany({
       where: { source, finishedAt: { not: null } },
       orderBy: { startedAt: 'desc' },
@@ -66,7 +66,7 @@ export class IngestionRepository {
   /**
    * End of the last successful run of one source, null if it never succeeded.
    */
-  async lastSuccessAt(source: string): Promise<Date | null> {
+  public async lastSuccessAt(source: string): Promise<Date | null> {
     const run = await this.prisma.ingestionRun.findFirst({
       where: { source, finishedAt: { not: null }, error: null },
       orderBy: { startedAt: 'desc' },
@@ -78,7 +78,7 @@ export class IngestionRepository {
   /**
    * Visible offers per source, keyed by source name.
    */
-  async countJobsBySource(): Promise<Map<string, number>> {
+  public async countJobsBySource(): Promise<Map<string, number>> {
     const groups = await this.prisma.job.groupBy({
       by: ['source'],
       where: { isHidden: false },
@@ -90,7 +90,7 @@ export class IngestionRepository {
   /**
    * Upserts by (source, sourceId); a twin from another source is enriched, not duplicated.
    */
-  async persistJob(job: PreparedJob): Promise<PersistOutcome> {
+  public async persistJob(job: PreparedJob): Promise<PersistOutcome> {
     const data = {
       sourceLabel: job.sourceLabel,
       title: job.title,
@@ -154,7 +154,7 @@ export class IngestionRepository {
   /**
    * Deletes offers not seen since the threshold, keeping favourites.
    */
-  async purgeStaleJobs(threshold: Date): Promise<number> {
+  public async purgeStaleJobs(threshold: Date): Promise<number> {
     const { count } = await this.prisma.job.deleteMany({
       where: { lastSeenAt: { lt: threshold }, isFavorite: false },
     });

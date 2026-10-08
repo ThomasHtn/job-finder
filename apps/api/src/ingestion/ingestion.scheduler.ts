@@ -34,7 +34,7 @@ export class IngestionScheduler implements OnApplicationBootstrap {
   /**
    * Registers the cron once every module is ready, then optionally runs at once.
    */
-  onApplicationBootstrap(): void {
+  public onApplicationBootstrap(): void {
     const expression = this.config.get('INGESTION_CRON', { infer: true });
     const job = new CronJob(expression, () => {
       void this.ingestion.run();

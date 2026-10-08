@@ -11,7 +11,14 @@ import { PrismaClient } from '../src/generated/prisma/client.js';
  */
 config({ path: '../../.env', quiet: true });
 
+/**
+ * Shortest password accepted.
+ */
 const MIN_LENGTH = 8;
+
+/**
+ * The new password, or `--clear`.
+ */
 const arg = process.argv[2];
 
 if (!arg) {
@@ -23,6 +30,9 @@ if (arg !== '--clear' && arg.length < MIN_LENGTH) {
   process.exit(1);
 }
 
+/**
+ * Short-lived client: the script disconnects once the row is written.
+ */
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL ?? '' }),
 });

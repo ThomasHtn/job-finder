@@ -25,7 +25,7 @@ export class JoobleSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'JOOBLE';
+  public readonly name = 'JOOBLE';
 
   /**
    * Key from the environment, place and keywords from the profile.
@@ -38,14 +38,14 @@ export class JoobleSource implements JobSourceConnector {
   /**
    * Skipped until a key is configured.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return Boolean(this.apiKey);
   }
 
   /**
    * One query per leading keyword around the configured city, deduplicated by link.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const jobs = new Map<string, JoobleJob>();
 
     for (const keywords of this.profile.keywords.slice(0, MAX_KEYWORDS)) {

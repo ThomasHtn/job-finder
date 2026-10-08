@@ -6,6 +6,9 @@ import type { JobSummary } from '@job-finder/shared';
 import { LastVisitService } from '../../../core/last-visit.service';
 import { JobRow } from './job-row';
 
+/**
+ * A feed row with sensible defaults.
+ */
 function summary(overrides: Partial<JobSummary> = {}): JobSummary {
   return {
     id: 'job-1',
@@ -31,6 +34,9 @@ function summary(overrides: Partial<JobSummary> = {}): JobSummary {
   };
 }
 
+/**
+ * Renders one row as if the previous visit happened at the given time.
+ */
 function create(job: JobSummary, previousVisitAt: string | null) {
   /* Pinned, so the wording asserted below does not depend on the machine's browser language. */
   localStorage.setItem('job-finder-locale', 'fr');

@@ -33,13 +33,13 @@ export class AuthService {
   /**
    * Current token, null when logged out.
    */
-  readonly token = signal<string | null>(localStorage.getItem(STORAGE_KEY));
+  public readonly token = signal<string | null>(localStorage.getItem(STORAGE_KEY));
 
   /**
    * Checks the password with the API and keeps the returned session token.
    * The password itself is never stored in the browser.
    */
-  login(password: string): Observable<LoginResponse> {
+  public login(password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(apiUrl('auth/login'), { password }).pipe(
       tap(({ token }) => {
         localStorage.setItem(STORAGE_KEY, token);
@@ -51,7 +51,7 @@ export class AuthService {
   /**
    * Forgets the token.
    */
-  logout(): void {
+  public logout(): void {
     localStorage.removeItem(STORAGE_KEY);
     this.token.set(null);
   }
@@ -59,7 +59,7 @@ export class AuthService {
   /**
    * True when a token is stored, whether or not the API still accepts it.
    */
-  isAuthenticated(): boolean {
+  public isAuthenticated(): boolean {
     return this.token() !== null;
   }
 }

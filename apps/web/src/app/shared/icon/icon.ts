@@ -15,5 +15,5 @@ export class Icon {
   /**
    * Glyph to draw.
    */
-  readonly name = input.required<IconName>();
+  public readonly name = input.required<IconName>();
 }

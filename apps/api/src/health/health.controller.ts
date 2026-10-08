@@ -33,7 +33,7 @@ export class HealthController {
    */
   @Public()
   @Get()
-  async check(): Promise<HealthReport> {
+  public async check(): Promise<HealthReport> {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
       return { status: 'ok', database: 'up' };

@@ -20,14 +20,14 @@ export class IngestionApi {
   /**
    * Triggers a manual fetch of every job source, right before the list is reloaded.
    */
-  run(): Observable<IngestionSummary> {
+  public run(): Observable<IngestionSummary> {
     return this.http.post<IngestionSummary>(apiUrl('ingestion/run'), {});
   }
 
   /**
    * Health of the last completed run of each source.
    */
-  status(): Observable<SourceStatus[]> {
+  public status(): Observable<SourceStatus[]> {
     return this.http.get<SourceStatus[]>(apiUrl('ingestion/status'));
   }
 }

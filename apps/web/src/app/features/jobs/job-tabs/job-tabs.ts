@@ -22,20 +22,20 @@ export class JobTabs {
   /**
    * Entries to draw, in order.
    */
-  readonly items = input.required<JobTabItem[]>();
+  public readonly items = input.required<JobTabItem[]>();
 
   /**
    * Currently selected tab.
    */
-  readonly current = input.required<ShellTab>();
+  public readonly current = input.required<ShellTab>();
 
   /**
    * `inline` sits in the header, `bar` is fixed at the bottom of a phone screen.
    */
-  readonly variant = input<'inline' | 'bar'>('inline');
+  public readonly variant = input<'inline' | 'bar'>('inline');
 
   /**
    * Emits the tab the reader pressed.
    */
-  readonly selected = output<ShellTab>();
+  public readonly selected = output<ShellTab>();
 }

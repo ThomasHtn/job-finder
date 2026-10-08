@@ -22,7 +22,7 @@ export class EuresSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'EURES';
+  public readonly name = 'EURES';
   /**
    * Scoped logger.
    */
@@ -36,7 +36,7 @@ export class EuresSource implements JobSourceConnector {
   /**
    * Always enabled.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     /* Public API, no credentials needed. */
     return true;
   }
@@ -44,7 +44,7 @@ export class EuresSource implements JobSourceConnector {
   /**
    * One search per keyword, deduplicated by id.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const jobs = new Map<string, EuresJob>();
 
     for (const query of this.profile.keywords) {

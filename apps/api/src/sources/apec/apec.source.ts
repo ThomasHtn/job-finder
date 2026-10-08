@@ -25,7 +25,7 @@ export class ApecSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'APEC';
+  public readonly name = 'APEC';
   /**
    * Scoped logger.
    */
@@ -39,14 +39,14 @@ export class ApecSource implements JobSourceConnector {
   /**
    * Public endpoint, no credentials needed.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return true;
   }
 
   /**
    * Local and nationwide-remote passes per keyword, deduplicated by offer number.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const offers = new Map<string, ApecOffer>();
     /* Offer numbers the remote facet matched: the teaser never states it. */
     const remoteIds = new Set<string>();

@@ -30,13 +30,13 @@ export class I18n {
   /**
    * Language currently in use.
    */
-  readonly locale = this.current.asReadonly();
+  public readonly locale = this.current.asReadonly();
 
   /**
    * Wording of that language. Components expose it as `t` and read `t().section.key`, so the
    * template re-renders on its own when the language changes.
    */
-  readonly t = computed<Translations>(() => this.dictionaries[this.current()]);
+  public readonly t = computed<Translations>(() => this.dictionaries[this.current()]);
 
   /**
    * Announces the initial language to the document.
@@ -48,7 +48,7 @@ export class I18n {
   /**
    * Switches language and remembers it for the next visit.
    */
-  setLocale(locale: Locale): void {
+  public setLocale(locale: Locale): void {
     this.current.set(locale);
     localStorage.setItem(STORAGE_KEY, locale);
     this.applyDocumentLang();

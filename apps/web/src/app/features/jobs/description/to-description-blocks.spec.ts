@@ -1,9 +1,15 @@
 import { toDescriptionBlocks } from './to-description-blocks';
 
+/**
+ * Expected paragraph block, flagged as the lead when it opens the description.
+ */
 function paragraph(text: string, lead = false) {
   return { items: [], text, lead };
 }
 
+/**
+ * Expected bullet-list block, which carries no paragraph text.
+ */
 function list(items: string[]) {
   return { items, text: '', lead: false };
 }

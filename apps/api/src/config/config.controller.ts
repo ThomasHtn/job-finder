@@ -24,7 +24,7 @@ export class ConfigController {
    */
   @Public()
   @Get()
-  async get(): Promise<AppConfig> {
+  public async get(): Promise<AppConfig> {
     return {
       areaLabel: this.profile.area.label,
       authRequired: await this.auth.isRequired(),

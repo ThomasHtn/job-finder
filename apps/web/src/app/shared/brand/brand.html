@@ -1,6 +1,8 @@
 <!-- A watch list, with the line that arrived since last time marked at its head. -->
 <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true">
+  <!-- The accent dot: what arrived since the last visit. -->
   <circle class="brand__dot" cx="4.6" cy="6.5" r="3" />
+  <!-- The three list lines, shortening downwards. -->
   <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
     <path d="M10.6 6.5H21" />
     <path d="M3 13h16" />
@@ -8,6 +10,7 @@
   </g>
 </svg>
 
+<!-- Wordmark, dropped where the header is too narrow for it. -->
 @if (showName()) {
   <span class="brand__name">JobFinder</span>
 }

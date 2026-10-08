@@ -29,7 +29,7 @@ export class AuthController {
   @UseGuards(LoginThrottleGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Body('password') password: unknown): Promise<{ token: string }> {
+  public async login(@Body('password') password: unknown): Promise<{ token: string }> {
     if (typeof password !== 'string') {
       throw new BadRequestException('password must be a string');
     }

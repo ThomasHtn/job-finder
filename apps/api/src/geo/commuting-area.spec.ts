@@ -8,6 +8,9 @@ import { loadIsochrone } from './load-isochrone.js';
  * Centre of the reference area, and the drive it is configured for.
  */
 const LE_HAVRE = { latitude: 49.4938, longitude: 0.1077 };
+/**
+ * Road distance the shipped isochrone was generated for, also the radius of the fallback.
+ */
 const DRIVE_KM = 100;
 
 /**

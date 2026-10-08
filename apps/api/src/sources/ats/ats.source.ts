@@ -13,7 +13,7 @@ export class AtsSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'ATS';
+  public readonly name = 'ATS';
   /**
    * Scoped logger.
    */
@@ -22,7 +22,7 @@ export class AtsSource implements JobSourceConnector {
   /**
    * No credentials involved: enabled as long as the company list is not empty.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return COMPANIES.length > 0;
   }
 
@@ -31,7 +31,7 @@ export class AtsSource implements JobSourceConnector {
    * One company failing must not cost the others, so failures are logged and skipped.
    *
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const results = await Promise.allSettled(
       COMPANIES.map((company) => ATS_FETCHERS[company.provider](company)),
     );

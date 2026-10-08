@@ -32,7 +32,7 @@ export class FranceTravailSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'FRANCE_TRAVAIL';
+  public readonly name = 'FRANCE_TRAVAIL';
   /**
    * Scoped logger.
    */
@@ -53,14 +53,14 @@ export class FranceTravailSource implements JobSourceConnector {
   /**
    * Both OAuth credentials are needed; without them the source is skipped.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return Boolean(this.clientId && this.clientSecret);
   }
 
   /**
    * Local and nationwide-remote passes per keyword, plus the ROME code when set.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const offers = new Map<string, FranceTravailOffer>();
 
     for (const query of this.profile.keywords) {

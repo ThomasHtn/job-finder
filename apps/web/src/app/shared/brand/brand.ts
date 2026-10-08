@@ -14,5 +14,5 @@ export class Brand {
   /**
    * False on screens too narrow for the wordmark; the mark alone still identifies the app.
    */
-  readonly showName = input(true);
+  public readonly showName = input(true);
 }

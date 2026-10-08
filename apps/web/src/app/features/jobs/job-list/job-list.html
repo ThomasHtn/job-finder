@@ -47,16 +47,19 @@
   <div class="scan" [class.scan--on]="loading() || refreshing()" aria-hidden="true"></div>
 </header>
 
+<!-- Feed beside the detail panel, or the sources board alone on its own tab. -->
 <div class="layout" [class.layout--single]="showingSources()">
   @if (showingSources()) {
     <!-- The sources replace the feed and need no panel beside them. -->
     <main class="feed">
+      <!-- Keeps the sources tab from looking blank when the status request failed. -->
       @if (statusFailed()) {
         <p class="notice notice--alert">
           <app-icon name="alert" />
           <span>{{ t().sources.unavailable }}</span>
         </p>
       }
+      <!-- Health, stock and recent runs of every source. -->
       <app-source-board [statuses]="sourceStatus()" />
     </main>
   } @else {
@@ -148,8 +151,10 @@
 
     <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
     <aside class="panel" [class.panel--open]="detailOpen()">
+      <!-- The detail child route renders here; its activation is what opens the panel. -->
       <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
 
+      <!-- Placeholder for the empty column; hidden on a phone, where the panel stays closed. -->
       @if (!detailOpen()) {
         <p class="panel__idle">{{ t().feed.idlePanel }}</p>
       }

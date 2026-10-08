@@ -52,7 +52,7 @@ export class IngestionService {
   /**
    * Runs every source in turn. A failing source never stops the others.
    */
-  async run(): Promise<IngestionSummary> {
+  public async run(): Promise<IngestionSummary> {
     if (this.running) {
       this.logger.warn('Ingestion already running, skipping this trigger');
       return emptySummary([ALREADY_RUNNING]);
@@ -85,7 +85,7 @@ export class IngestionService {
   /**
    * Health and recent history per connector, for the degraded flag and the sources tab.
    */
-  async status(): Promise<SourceStatus[]> {
+  public async status(): Promise<SourceStatus[]> {
     const jobCounts = await this.repository.countJobsBySource();
 
     return Promise.all(

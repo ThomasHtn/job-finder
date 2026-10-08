@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
   /**
    * Passes public routes and open dev; otherwise the token must match a session.
    */
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

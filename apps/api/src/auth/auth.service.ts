@@ -22,14 +22,14 @@ export class AuthService {
   /**
    * True when a password has been set (`npm run auth:set-password`).
    */
-  async isRequired(): Promise<boolean> {
+  public async isRequired(): Promise<boolean> {
     return (await this.prisma.appPassword.count()) > 0;
   }
 
   /**
    * Verifies the password and opens a session; null on a wrong password.
    */
-  async login(password: unknown): Promise<string | null> {
+  public async login(password: unknown): Promise<string | null> {
     const stored = await this.prisma.appPassword.findUnique({ where: { id: 1 } });
     if (!stored || !verifyPassword(password, stored.hash)) return null;
 
@@ -48,7 +48,7 @@ export class AuthService {
   /**
    * True when the token belongs to a live session.
    */
-  async isValidToken(token: unknown): Promise<boolean> {
+  public async isValidToken(token: unknown): Promise<boolean> {
     if (typeof token !== 'string' || !token) return false;
     const session = await this.prisma.session.findUnique({
       where: { tokenHash: hashToken(token) },

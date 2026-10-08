@@ -16,12 +16,12 @@ export class JobPatchBus {
   /**
    * Last offer changed elsewhere, null until one is.
    */
-  readonly lastPatch = this.patched.asReadonly();
+  public readonly lastPatch = this.patched.asReadonly();
 
   /**
    * Announces the new state of one offer.
    */
-  publish(job: JobSummary): void {
+  public publish(job: JobSummary): void {
     this.patched.set(job);
   }
 }

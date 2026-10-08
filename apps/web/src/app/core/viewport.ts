@@ -24,7 +24,7 @@ export class Viewport {
   /**
    * True on phones and narrow windows.
    */
-  readonly isCompact = this.compact.asReadonly();
+  public readonly isCompact = this.compact.asReadonly();
 
   /**
    * Follows the media query for the life of the app.

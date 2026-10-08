@@ -41,22 +41,22 @@ export class JobRow {
   /**
    * The offer to render.
    */
-  readonly job = input.required<JobSummary>();
+  public readonly job = input.required<JobSummary>();
 
   /**
    * True while this offer is the one open in the panel.
    */
-  readonly selected = input(false);
+  public readonly selected = input(false);
 
   /**
    * Emits the offer id when the star is pressed.
    */
-  readonly favoriteToggled = output<string>();
+  public readonly favoriteToggled = output<string>();
 
   /**
    * Emits the offer id when the hide button is pressed.
    */
-  readonly hidden = output<string>();
+  public readonly hidden = output<string>();
 
   /**
    * True when the offer first appeared after the previous time the feed was consulted.

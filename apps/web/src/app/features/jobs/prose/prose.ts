@@ -15,7 +15,7 @@ export class Prose {
   /**
    * Raw text from the source.
    */
-  readonly text = input.required<string | null>();
+  public readonly text = input.required<string | null>();
 
   /**
    * Structured blocks derived from the text.

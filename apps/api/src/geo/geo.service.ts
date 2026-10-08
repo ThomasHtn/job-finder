@@ -44,7 +44,7 @@ export class GeoService {
    * True when the point is inside the commuting area. Without an isochrone, the configured
    * drive doubles as the radius, so the fallback answers for the area actually asked for.
    */
-  isWithinArea(point: Coordinates): boolean {
+  public isWithinArea(point: Coordinates): boolean {
     const { center, driveKm } = this.profile.area;
     return isWithinArea(this.area, center, point, driveKm);
   }
@@ -52,7 +52,7 @@ export class GeoService {
   /**
    * Geocodes a free-form French location, caching both hits and misses.
    */
-  async geocode(rawQuery: string): Promise<ResolvedLocation | null> {
+  public async geocode(rawQuery: string): Promise<ResolvedLocation | null> {
     const query = rawQuery.trim().toLowerCase();
     if (!query) return null;
 

@@ -25,7 +25,7 @@ export class FreeWorkSource implements JobSourceConnector {
   /**
    * Identifier in logs and IngestionRun.
    */
-  readonly name = 'FREE_WORK';
+  public readonly name = 'FREE_WORK';
   /**
    * Scoped logger.
    */
@@ -39,14 +39,14 @@ export class FreeWorkSource implements JobSourceConnector {
   /**
    * Public endpoint, no credentials needed.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return true;
   }
 
   /**
    * Everything permanent in the configured locations, plus a nationwide remote sweep.
    */
-  async fetchJobs(): Promise<RawJob[]> {
+  public async fetchJobs(): Promise<RawJob[]> {
     const jobs = new Map<number, FreeWorkJob>();
 
     for (const job of await this.search({

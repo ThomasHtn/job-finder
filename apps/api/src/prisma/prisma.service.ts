@@ -25,14 +25,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   /**
    * Opens the pool eagerly so a bad database URL fails at boot, not on the first request.
    */
-  async onModuleInit(): Promise<void> {
+  public async onModuleInit(): Promise<void> {
     await this.$connect();
   }
 
   /**
    * Releases the pool on graceful shutdown.
    */
-  async onModuleDestroy(): Promise<void> {
+  public async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
   }
 }

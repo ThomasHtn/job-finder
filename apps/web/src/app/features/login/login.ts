@@ -66,7 +66,7 @@ export class Login {
       .login(this.password())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.router.navigateByUrl('/'),
+        next: () => void this.router.navigateByUrl('/'),
         error: (error: { status?: number }) => {
           this.error.set(
             error.status === 429 ? this.t().login.throttled : this.t().login.wrongPassword,

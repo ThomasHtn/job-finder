@@ -64,6 +64,9 @@ describe('JobList', () => {
 
   afterEach(() => http.verify());
 
+  /**
+   * Mounts the list on a tab and answers the config and status calls it fires on boot.
+   */
   function create(tab?: string) {
     const fixture = TestBed.createComponent(JobList);
     if (tab) fixture.componentRef.setInput('tab', tab);

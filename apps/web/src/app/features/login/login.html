@@ -3,9 +3,12 @@
   <!-- Reachable before the password: the screen has to read in the visitor's language too. -->
   <app-language-toggle class="login__lang" />
 
+  <!-- Brand, heading and form, kept together in one column. -->
   <div class="login__panel">
+    <!-- Same mark as the header, with its wordmark. -->
     <app-brand class="login__brand" />
 
+    <!-- What the screen guards, and what it expects from the visitor. -->
     <h1 class="login__title">{{ t().login.title }}</h1>
     <p class="login__lead">{{ t().login.lead }}</p>
 
@@ -14,14 +17,18 @@
       <!-- Password field bound to the signal. -->
       <label class="login__field">
         <span class="login__label">{{ t().login.password }}</span>
+        <!-- The only field of the screen: focusing it on arrival is what the reader expects. -->
+        <!-- eslint-disable @angular-eslint/template/no-autofocus -->
         <input
           class="login__input"
           type="password"
           name="password"
           autocomplete="current-password"
+          autofocus
           [ngModel]="password()"
           (ngModelChange)="password.set($event)"
         />
+        <!-- eslint-enable @angular-eslint/template/no-autofocus -->
       </label>
 
       <!-- Failure message, announced to screen readers. -->

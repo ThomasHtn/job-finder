@@ -11,6 +11,7 @@
     <app-icon class="job-tabs__icon" [name]="item.icon" />
     <span class="job-tabs__text">
       <span class="job-tabs__label">{{ item.label }}</span>
+      <!-- The sources tab has no offers to count. -->
       @if (item.count !== null) {
         <span class="job-tabs__count u-num">{{ item.count }}</span>
       }

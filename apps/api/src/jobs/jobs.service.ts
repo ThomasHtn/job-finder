@@ -20,7 +20,7 @@ export class JobsService {
   /**
    * One tab's offers plus the counts of every tab and the last ingestion time.
    */
-  async list(tab: JobTab): Promise<JobListResponse> {
+  public async list(tab: JobTab): Promise<JobListResponse> {
     const [jobs, counts, lastRun] = await Promise.all([
       this.prisma.job.findMany({
         where: tabWhere(tab),
@@ -44,7 +44,7 @@ export class JobsService {
   /**
    * Opening the detail is itself the "consulted" signal.
    */
-  async detail(id: string): Promise<JobDetail> {
+  public async detail(id: string): Promise<JobDetail> {
     const job = await this.requireJob(id);
     const viewed = job.isViewed
       ? job
@@ -58,7 +58,7 @@ export class JobsService {
   /**
    * Flips the favourite flag.
    */
-  async toggleFavorite(id: string): Promise<JobSummary> {
+  public async toggleFavorite(id: string): Promise<JobSummary> {
     const job = await this.requireJob(id);
     const updated = await this.prisma.job.update({
       where: { id },
@@ -70,7 +70,7 @@ export class JobsService {
   /**
    * "Not interested": excludes the offer from every tab. No undo in the UI yet.
    */
-  async hide(id: string): Promise<JobSummary> {
+  public async hide(id: string): Promise<JobSummary> {
     await this.requireJob(id);
     const updated = await this.prisma.job.update({
       where: { id },

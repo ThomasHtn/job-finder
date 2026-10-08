@@ -37,7 +37,7 @@ export class LoginThrottleGuard implements CanActivate {
    * Records the attempt and rejects the request once the client is over quota.
    * Every call counts, successful or not: the login route is cheap to retry.
    */
-  canActivate(context: ExecutionContext): boolean {
+  public canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     const key = request.ip ?? 'unknown';
     const since = this.now() - WINDOW_MS;

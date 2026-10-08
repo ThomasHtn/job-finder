@@ -47,7 +47,7 @@ export class JobDetail {
   /**
    * Bound from the :id route parameter.
    */
-  readonly id = input.required<string>();
+  public readonly id = input.required<string>();
 
   /**
    * Offers API.

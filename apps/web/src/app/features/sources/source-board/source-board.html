@@ -1,6 +1,7 @@
 <!-- One block per source: its health, its stock, and its recent runs. -->
 <ul class="board">
   @for (status of statuses(); track status.source) {
+    <!-- Health is derived once per source, then reused for the class and the label. -->
     @let state = stateOf(status);
     <li class="source" [class]="'source--' + state">
       <!-- Name, health, and how many offers it holds right now. -->
@@ -42,6 +43,7 @@
         <details class="source__history">
           <summary>{{ t().sources.history(status.runs.length) }}</summary>
           <ol class="runs">
+            <!-- One line per run: when it finished, and its figures or its error. -->
             @for (run of status.runs; track run.startedAt) {
               <li class="run" [class.run--failed]="run.error">
                 <span class="run__date u-num">

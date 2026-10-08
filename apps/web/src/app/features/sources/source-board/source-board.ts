@@ -21,7 +21,7 @@ export class SourceBoard {
   /**
    * Statuses as the API orders them.
    */
-  readonly statuses = input.required<SourceStatus[]>();
+  public readonly statuses = input.required<SourceStatus[]>();
 
   /**
    * Wording of the language in use.

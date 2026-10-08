@@ -17,7 +17,7 @@ export class BanGeocoder {
   /**
    * Resolves a free-form French location to its best match.
    */
-  async resolve(query: string): Promise<ResolvedLocation | null> {
+  public async resolve(query: string): Promise<ResolvedLocation | null> {
     const url = `${GEOCODER_URL}?q=${encodeURIComponent(query)}&limit=1`;
     try {
       const response = await fetch(url, {

@@ -2,23 +2,30 @@
 <!-- Corrected at boot from the reader's browser, or from the language they picked. -->
 <html lang="en">
   <head>
+    <!-- Encoding, tab title, and the root the router resolves paths against. -->
     <meta charset="utf-8" />
     <title>JobFinder</title>
     <base href="/" />
+    <!-- Edge to edge on notched phones; the layout pads itself with the safe-area insets. -->
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Both schemes are designed, so native controls follow the system one. -->
     <meta name="color-scheme" content="light dark" />
+    <!-- Browser chrome tinted to the page background in each scheme. -->
     <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0d1013" media="(prefers-color-scheme: dark)" />
+    <!-- Vector tab icon, with the multi-size favicon for browsers that skip SVG. -->
     <link rel="icon" type="image/svg+xml" href="icon.svg" sizes="any" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
     <!-- iOS ignores SVG here and screenshots the page instead: it needs the raster tile. -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <!-- Home-screen install: name, icons and a standalone window. -->
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- Standalone on iOS before 17.4, which does not read display from the manifest. -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="JobFinder" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- The single typeface, with its hosts contacted before the stylesheet asks. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -27,6 +34,7 @@
     />
   </head>
   <body>
+    <!-- Angular boots the whole app into this element. -->
     <app-root></app-root>
   </body>
 </html>

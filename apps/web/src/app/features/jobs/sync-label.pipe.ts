@@ -3,10 +3,18 @@ import { Pipe, PipeTransform } from '@angular/core';
 import type { Translations } from '../../core/i18n/translations';
 
 /**
- * Milliseconds in a minute, an hour and a day.
+ * Milliseconds in one minute.
  */
 const MINUTE_MS = 60 * 1000;
+
+/**
+ * Milliseconds in one hour.
+ */
 const HOUR_MS = 60 * MINUTE_MS;
+
+/**
+ * Milliseconds in one day.
+ */
 const DAY_MS = 24 * HOUR_MS;
 
 /**
@@ -19,7 +27,7 @@ export class SyncLabelPipe implements PipeTransform {
    * ISO date to its label. The wording is an argument rather than an injection: a pure pipe
    * only recomputes when its arguments change, and the language is one of them.
    */
-  transform(value: string | null, text: Translations, now: Date = new Date()): string {
+  public transform(value: string | null, text: Translations, now: Date = new Date()): string {
     if (!value) return text.sync.never;
 
     const elapsed = now.getTime() - new Date(value).getTime();

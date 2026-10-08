@@ -25,7 +25,7 @@ export class AppConfigService {
   /**
    * Returns the shared config stream, firing the request only the first time.
    */
-  load(): Observable<AppConfig> {
+  public load(): Observable<AppConfig> {
     this.cache ??= this.http.get<AppConfig>(apiUrl('config')).pipe(shareReplay(1));
     return this.cache;
   }
