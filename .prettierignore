@@ -1,0 +1,13 @@
+# Generated, vendored or build output.
+package-lock.json
+node_modules/
+dist/
+coverage/
+.angular/
+apps/api/src/generated/
+apps/api/prisma/migrations/
+apps/api/src/geo/isochrone.geojson
+
+# Local agent notes, not part of the repository.
+CLAUDE.md
+.claude/

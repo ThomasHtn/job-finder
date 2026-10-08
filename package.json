@@ -11,18 +11,48 @@
     "setup": "npm run build -w @job-finder/shared && npm run db:setup && npm run db:migrate",
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run start:dev -w api\" \"npm start -w web\"",
     "build": "npm run build -w @job-finder/shared && npm run build -w api && npm run build -w web",
-    "test": "npm run test -w api",
-    "lint": "npm run lint -w api",
+    "test": "npm run test -w api && npm run test -w web -- --watch=false",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint . && stylelint \"apps/web/src/**/*.scss\"",
+    "lint:fix": "eslint . --fix && stylelint \"apps/web/src/**/*.scss\" --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fix": "npm run format && npm run lint:fix",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
     "db:setup": "bash scripts/db-setup.sh",
     "db:migrate": "npm run db:migrate -w api",
     "db:studio": "npm run db:studio -w api",
     "geo:isochrone": "npm run geo:isochrone -w api",
-    "auth:set-password": "npm run auth:set-password -w api --"
+    "auth:set-password": "npm run auth:set-password -w api --",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "^22.1.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-jsdoc": "^65.2.0",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.9",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "typescript-eslint": "^8.62.1"
   },
   "engines": {
     "node": ">=22"
+  },
+  "lint-staged": {
+    "*.{ts,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.scss": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{js,mjs,json,md,yml,yaml}": "prettier --write"
   }
 }
