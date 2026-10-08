@@ -1,5 +1,5 @@
 # Build context is the repo root: the API depends on packages/shared.
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -14,7 +14,7 @@ RUN npm run build -w @job-finder/shared \
   && npm run db:generate -w api \
   && npm run build -w api
 
-FROM node:22-alpine
+FROM node:26-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
