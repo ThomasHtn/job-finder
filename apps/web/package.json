@@ -12,22 +12,22 @@
   "private": true,
   "packageManager": "npm@10.9.8",
   "dependencies": {
-    "@angular/common": "^22.0.0",
+    "@angular/common": "^22.2.1",
     "@angular/compiler": "^22.0.0",
     "@angular/core": "^22.0.0",
-    "@angular/forms": "^22.0.0",
+    "@angular/forms": "^22.2.1",
     "@angular/platform-browser": "^22.0.0",
-    "@angular/router": "^22.0.0",
+    "@angular/router": "^22.2.1",
     "@job-finder/shared": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.8",
-    "@angular/cli": "^22.0.8",
-    "@angular/compiler-cli": "^22.0.0",
-    "jsdom": "^28.0.0",
-    "typescript": "~6.0.2",
-    "vitest": "^4.0.8"
+    "@angular/build": "^22.2.1",
+    "@angular/cli": "^22.2.1",
+    "@angular/compiler-cli": "^22.2.1",
+    "jsdom": "^30.1.2",
+    "typescript": "~7.0.2",
+    "vitest": "^5.0.3"
   }
 }
