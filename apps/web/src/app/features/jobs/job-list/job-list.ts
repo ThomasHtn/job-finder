@@ -15,13 +15,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 
 import { filter, map } from 'rxjs';
 
-import {
-  type JobListResponse,
-  type JobSummary,
-  type JobTab,
-  type SourceStatus,
-  toJobTab,
-} from '@job-finder/shared';
+import { type JobListResponse, type JobSummary, type JobTab, toJobTab } from '@job-finder/shared';
 
 import { AppConfigService } from '../../../core/app-config.service';
 import { describeHttpError } from '../../../core/http/describe-http-error';
@@ -32,6 +26,7 @@ import { Brand } from '../../../shared/brand/brand';
 import { Icon } from '../../../shared/icon/icon';
 import { LanguageToggle } from '../../../shared/language-toggle/language-toggle';
 import { SourceBoard } from '../../sources/source-board/source-board';
+import { SourceHealth } from '../../sources/source-health';
 import { detailIdFromUrl } from '../detail-id-from-url';
 import { IngestionApi } from '../ingestion-api';
 import { JobPatchBus } from '../job-patch-bus';
@@ -41,6 +36,8 @@ import { JobTabs } from '../job-tabs/job-tabs';
 import { JobsApi } from '../jobs-api';
 import { type ShellTab, SOURCES_TAB, toShellTab } from '../shell-tab';
 import { SyncLabelPipe } from '../sync-label.pipe';
+import { applyJobPatch } from './apply-job-patch';
+import { buildTabItems } from './build-tab-items';
 import { NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
 
 /**
@@ -52,6 +49,7 @@ import { NO_COUNTS, REFRESH_MESSAGE_MS } from './job-list.constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.html',
   styleUrl: './job-list.scss',
+  providers: [SourceHealth],
 })
 export class JobList {
   /**
@@ -63,6 +61,11 @@ export class JobList {
    * Ingestion API, for the refresh button and the source health.
    */
   private readonly ingestion = inject(IngestionApi);
+
+  /**
+   * Source health, for the refresh button and the sources tab.
+   */
+  private readonly health = inject(SourceHealth);
 
   /**
    * Router, to reflect the tab in the URL and to know which offer is open.
@@ -97,7 +100,7 @@ export class JobList {
   /**
    * Bound from the `?tab=` query parameter, so the browser's back button restores it.
    */
-  readonly tab = input<string>();
+  public readonly tab = input<string>();
 
   /**
    * Validated tab, defaulting when the URL carries garbage.
@@ -173,12 +176,12 @@ export class JobList {
   /**
    * Health of every source, from the API.
    */
-  protected readonly sourceStatus = signal<SourceStatus[]>([]);
+  protected readonly sourceStatus = this.health.statuses;
 
   /**
    * True when the last status request failed, so the sources tab is not left blank.
    */
-  protected readonly statusFailed = signal(false);
+  protected readonly statusFailed = this.health.failed;
 
   /**
    * Narrows the feed to the offers that appeared since the previous visit.
@@ -203,25 +206,9 @@ export class JobList {
   /**
    * The tab strip entries: where they lead, how they read, how many offers they hold.
    */
-  protected readonly tabItems = computed<JobTabItem[]>(() => {
-    const text = this.t();
-    return [
-      {
-        tab: 'local',
-        label: this.areaLabel() ?? text.tabs.areaPlaceholder,
-        count: this.counts().local,
-        icon: 'pin',
-      },
-      { tab: 'remote', label: text.tabs.remote, count: this.counts().remote, icon: 'remote' },
-      {
-        tab: 'favorites',
-        label: text.tabs.favorites,
-        count: this.counts().favorites,
-        icon: 'star',
-      },
-      { tab: SOURCES_TAB, label: text.tabs.sources, count: null, icon: 'pulse' },
-    ];
-  });
+  protected readonly tabItems = computed<JobTabItem[]>(() =>
+    buildTabItems(this.t(), this.areaLabel(), this.counts()),
+  );
 
   /**
    * Every offer of the current tab, before the "new" filter.
@@ -248,28 +235,14 @@ export class JobList {
   protected readonly jobs = computed(() => (this.onlyNew() ? this.newJobs() : this.allJobs()));
 
   /**
-   * Enabled sources whose last run failed.
-   */
-  private readonly failedSources = computed(() =>
-    this.sourceStatus().filter((status) => status.enabled && !status.ok),
-  );
-
-  /**
    * True when at least one enabled source is down.
    */
-  protected readonly sourcesDegraded = computed(() => this.failedSources().length > 0);
+  protected readonly sourcesDegraded = this.health.degraded;
 
   /**
-   * e.g. "3/4 sources available" plus the down ones, shown as the refresh button's tooltip.
+   * Refresh button tooltip: how many sources answer, and which ones do not.
    */
-  protected readonly sourceStatusLabel = computed(() => {
-    const enabled = this.sourceStatus().filter((status) => status.enabled);
-    if (enabled.length === 0) return '';
-    const text = this.t();
-    const down = this.failedSources().map((status) => status.source);
-    const summary = text.feed.sourcesAvailable(enabled.length - down.length, enabled.length);
-    return down.length ? text.feed.sourcesFailed(summary, down.join(', ')) : summary;
-  });
+  protected readonly sourceStatusLabel = this.health.label;
 
   /**
    * Reloads on tab change, folds in offers changed from the panel, and keeps the page behind
@@ -281,7 +254,7 @@ export class JobList {
       untracked(() => {
         this.onlyNew.set(false);
         if (view === SOURCES_TAB) {
-          this.loadStatus();
+          this.health.load();
           /* Landing straight on the sources still needs the tab counts. */
           if (!this.data()) this.load(this.currentTab());
         } else {
@@ -302,7 +275,7 @@ export class JobList {
       document.body.classList.toggle('is-sheet-open', locked);
     });
 
-    this.loadStatus();
+    this.health.load();
     this.destroyRef.onDestroy(() => {
       clearTimeout(this.refreshMessageTimer);
       document.body.classList.remove('is-sheet-open');
@@ -346,7 +319,7 @@ export class JobList {
         next: (summary) => {
           this.refreshing.set(false);
           this.reload();
-          this.loadStatus();
+          this.health.load();
           this.showRefreshMessage(this.t().feed.newOffers(summary.inserted));
           if (summary.failedSources.length) {
             this.sourceWarning.set(
@@ -386,33 +359,7 @@ export class JobList {
    * pull the open offer out from under the panel.
    */
   private applyPatch(patched: JobSummary): void {
-    this.data.update((current) => {
-      const previous = current?.jobs.find((job) => job.id === patched.id);
-      if (!current || !previous) return current;
-      const favorites =
-        current.counts.favorites + (patched.isFavorite ? 1 : 0) - (previous.isFavorite ? 1 : 0);
-      return {
-        ...current,
-        jobs: current.jobs.map((job) => (job.id === patched.id ? patched : job)),
-        counts: { ...current.counts, favorites },
-      };
-    });
-  }
-
-  /**
-   * Fetches the source health for the tooltip, the degraded state and the sources tab.
-   */
-  private loadStatus(): void {
-    this.ingestion
-      .status()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (statuses) => {
-          this.sourceStatus.set(statuses);
-          this.statusFailed.set(false);
-        },
-        error: () => this.statusFailed.set(true),
-      });
+    this.data.update((current) => applyJobPatch(current, patched));
   }
 
   /**
