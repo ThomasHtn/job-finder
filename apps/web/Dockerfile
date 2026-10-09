@@ -1,5 +1,5 @@
 # Build context is the repo root: the front depends on packages/shared.
-FROM node:22-alpine AS build
+FROM node:25-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
