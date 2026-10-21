@@ -29,7 +29,10 @@ RUN npm run build --workspace contract \
 # ---- Production dependencies stage -----------------------------------------
 # Same install without the dev tools. The Prisma CLI stays: it applies the migrations at startup.
 FROM deps AS prod-deps
-RUN npx --yes npm@11.21.1 ci --workspace contract --workspace backend --omit=dev
+# A dependency whose range the hoisted copy does not satisfy (another workspace pins an older one) is
+# nested in backend/node_modules; the folder always exists so the runtime COPY never fails.
+RUN npx --yes npm@11.21.1 ci --workspace contract --workspace backend --omit=dev \
+  && mkdir -p backend/node_modules
 
 # ---- Runtime stage ----------------------------------------------------------
 FROM node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS runtime
@@ -46,6 +49,7 @@ RUN addgroup -S -g 10001 jobfinder && adduser -S -D -H -u 10001 -G jobfinder job
 
 WORKDIR /app
 COPY --from=prod-deps /workspace/node_modules node_modules
+COPY --from=prod-deps /workspace/backend/node_modules backend/node_modules
 COPY --from=build /workspace/package.json ./
 COPY --from=build /workspace/contract/package.json contract/
 COPY --from=build /workspace/contract/dist contract/dist
