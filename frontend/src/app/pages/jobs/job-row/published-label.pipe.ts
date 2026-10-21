@@ -2,11 +2,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 import { translate } from '@jsverse/transloco';
 
-import { DAY_MS } from '@core/date/date.constants';
+import { calendarDaysBetween } from '@core/date/date.utils';
 import { AppLocale } from '@core/i18n/i18n.model';
 
 import { RELATIVE_DAYS } from './job-row.constants';
-import { startOfDay } from './job-row.utils';
 
 /**
  * "Today", "Yesterday", "3 days ago", then the full date. The row's date slot needs no
@@ -23,7 +22,7 @@ export class PublishedLabelPipe implements PipeTransform {
       return '';
     }
     const published = new Date(value);
-    const days = Math.round((startOfDay(now) - startOfDay(published)) / DAY_MS);
+    const days = calendarDaysBetween(published, now);
     if (days <= 0) {
       return translate('published.today');
     }

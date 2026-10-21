@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { PROFILE } from '../shared/config/search-profile.fixtures.js';
 import type { PrismaService } from '../shared/prisma/prisma.service.js';
 import { JobsService } from './jobs.service.js';
 
@@ -17,7 +18,7 @@ function build(groups: { isRemote: boolean; isFavorite: boolean; _count: { _all:
     },
     ingestionRun: { findFirst: vi.fn(async () => null) },
   };
-  return { service: new JobsService(prisma as unknown as PrismaService), prisma };
+  return { service: new JobsService(prisma as unknown as PrismaService, PROFILE), prisma };
 }
 
 /**

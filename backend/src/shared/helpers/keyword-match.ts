@@ -1,4 +1,4 @@
-import { normalize } from '../../shared/helpers/normalize-text.js';
+import { normalize } from './normalize-text.js';
 
 /**
  * Word-boundary match for plain keywords, so "java" does not match "javascript".

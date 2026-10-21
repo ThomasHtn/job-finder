@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { TranslocoPipe } from '@jsverse/transloco';
+import { translate, TranslocoPipe } from '@jsverse/transloco';
 
 import type { JobSummary } from '@job-finder/contract';
 
@@ -13,11 +13,12 @@ import { LastVisit } from '@core/jobs/last-visit';
 import { Icon } from '@shared/icon/icon';
 import { IconButton } from '@shared/icon-button/icon-button';
 
+import { ROW_STACK_LIMIT } from './job-row.constants';
 import { unusualContract } from './job-row.utils';
 import { PublishedLabelPipe } from './published-label.pipe';
 
 /**
- * One line of the feed: title, who and where, an excerpt, then the provenance strip.
+ * One line of the feed: title, who and where, the stack and provenance, the salary beside them.
  */
 @Component({
   selector: 'app-job-row',
@@ -83,6 +84,21 @@ export class JobRow {
    * Contract wording, only when it says something other than the usual permanent contract.
    */
   protected readonly contract = computed(() => unusualContract(this.job().contractLabel));
+
+  /**
+   * The first stack keywords the offer names, `null` when it names none.
+   */
+  protected readonly stack = computed(
+    () => this.job().stack.slice(0, ROW_STACK_LIMIT).join(', ') || null,
+  );
+
+  /**
+   * Salary wording from the source, or the short "not stated".
+   */
+  protected readonly salary = computed(() => {
+    this.language.active();
+    return this.job().salary ?? translate('row.unknownSalary');
+  });
 
   /**
    * "76 - LE HAVRE" like France Travail, or the closest the source allows.

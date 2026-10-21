@@ -1,12 +1,12 @@
 import type { JobDetail, JobSummary } from '@job-finder/contract';
 
 import type { JobModel } from '../generated/prisma/models.js';
-import { excerpt } from './excerpt.js';
+import { matchedStack } from './matched-stack.js';
 
 /**
- * Prisma row to the list DTO: dates become ISO strings, the description an excerpt.
+ * Prisma row to the list DTO: dates become ISO strings, title and description the stack they name.
  */
-export function toSummary(job: JobModel): JobSummary {
+export function toSummary(job: JobModel, stackKeywords: readonly string[]): JobSummary {
   return {
     id: job.id,
     title: job.title,
@@ -21,7 +21,7 @@ export function toSummary(job: JobModel): JobSummary {
     hasFullDescription: job.hasFullDescription,
     contractLabel: job.contractLabel,
     salary: job.salary,
-    excerpt: excerpt(job.description),
+    stack: matchedStack(`${job.title} ${job.description ?? ''}`, stackKeywords),
     isFavorite: job.isFavorite,
     isViewed: job.isViewed,
     publishedAt: job.publishedAt?.toISOString() ?? null,
@@ -33,9 +33,9 @@ export function toSummary(job: JobModel): JobSummary {
 /**
  * Prisma row to the detail DTO: the summary plus the full texts.
  */
-export function toDetail(job: JobModel): JobDetail {
+export function toDetail(job: JobModel, stackKeywords: readonly string[]): JobDetail {
   return {
-    ...toSummary(job),
+    ...toSummary(job, stackKeywords),
     description: job.description,
     companyDescription: job.companyDescription,
   };

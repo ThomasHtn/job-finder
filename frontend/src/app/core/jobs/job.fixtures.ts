@@ -18,7 +18,7 @@ export function jobSummary(overrides: Partial<JobSummary> = {}): JobSummary {
     hasFullDescription: true,
     contractLabel: 'CDI',
     salary: null,
-    excerpt: 'Un extrait de la description.',
+    stack: ['Angular'],
     isFavorite: false,
     isViewed: false,
     publishedAt: new Date().toISOString(),

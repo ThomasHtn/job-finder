@@ -16,10 +16,11 @@
   --color-line: rgb(16 24 34 / 9%);
   --color-line-2: rgb(16 24 34 / 16%);
 
-  /* Deep teal, spent on one thing only: what arrived since the last visit, and the active tab. */
+  /* Deep teal: what arrived since the last visit, the active tab, and the one main action of a screen. */
   --color-accent: #0e6e63;
   --color-accent-ink: #0b5a51;
   --color-accent-soft: rgb(14 110 99 / 9%);
+  --color-on-accent: #fff;
 
   /* Failures: a source down, a refused password. */
   --color-alert: #a8331f;
@@ -41,6 +42,7 @@
     --color-accent: #3fb8a6;
     --color-accent-ink: #5cd0bd;
     --color-accent-soft: rgb(63 184 166 / 14%);
+    --color-on-accent: #0d1013;
     --color-alert: #e2705f;
     --color-alert-soft: rgb(226 112 95 / 12%);
   }

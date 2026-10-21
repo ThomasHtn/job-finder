@@ -106,7 +106,7 @@ describe('JobsPage', () => {
     expect(text(fixture)).toContain('Développeur Angular');
     expect(text(fixture)).toContain('Acme');
     expect(text(fixture)).toContain('76 - Le Havre');
-    expect(text(fixture)).toContain('Un extrait de la description.');
+    expect(text(fixture)).toContain('Angular');
     expect(text(fixture)).toContain("Aujourd'hui");
     expect(text(fixture)).toContain('France Travail');
     expect(find(fixture, 'a.job-row__title').getAttribute('href')).toBe('/offres/job-1');
@@ -268,8 +268,13 @@ describe('JobsPage', () => {
       jobSummary({ id: 'new', title: 'Nouvelle', firstSeenAt: '2026-09-06T00:00:00.000Z' }),
     ]);
 
-    expect(text(fixture)).toContain('offre depuis votre dernière visite');
-    find<HTMLButtonElement>(fixture, '.jobs__fresh').click();
+    expect(text(fixture)).toContain('1 nouvelle offre');
+    expect(text(fixture)).toContain("Vu jusqu'ici");
+    const titles = [...fixture.nativeElement.querySelectorAll('.job-row__title')].map((title) =>
+      (title as HTMLElement).textContent?.trim(),
+    );
+    expect(titles).toEqual(['Nouvelle', 'Ancienne']);
+    find<HTMLButtonElement>(fixture, '.jobs__only-new').click();
     await settle(fixture);
 
     expect(text(fixture)).toContain('Nouvelle');

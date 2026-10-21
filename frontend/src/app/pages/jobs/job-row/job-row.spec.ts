@@ -60,6 +60,20 @@ describe('JobRow', () => {
     expect(fixture.nativeElement.textContent).toContain('45 k€');
   });
 
+  it('says when the salary is not stated', () => {
+    const fixture = create(jobSummary({ salary: null }), null);
+
+    expect(fixture.nativeElement.textContent).toContain('Non communiqué');
+  });
+
+  it('names the first keywords of the searched stack', () => {
+    const stack = ['Angular', 'Java', 'Spring Boot', 'PostgreSQL'];
+    const fixture = create(jobSummary({ stack }), null);
+
+    expect(fixture.nativeElement.textContent).toContain('Angular, Java, Spring Boot');
+    expect(fixture.nativeElement.textContent).not.toContain('PostgreSQL');
+  });
+
   it('emits the star and hide presses without opening the offer', () => {
     const fixture = create(jobSummary(), null);
     const starred: string[] = [];

@@ -38,6 +38,13 @@
   font-size: 0.8125rem;
 }
 
+/* The origin's glyph. */
+.job-detail__origin-icon {
+  --icon-size: 0.9375rem;
+
+  flex: none;
+}
+
 /* Close glyph size. */
 .job-detail__close {
   --icon-size: 1.125rem;
@@ -103,6 +110,14 @@
   font-weight: 500;
 }
 
+/* The glyph before the company and the place. */
+.job-detail__meta-icon {
+  --icon-size: 1rem;
+
+  flex: none;
+  color: var(--color-ink-3);
+}
+
 /* Contract, salary and date: one band split by hairlines, not three cards. */
 .job-detail__facts {
   display: grid;
@@ -131,12 +146,41 @@
   font-size: 0.8125rem;
 }
 
+/* The glyph before a fact's name. */
+.job-detail__fact-icon {
+  --icon-size: 0.9375rem;
+
+  flex: none;
+}
+
 /* A fact's value. */
 .job-detail__fact-value {
   margin: 0.1875rem 0 0;
   font-size: 0.9375rem;
   font-weight: 500;
   letter-spacing: -0.01em;
+}
+
+/* The stack keywords the ad names, under the facts. */
+.job-detail__stack {
+  margin: -0.25rem 0 1.75rem;
+}
+
+/* Their label. */
+.job-detail__stack-label {
+  margin: 0 0 0.625rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* One keyword, tinted like the new offers: it is what the search looks for. */
+.job-detail__chip {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 /* Section heading inside the offer: small, weighted, in sentence case. */

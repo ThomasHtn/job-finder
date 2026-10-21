@@ -70,9 +70,9 @@ export interface JobSummary {
   salary: string | null;
 
   /**
-   * First lines of the description, for the feed.
+   * Keywords of the searched stack the ad mentions, as the profile spells them.
    */
-  excerpt: string | null;
+  stack: string[];
 
   /**
    * Starred by the user.

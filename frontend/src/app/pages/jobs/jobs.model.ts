@@ -29,7 +29,7 @@ export interface JobTabItem {
   count: number | null;
 
   /**
-   * Glyph, only drawn in the bottom bar.
+   * Glyph drawn before the label.
    */
   icon: IconName;
 }

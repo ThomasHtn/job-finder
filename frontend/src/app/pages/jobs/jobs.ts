@@ -37,7 +37,6 @@ import { Brand } from '@shared/brand/brand';
 import { Button } from '@shared/button/button';
 import { EmptyState } from '@shared/empty-state/empty-state';
 import { Icon } from '@shared/icon/icon';
-import { IconButton } from '@shared/icon-button/icon-button';
 import { LanguageToggle } from '@shared/language-toggle/language-toggle';
 import { Notice } from '@shared/notice/notice';
 import { ScanLine } from '@shared/scan-line/scan-line';
@@ -53,6 +52,7 @@ import {
   sourceName,
   toShellTab,
 } from './jobs.utils';
+import { SinceVisitLabelPipe } from './since-visit-label/since-visit-label.pipe';
 import { SourceBoard } from './source-board/source-board';
 import { SourceHealth } from './source-health';
 import { SyncLabelPipe } from './sync-label/sync-label.pipe';
@@ -68,13 +68,13 @@ import { SyncLabelPipe } from './sync-label/sync-label.pipe';
     Button,
     EmptyState,
     Icon,
-    IconButton,
     JobRow,
     JobTabs,
     LanguageToggle,
     Notice,
     RouterOutlet,
     ScanLine,
+    SinceVisitLabelPipe,
     SourceBoard,
     SyncLabelPipe,
     TranslocoPipe,
@@ -110,9 +110,9 @@ export class JobsPage {
   private readonly route = inject(ActivatedRoute);
 
   /**
-   * Previous visit timestamp, for the "new" filter.
+   * Previous visit timestamp, for the "new" filter and the line under the count of new offers.
    */
-  private readonly lastVisit = inject(LastVisit);
+  protected readonly previousVisitAt = inject(LastVisit).previousVisitAt;
 
   /**
    * Offers changed from inside the detail panel.
@@ -262,10 +262,10 @@ export class JobsPage {
   private readonly allJobs = computed(() => this.data()?.jobs ?? []);
 
   /**
-   * Offers first seen after the previous visit, by the same rule as the row's own badge.
+   * Offers first seen after the previous visit, by the same rule as the row's own dot; listed first.
    */
-  private readonly newJobs = computed(() =>
-    this.allJobs().filter((job) => isNewSince(job, this.lastVisit.previousVisitAt)),
+  protected readonly newJobs = computed(() =>
+    this.allJobs().filter((job) => isNewSince(job, this.previousVisitAt)),
   );
 
   /**
@@ -274,17 +274,28 @@ export class JobsPage {
   protected readonly newCount = computed(() => this.newJobs().length);
 
   /**
-   * Text after the count of new offers, agreed with it.
+   * "3 new offers", agreed with the count.
    */
-  protected readonly newSinceLabel = computed(() => {
+  protected readonly newHeadline = computed(() => {
     this.language.active();
-    return translate(isSingular(this.newCount()) ? 'feed.newSinceOne' : 'feed.newSinceOther');
+    const count = this.newCount();
+    return translate(isSingular(count) ? 'feed.newHeadlineOne' : 'feed.newHeadlineOther', {
+      count,
+    });
   });
 
   /**
-   * Offers actually rendered.
+   * Offers already there at the previous visit, listed under the new ones; none while the filter
+   * keeps only the new.
    */
-  protected readonly jobs = computed(() => (this.onlyNew() ? this.newJobs() : this.allJobs()));
+  protected readonly seenJobs = computed(() =>
+    this.onlyNew() ? [] : this.allJobs().filter((job) => !isNewSince(job, this.previousVisitAt)),
+  );
+
+  /**
+   * Offers actually rendered, new ones first.
+   */
+  protected readonly jobs = computed(() => [...this.newJobs(), ...this.seenJobs()]);
 
   /**
    * Loads the public settings, reloads the sources on their tab, folds in offers changed from the

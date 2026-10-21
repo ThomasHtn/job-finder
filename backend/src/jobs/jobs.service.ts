@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import type {
   JobCounts,
@@ -9,6 +9,7 @@ import type {
 } from '@job-finder/contract';
 
 import type { JobModel } from '../generated/prisma/models.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
 import { PrismaService } from '../shared/prisma/prisma.service.js';
 import { toDetail, toSummary } from './job.mapper.js';
 import { tabWhere } from './tab-where.js';
@@ -19,9 +20,13 @@ import { tabWhere } from './tab-where.js';
 @Injectable()
 export class JobsService {
   /**
-   * Direct Prisma access: the read side is simple enough not to need a repository.
+   * Direct Prisma access: the read side is simple enough not to need a repository. The profile
+   * names the stack each offer is matched against.
    */
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
+  ) {}
 
   /**
    * One tab's offers plus the counts of every tab and the last ingestion time.
@@ -41,7 +46,7 @@ export class JobsService {
     ]);
 
     return {
-      jobs: jobs.map(toSummary),
+      jobs: jobs.map((job) => toSummary(job, this.profile.stackKeywords)),
       counts,
       lastIngestionAt: lastRun?.finishedAt?.toISOString() ?? null,
     };
@@ -58,7 +63,7 @@ export class JobsService {
           where: { id },
           data: { isViewed: true },
         });
-    return toDetail(viewed);
+    return toDetail(viewed, this.profile.stackKeywords);
   }
 
   /**
@@ -70,7 +75,7 @@ export class JobsService {
       where: { id },
       data: { isFavorite: !job.isFavorite },
     });
-    return toSummary(updated);
+    return toSummary(updated, this.profile.stackKeywords);
   }
 
   /**
@@ -82,7 +87,7 @@ export class JobsService {
       where: { id },
       data: { isHidden: true },
     });
-    return toSummary(updated);
+    return toSummary(updated, this.profile.stackKeywords);
   }
 
   /**

@@ -24,7 +24,10 @@
 
     <!-- Origin and star only once the offer has loaded. -->
     @if (job(); as job) {
-      <p class="job-detail__origin min-w-0 flex-1 truncate">{{ job.sourceLabel }}</p>
+      <p class="job-detail__origin flex min-w-0 flex-1 items-center gap-1.5">
+        <app-icon class="job-detail__origin-icon" name="source" />
+        <span class="truncate">{{ job.sourceLabel }}</span>
+      </p>
 
       <!-- Favourite toggle, mirrored back to the row through the patch bus. -->
       <button
@@ -57,29 +60,42 @@
     <article>
       <!-- Title, company and place. -->
       <h1 class="job-detail__title">{{ job.title }}</h1>
-      <p class="job-detail__meta mt-3 flex flex-wrap items-baseline gap-x-3.5 gap-y-0.5">
-        <span class="job-detail__company">
+      <p class="job-detail__meta mt-3 flex flex-wrap items-center gap-x-4.5 gap-y-1">
+        <span class="job-detail__company inline-flex items-center gap-1.75">
+          <app-icon class="job-detail__meta-icon" name="building" />
           {{ job.company ?? ('row.unknownCompany' | transloco) }}
         </span>
-        <span>{{ place() }}</span>
+        <span class="inline-flex items-center gap-1.75">
+          <app-icon class="job-detail__meta-icon" [name]="job.isRemote ? 'remote' : 'pin'" />
+          {{ place() }}
+        </span>
       </p>
 
       <!-- Key facts, on one band rather than in three boxes. -->
       <dl class="job-detail__facts">
         <div class="job-detail__fact">
-          <dt class="job-detail__fact-term">{{ 'detail.contract' | transloco }}</dt>
-          <dd class="job-detail__fact-value">
-            {{ job.contractLabel ?? ('detail.defaultContract' | transloco) }}
-          </dd>
-        </div>
-        <div class="job-detail__fact">
-          <dt class="job-detail__fact-term">{{ 'detail.salary' | transloco }}</dt>
+          <dt class="job-detail__fact-term flex items-center gap-1.5">
+            <app-icon class="job-detail__fact-icon" name="salary" />
+            {{ 'detail.salary' | transloco }}
+          </dt>
           <dd class="job-detail__fact-value">
             {{ job.salary ?? ('detail.unknownSalary' | transloco) }}
           </dd>
         </div>
         <div class="job-detail__fact">
-          <dt class="job-detail__fact-term">{{ 'detail.publishedOn' | transloco }}</dt>
+          <dt class="job-detail__fact-term flex items-center gap-1.5">
+            <app-icon class="job-detail__fact-icon" name="contract" />
+            {{ 'detail.contract' | transloco }}
+          </dt>
+          <dd class="job-detail__fact-value">
+            {{ job.contractLabel ?? ('detail.defaultContract' | transloco) }}
+          </dd>
+        </div>
+        <div class="job-detail__fact">
+          <dt class="job-detail__fact-term flex items-center gap-1.5">
+            <app-icon class="job-detail__fact-icon" name="calendar" />
+            {{ 'detail.publishedOn' | transloco }}
+          </dt>
           <dd class="job-detail__fact-value tabular-nums">
             @if (job.publishedAt; as publishedAt) {
               {{ publishedAt | date: ('date.day' | transloco) }}
@@ -89,6 +105,21 @@
           </dd>
         </div>
       </dl>
+
+      <!-- The searched stack this ad names, so the match reads before the text. -->
+      @if (job.stack.length) {
+        <div class="job-detail__stack">
+          <p class="job-detail__stack-label flex items-center gap-1.5">
+            <app-icon class="job-detail__fact-icon" name="code" />
+            {{ 'detail.yourStack' | transloco }}
+          </p>
+          <ul class="flex flex-wrap gap-2">
+            @for (keyword of job.stack; track keyword) {
+              <li class="job-detail__chip">{{ keyword }}</li>
+            }
+          </ul>
+        </div>
+      }
 
       <!-- A star that did not go through: said here, the offer stays as it was. -->
       @if (actionError(); as message) {

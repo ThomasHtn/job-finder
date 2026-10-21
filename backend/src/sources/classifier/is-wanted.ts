@@ -1,8 +1,8 @@
 import type { SearchProfile } from '../../shared/config/search-profile.js';
+import { matchesAny } from '../../shared/helpers/keyword-match.js';
 import { normalize } from '../../shared/helpers/normalize-text.js';
 import type { RawJob } from '../raw-job.js';
 import { THIN_DESCRIPTION_LENGTH } from './classifier.constants.js';
-import { matchesAny } from './keyword-match.js';
 
 /**
  * True when the offer is the trade described by the profile: the title looks

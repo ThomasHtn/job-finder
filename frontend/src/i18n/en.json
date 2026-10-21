@@ -2,7 +2,9 @@
   "date": {
     "tag": "en-GB",
     "day": "d MMM yyyy",
-    "dayTime": "dd/MM/yyyy HH:mm"
+    "dayTime": "dd/MM/yyyy HH:mm",
+    "time": "HH:mm",
+    "shortDay": "d MMM"
   },
   "languages": {
     "fr": "French",
@@ -69,10 +71,13 @@
     "unavailable": "The source status could not be loaded."
   },
   "feed": {
-    "newSinceOne": "offer since your last visit",
-    "newSinceOther": "offers since your last visit",
-    "showOnlyNew": "Show",
-    "showAll": "Show all",
+    "newHeadlineOne": "{{ count }} new offer",
+    "newHeadlineOther": "{{ count }} new offers",
+    "sinceVisitAt": "since your visit at {{ time }}",
+    "sinceVisitYesterday": "since your visit yesterday at {{ time }}",
+    "sinceVisitOn": "since your visit on {{ date }}",
+    "onlyNew": "New only",
+    "seenUpTo": "Seen up to here",
     "retry": "Try again",
     "nothingNew": "Nothing new since your last visit.",
     "nothingNewHint": "The offers you have already seen are still there.",
@@ -98,6 +103,7 @@
   "row": {
     "unknownCompany": "Company not stated",
     "approximateCity": "town not stated",
+    "unknownSalary": "Not stated",
     "new": "New",
     "hide": "Not interested, hide this offer",
     "addFavorite": "Add to favorites",
@@ -115,9 +121,10 @@
     "defaultContract": "Permanent",
     "salary": "Salary",
     "unknownSalary": "Not stated",
-    "publishedOn": "Published on",
+    "publishedOn": "Published",
     "unknownDate": "Unknown date",
     "excerptOnly": "This source only publishes an excerpt. The full listing is on the original site.",
+    "yourStack": "Your stack",
     "offerSection": "The role",
     "companySection": "The company",
     "alsoPublishedOn": "Also published on",

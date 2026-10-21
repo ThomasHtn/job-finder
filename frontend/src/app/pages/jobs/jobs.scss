@@ -1,10 +1,9 @@
 @use 'tools' as *;
 
-/* The header is two rows on a wide screen, one on a phone; everything sticky measures from here. */
+/* The shell: header, then the feed beside a panel pinned to the right edge. */
 :host {
-  --head-total: calc(var(--layout-header-height) + 2.75rem);
-  --shell-width: 74rem;
-  --panel-gap: 1.5rem;
+  --feed-width: 47.5rem;
+  --panel-width: 37.5rem;
 
   display: block;
   min-height: 100dvh;
@@ -16,42 +15,58 @@
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--color-line);
-  background: color-mix(in srgb, var(--color-paper) 84%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
 }
 
-/* One header row, as wide as the content below. */
+/* The header's single row, edge to edge. */
 .jobs__head-row {
-  max-width: var(--shell-width);
+  gap: 0.625rem;
   height: var(--layout-header-height);
-  margin: 0 auto;
   padding: 0 var(--layout-gutter);
 }
 
-/* The tab row, shorter, the tabs resting on its bottom edge. */
-.jobs__head-row--tabs {
-  height: 2.75rem;
+/* The tabs, set apart from the brand. */
+.jobs__tabs {
+  margin-left: 1.25rem;
 }
 
-/* Sync time: truncates rather than pushing the buttons off a narrow screen. */
-.jobs__stamp {
-  margin: 0;
-  color: var(--color-ink-3);
-  font-size: 0.8125rem;
-}
-
-/* What a manual refresh just brought. */
-.jobs__stamp-fresh {
-  color: var(--color-accent-ink);
-  font-weight: 600;
-}
-
-/* Refresh button, flush with the gutter. */
+/* Refresh, labelled with the sync time: a tile rather than a bare glyph, so the label reads as its state. */
 .jobs__refresh {
-  --icon-size: 1.1875rem;
+  max-width: 16rem;
+  height: 2.5rem;
+  margin-right: -0.25rem;
+  padding: 0 0.875rem 0 0.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  color: var(--color-ink-2);
+  font: 500 0.875rem/1.2 var(--font-sans);
+  cursor: pointer;
 
-  margin-right: -0.5rem;
+  @include motion {
+    transition:
+      background-color 0.16s ease,
+      color 0.16s ease;
+  }
+}
+
+/* Hovered refresh. */
+.jobs__refresh:hover {
+  color: var(--color-ink);
+}
+
+/* Unavailable while a run is going. */
+.jobs__refresh:disabled {
+  cursor: default;
+}
+
+/* Its glyph. */
+.jobs__refresh-icon {
+  --icon-size: 1.0625rem;
+
+  flex: none;
 }
 
 /* A source is down. */
@@ -60,7 +75,7 @@
 }
 
 /* A refresh is running. */
-.jobs__refresh--spinning app-icon {
+.jobs__refresh--spinning .jobs__refresh-icon {
   @include motion {
     animation: jobs-spin 0.9s linear infinite;
   }
@@ -73,15 +88,17 @@
   }
 }
 
-/* Reading and choosing get the same room: neither column is the leftover of the other. */
+/* What a manual refresh just brought. */
+.jobs__stamp-fresh {
+  color: var(--color-accent-ink);
+  font-weight: 600;
+}
+
+/* The feed takes the room left by the panel. */
 .jobs__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(21rem, 1fr);
+  grid-template-columns: minmax(0, 1fr) clamp(24rem, 40vw, var(--panel-width));
   align-items: start;
-  gap: 2rem;
-  max-width: var(--shell-width);
-  margin: 0 auto;
-  padding: 0 var(--layout-gutter);
 }
 
 /* The sources tab: one column, no panel. */
@@ -89,82 +106,84 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* The feed column. */
+/* The feed column, its content centred on a reading width. */
 .jobs__feed {
   min-width: 0;
-  padding: var(--panel-gap) 0 4rem;
+  padding: 2rem max(var(--layout-gutter), calc((100% - var(--feed-width)) / 2)) 4rem;
 }
 
-/* The rows, as one card. */
-.jobs__list {
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
+/* The count of new offers and the filter, lined up with the row text. */
+.jobs__intro {
+  padding: 0 1.25rem 1.375rem;
 }
 
-/* The page's one memorable control: what landed since the last visit, and a way to see only that. */
-.jobs__fresh {
-  margin: 0 0 1rem;
-  padding: 0.8125rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
-  border-radius: var(--radius-md);
+/* "3 new offers": the first thing to read. */
+.jobs__headline {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* When the previous visit was. */
+.jobs__since {
+  margin: 0.375rem 0 0;
+  color: var(--color-ink-2);
+  font-size: 0.9375rem;
+}
+
+/* The filter's glyph. */
+.jobs__only-new-icon {
+  --icon-size: 1rem;
+}
+
+/* Filter on: tinted like the new offers it keeps. */
+.jobs__only-new--active {
+  border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-accent-ink);
-  font: 500 0.9375rem/1.35 var(--font-sans);
-  letter-spacing: -0.01em;
-  text-align: left;
-  cursor: pointer;
-
-  @include motion {
-    transition:
-      background-color 0.16s ease,
-      border-color 0.16s ease,
-      color 0.16s ease;
-  }
 }
 
-/* The accent dot. */
-.jobs__fresh-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
+/* The rows, loose: the selected one is the only filled shape. */
+.jobs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Where the previous visit stopped: what is above arrived since. */
+.jobs__seen {
+  margin: 0.875rem 0;
+  padding: 0 1.25rem;
+  color: var(--color-accent-ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* The rule on each side of the label. */
+.jobs__seen-rule {
+  height: 1px;
   background: var(--color-accent);
 }
 
-/* The filter's action: show only the new offers, or all of them again. */
-.jobs__fresh-action {
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* Its glyph. */
+.jobs__seen-icon {
+  --icon-size: 0.9375rem;
 }
 
-/* Filter on: the banner drops its colour, since the rows it left are the coloured ones. */
-.jobs__fresh--active {
-  border-color: var(--color-line-2);
-  background: var(--color-surface);
-  color: var(--color-ink);
-}
-
-/* Its dot, greyed. */
-.jobs__fresh--active .jobs__fresh-dot {
-  background: var(--color-ink-3);
-}
-
-/* The panel: keeps the same air under the header as the feed does, scrolled or not. */
+/* The panel, pinned under the header down to the bottom of the window. */
 .jobs__panel {
   position: sticky;
-  top: calc(var(--head-total) + var(--panel-gap));
-  height: calc(100dvh - var(--head-total) - var(--panel-gap) * 2);
-  margin-top: var(--panel-gap);
+  top: var(--layout-header-height);
+  height: calc(100dvh - var(--layout-header-height));
   overflow: hidden;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
+  border-left: 1px solid var(--color-line);
   background: var(--color-surface);
 }
 
-/* Nothing open, nothing to frame: the invitation floats on the page itself. */
+/* Nothing open: the invitation floats on the page itself. */
 .jobs__panel:not(.jobs__panel--open) {
-  border-color: transparent;
   background: none;
 }
 
@@ -181,17 +200,12 @@
 
 /* Phones and narrow windows: one column, the offer as a sheet over it. */
 @include below(lg) {
-  :host {
-    --head-total: var(--layout-header-height);
-  }
-
   .jobs__layout {
     display: block;
-    padding: 0;
   }
 
   .jobs__feed {
-    padding: 1rem var(--layout-gutter)
+    padding: 1.25rem var(--layout-gutter)
       calc(var(--layout-tabbar-height) + env(safe-area-inset-bottom) + 2rem);
   }
 
@@ -201,9 +215,7 @@
     inset: 0;
     z-index: 30;
     height: auto;
-    margin: 0;
     border: 0;
-    border-radius: 0;
     visibility: hidden;
     overscroll-behavior: contain;
     transform: translateY(100%);
@@ -227,27 +239,49 @@
 
 /* On a phone the list runs edge to edge: the frame was costing reading width. */
 @include below(sm) {
+  .jobs__head-row {
+    padding-right: calc(var(--layout-gutter) - 0.375rem);
+  }
+
+  .jobs__refresh {
+    max-width: 11rem;
+    height: 2.75rem;
+  }
+
   .jobs__feed {
     padding-inline: 0;
   }
 
-  .jobs__fresh,
+  .jobs__intro,
+  .jobs__seen {
+    padding-inline: var(--layout-gutter);
+  }
+
+  .jobs__intro {
+    padding-bottom: 1rem;
+  }
+
+  .jobs__headline {
+    font-size: 1.625rem;
+  }
+
+  /* Icon-only filter, a full 44px target. */
+  .jobs__only-new {
+    width: 2.75rem;
+    padding: 0;
+  }
+
   .jobs__notice {
     width: auto;
     margin-inline: var(--layout-gutter);
   }
 
   .jobs__list {
-    border-inline: 0;
-    border-radius: 0;
+    gap: 0;
   }
-}
 
-/* The narrowest phones: a tighter banner. */
-@media (width <= 26rem) {
-  .jobs__fresh {
-    gap: 0.5rem;
-    padding: 0.75rem 0.875rem;
-    font-size: 0.875rem;
+  .jobs__seen {
+    margin: 0;
+    padding-block: 0.625rem;
   }
 }

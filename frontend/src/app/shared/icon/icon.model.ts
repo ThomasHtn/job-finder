@@ -13,6 +13,15 @@ export const ICON_NAMES = [
   'pin',
   'remote',
   'pulse',
+  'building',
+  'clock',
+  'code',
+  'source',
+  'salary',
+  'contract',
+  'calendar',
+  'eye',
+  'filter',
 ] as const;
 
 /**

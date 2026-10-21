@@ -1,53 +1,51 @@
-<!-- Header: who we are, when the sources were last read, and the way to read them again. -->
+<!-- Header: who we are, the tabs, and the way to read the sources again with when it last happened. -->
 <header class="jobs__head">
-  <div class="jobs__head-row flex items-center gap-2.5">
+  <div class="jobs__head-row flex items-center">
     <!-- The wordmark goes once the row has to hold two buttons: the mark alone still signs it. -->
     <app-brand [showName]="!compact()" />
 
-    <span class="flex-1"></span>
-
-    <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
-    <p class="jobs__stamp min-w-0 truncate tabular-nums" aria-live="polite">
-      <span class="sr-only">{{ 'head.lastSync' | transloco }}</span>
-      @if (refreshMessage(); as message) {
-        <span class="jobs__stamp-fresh">{{ message }}</span>
-      } @else if (refreshing()) {
-        {{ 'head.searching' | transloco }}
-      } @else {
-        {{ lastIngestionAt() | syncLabel: language.active() : now() }}
-      }
-    </p>
-
-    <!-- Two languages, switched here rather than in a settings screen the app does not have. -->
-    <app-language-toggle />
-
-    <!-- Manual ingestion; turns red when a source is down, spins while running. -->
-    <button
-      app-icon-button
-      type="button"
-      class="jobs__refresh"
-      [class.jobs__refresh--degraded]="health.degraded()"
-      [class.jobs__refresh--spinning]="refreshing()"
-      [attr.aria-label]="'head.refresh' | transloco"
-      [attr.title]="health.label() || null"
-      [disabled]="refreshing()"
-      (click)="refreshJobs()"
-    >
-      <app-icon name="refresh" />
-    </button>
-  </div>
-
-  <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
-  @if (!compact()) {
-    <div class="jobs__head-row jobs__head-row--tabs flex items-end">
+    <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
+    @if (!compact()) {
       <app-job-tabs
+        class="jobs__tabs"
         [label]="'tabs.label' | transloco"
         [items]="tabItems()"
         [current]="currentView()"
         (selected)="selectTab($event)"
       />
-    </div>
-  }
+    }
+
+    <span class="flex-1"></span>
+
+    <!-- Two languages, switched here rather than in a settings screen the app does not have. -->
+    <app-language-toggle />
+
+    <!-- Manual ingestion, labelled with the sync time; red when a source is down, spins while running. -->
+    <button
+      type="button"
+      class="jobs__refresh flex min-w-0 items-center gap-2"
+      [class.jobs__refresh--degraded]="health.degraded()"
+      [class.jobs__refresh--spinning]="refreshing()"
+      [attr.aria-label]="'head.refresh' | transloco"
+      aria-describedby="jobs-sync"
+      [attr.title]="health.label() || null"
+      [disabled]="refreshing()"
+      (click)="refreshJobs()"
+    >
+      <app-icon class="jobs__refresh-icon" name="refresh" />
+      <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
+      <span id="jobs-sync" class="min-w-0 truncate tabular-nums" aria-live="polite">
+        <span class="sr-only">{{ 'head.lastSync' | transloco }}</span>
+        @if (refreshMessage(); as message) {
+          <span class="jobs__stamp-fresh">{{ message }}</span>
+        } @else if (refreshing()) {
+          {{ 'head.searching' | transloco }}
+        } @else {
+          {{ lastIngestionAt() | syncLabel: language.active() : now() }}
+        }
+      </span>
+    </button>
+  </div>
 
   <!-- Thin progress line under the bar while anything loads. -->
   <app-scan-line [active]="loading() || refreshing()" />
@@ -70,24 +68,27 @@
   } @else {
     <!-- The feed itself. -->
     <main class="jobs__feed" [attr.aria-busy]="loading() || refreshing()">
-      <!-- What changed since last time: the first thing to read, and the only accent on the page. -->
+      <!-- What changed since last time: the first thing to read, and a way to see only that. -->
       @if (newCount() > 0) {
-        <button
-          type="button"
-          class="jobs__fresh flex w-full items-center gap-2.75"
-          [class.jobs__fresh--active]="onlyNew()"
-          [attr.aria-pressed]="onlyNew()"
-          (click)="toggleOnlyNew()"
-        >
-          <span class="jobs__fresh-dot flex-none" aria-hidden="true"></span>
-          <span class="min-w-0 flex-1">
-            <span class="tabular-nums">{{ newCount() }}</span>
-            {{ newSinceLabel() }}
-          </span>
-          <span class="jobs__fresh-action flex-none">
-            {{ (onlyNew() ? 'feed.showAll' : 'feed.showOnlyNew') | transloco }}
-          </span>
-        </button>
+        <div class="jobs__intro flex flex-wrap items-end gap-x-5 gap-y-3">
+          <div class="min-w-0 flex-1">
+            <h2 class="jobs__headline tabular-nums">{{ newHeadline() }}</h2>
+            <p class="jobs__since">
+              {{ previousVisitAt | sinceVisitLabel: language.active() : now() }}
+            </p>
+          </div>
+          <button
+            app-button
+            type="button"
+            class="jobs__only-new"
+            [class.jobs__only-new--active]="onlyNew()"
+            [attr.aria-pressed]="onlyNew()"
+            (click)="toggleOnlyNew()"
+          >
+            <app-icon class="jobs__only-new-icon" name="filter" />
+            <span class="max-sm:sr-only">{{ 'feed.onlyNew' | transloco }}</span>
+          </button>
+        </div>
       }
 
       <!-- A refresh, star or hide that failed: said above the list, which stays as it was. -->
@@ -143,9 +144,27 @@
           </app-empty-state>
         }
       } @else {
-        <!-- One row per offer; the row emits, the page persists and reloads. -->
+        <!-- New offers first, a rule where the last visit stopped, then the rest; the row emits, the page persists and reloads. -->
         <div class="jobs__list">
-          @for (job of jobs(); track job.id) {
+          @for (job of newJobs(); track job.id) {
+            <app-job-row
+              [job]="job"
+              [selected]="job.id === selectedId()"
+              (favoriteToggled)="toggleFavorite($event)"
+              (hidden)="hideJob($event)"
+            />
+          }
+          @if (newJobs().length && seenJobs().length) {
+            <p class="jobs__seen flex items-center gap-3">
+              <span class="jobs__seen-rule flex-1" aria-hidden="true"></span>
+              <span class="flex items-center gap-1.5">
+                <app-icon class="jobs__seen-icon" name="eye" />
+                {{ 'feed.seenUpTo' | transloco }}
+              </span>
+              <span class="jobs__seen-rule flex-1" aria-hidden="true"></span>
+            </p>
+          }
+          @for (job of seenJobs(); track job.id) {
             <app-job-row
               [job]="job"
               [selected]="job.id === selectedId()"

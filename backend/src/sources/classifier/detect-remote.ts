@@ -1,7 +1,7 @@
+import { keywordRegex } from '../../shared/helpers/keyword-match.js';
 import { normalize } from '../../shared/helpers/normalize-text.js';
 import type { RawJob } from '../raw-job.js';
 import { NEGATION_BEFORE, NEGATION_LOOKBEHIND, REMOTE_PATTERNS } from './classifier.constants.js';
-import { keywordRegex } from './keyword-match.js';
 
 /**
  * Sources rarely flag remote explicitly, so the wording is inspected as well.

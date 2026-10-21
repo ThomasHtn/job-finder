@@ -42,20 +42,21 @@
   pointer-events: none;
 }
 
-/* The main action: filled with ink. */
+/* The main action: filled with the accent. */
 :host(.button--primary) {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
-  color: var(--color-surface);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
 }
 
 /* Main action, hovered. */
 :host(.button--primary:where(:hover)) {
-  border-color: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
-  background: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
+  border-color: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
+  background: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
 }
 
-/* A dimmed ink fill turns to mud: an unavailable main action reads as a flat tile instead. */
+/* A dimmed accent fill turns to mud: an unavailable main action reads as a flat tile instead. */
 :host(.button--primary:where(:disabled)) {
   border-color: transparent;
   background: var(--color-surface-2);

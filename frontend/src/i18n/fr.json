@@ -2,7 +2,9 @@
   "date": {
     "tag": "fr-FR",
     "day": "dd/MM/yyyy",
-    "dayTime": "dd/MM/yyyy HH:mm"
+    "dayTime": "dd/MM/yyyy HH:mm",
+    "time": "HH 'h' mm",
+    "shortDay": "dd/MM"
   },
   "languages": {
     "fr": "français",
@@ -69,10 +71,13 @@
     "unavailable": "L'état des sources n'a pas pu être chargé."
   },
   "feed": {
-    "newSinceOne": "offre depuis votre dernière visite",
-    "newSinceOther": "offres depuis votre dernière visite",
-    "showOnlyNew": "Voir",
-    "showAll": "Tout afficher",
+    "newHeadlineOne": "{{ count }} nouvelle offre",
+    "newHeadlineOther": "{{ count }} nouvelles offres",
+    "sinceVisitAt": "depuis votre visite à {{ time }}",
+    "sinceVisitYesterday": "depuis votre visite d'hier à {{ time }}",
+    "sinceVisitOn": "depuis votre visite du {{ date }}",
+    "onlyNew": "Nouvelles seulement",
+    "seenUpTo": "Vu jusqu'ici",
     "retry": "Réessayer",
     "nothingNew": "Rien de nouveau depuis votre dernière visite.",
     "nothingNewHint": "Les offres déjà vues sont toujours là.",
@@ -98,6 +103,7 @@
   "row": {
     "unknownCompany": "Entreprise non précisée",
     "approximateCity": "commune non précisée",
+    "unknownSalary": "Non communiqué",
     "new": "Nouveau",
     "hide": "Pas intéressé, masquer cette offre",
     "addFavorite": "Ajouter aux favoris",
@@ -115,9 +121,10 @@
     "defaultContract": "CDI",
     "salary": "Salaire",
     "unknownSalary": "Non communiqué",
-    "publishedOn": "Publiée le",
+    "publishedOn": "Publiée",
     "unknownDate": "Date inconnue",
     "excerptOnly": "Cette source ne publie qu'un extrait. L'annonce complète est sur le site d'origine.",
+    "yourStack": "Votre stack",
     "offerSection": "L'offre",
     "companySection": "L'entreprise",
     "alsoPublishedOn": "Également publiée sur",
