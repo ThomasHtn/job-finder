@@ -76,7 +76,7 @@ describe('jobs utils', () => {
   });
 
   describe('buildTabItems', () => {
-    it('names the on-site tab after the area once known, with every count', () => {
+    it('lists the three offer tabs, the on-site one named after the area once known', () => {
       const counts = { local: 3, remote: 2, favorites: 1 };
 
       expect(buildTabItems(null, counts)[0].label).toBe('Sur site');
@@ -84,7 +84,6 @@ describe('jobs utils', () => {
         ['Normandie', 3],
         ['Full remote', 2],
         ['Favoris', 1],
-        ['Sources', null],
       ]);
     });
   });

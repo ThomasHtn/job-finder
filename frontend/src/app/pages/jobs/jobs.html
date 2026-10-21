@@ -1,8 +1,8 @@
-<!-- Header: who we are, the tabs, and the way to read the sources again with when it last happened. -->
+<!-- Header: who we are, the tabs, the way to read the sources again with when it last happened, then the settings. -->
 <header class="jobs__head" [attr.inert]="sheetOpen() ? '' : null">
   <div class="jobs__head-row flex items-center">
-    <!-- The wordmark goes once the row has to hold two buttons: the mark alone still signs it. -->
-    <app-brand [showName]="!compact()" />
+    <!-- The mark and the app's name, on every screen. -->
+    <app-brand />
 
     <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
     @if (!compact()) {
@@ -17,24 +17,14 @@
 
     <span class="flex-1"></span>
 
-    <!-- Two languages, switched here rather than in a settings screen the app does not have. -->
-    <app-language-toggle />
-
-    <!-- Manual ingestion, labelled with the sync time; red when a source is down, spins while running. -->
-    <button
-      type="button"
-      class="jobs__refresh flex min-w-0 items-center gap-2"
-      [class.jobs__refresh--degraded]="health.degraded()"
-      [class.jobs__refresh--spinning]="refreshing()"
-      [attr.aria-label]="'head.refresh' | transloco"
-      aria-describedby="jobs-sync"
-      [attr.title]="health.label() || null"
-      [disabled]="refreshing()"
-      (click)="refreshJobs()"
-    >
-      <app-icon class="jobs__refresh-icon" name="refresh" />
+    <!-- Sync time, refresh and settings, one visible step apart; the gear's glyph on the content's edge. -->
+    <div class="jobs__actions flex min-w-0 items-center">
       <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
-      <span id="jobs-sync" class="min-w-0 truncate tabular-nums">
+      <span
+        id="jobs-sync"
+        class="jobs__sync min-w-0 truncate tabular-nums"
+        [class.jobs__sync--degraded]="health.degraded()"
+      >
         <span class="sr-only">{{ 'head.lastSync' | transloco }}</span>
         @if (refreshMessage(); as message) {
           <span class="jobs__stamp-fresh">{{ message }}</span>
@@ -44,10 +34,34 @@
           {{ lastIngestionAt() | syncLabel: language.active() : now() }}
         }
       </span>
-    </button>
 
-    <!-- Announces the outcome of a refresh once, where the ageing sync time would every minute. -->
-    <span class="sr-only" aria-live="polite">{{ refreshMessage() }}</span>
+      <!-- Manual ingestion, a round glyph like the gear; red when a source is down, spins while running. -->
+      <button
+        app-icon-button
+        type="button"
+        class="jobs__refresh"
+        [class.jobs__refresh--degraded]="health.degraded()"
+        [class.jobs__refresh--spinning]="refreshing()"
+        [attr.aria-label]="'head.refresh' | transloco"
+        aria-describedby="jobs-sync"
+        [attr.title]="health.label() || null"
+        [disabled]="refreshing()"
+        (click)="refreshJobs()"
+      >
+        <app-icon class="jobs__refresh-icon" name="refresh" />
+      </button>
+
+      <!-- Announces the outcome of a refresh once, where the ageing sync time would every minute. -->
+      <span class="sr-only" aria-live="polite">{{ refreshMessage() }}</span>
+
+      <!-- Settings at the far right: the sources board and the language. -->
+      <app-settings-menu
+        class="jobs__settings"
+        [sourcesActive]="showingSources()"
+        [degraded]="health.degraded()"
+        (sourcesSelected)="selectTab(sourcesTab)"
+      />
+    </div>
   </div>
 
   <!-- Thin progress line under the bar while anything loads. -->
@@ -58,7 +72,7 @@
 <div class="jobs__layout" [class.jobs__layout--single]="showingSources()">
   @if (showingSources()) {
     <!-- The sources replace the feed and need no panel beside them. -->
-    <main class="jobs__feed">
+    <main class="jobs__feed" #feed>
       <!-- Keeps the sources tab from looking blank when the status request failed. -->
       @if (health.failed()) {
         <app-notice class="jobs__notice" tone="alert">
@@ -71,6 +85,7 @@
   } @else {
     <!-- The feed itself. -->
     <main
+      #feed
       class="jobs__feed"
       [attr.aria-busy]="loading() || refreshing()"
       [attr.inert]="sheetOpen() ? '' : null"
@@ -98,7 +113,7 @@
         </div>
       }
 
-      <!-- A refresh, star, hide or reload that failed: said above the list, which stays as it was. -->
+      <!-- A refresh, star or reload that failed: said above the list, which stays as it was. -->
       @if (actionError(); as message) {
         <app-notice class="jobs__notice" tone="alert">{{ message }}</app-notice>
       } @else if (reloadError(); as message) {
@@ -160,7 +175,6 @@
               [job]="job"
               [selected]="job.id === selectedId()"
               (favoriteToggled)="toggleFavorite($event)"
-              (hidden)="hideJob($event)"
             />
           }
           @if (newJobs().length && seenJobs().length) {
@@ -178,7 +192,6 @@
               [job]="job"
               [selected]="job.id === selectedId()"
               (favoriteToggled)="toggleFavorite($event)"
-              (hidden)="hideJob($event)"
             />
           }
         </div>

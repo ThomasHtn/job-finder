@@ -27,7 +27,7 @@
   <text class="ink2" x="640" y="97" font-size="21" text-anchor="middle">55 public sources</text>
   <path class="arrow" d="M640 130v34" />
   <path class="arrow" d="M634 158l6 6 6-6" />
-  <text class="ink3" x="658" y="152" font-size="17">every 2 h</text>
+  <text class="ink3" x="658" y="152" font-size="17">twice a day</text>
 
   <rect class="card" x="80" y="180" width="280" height="150" rx="16" />
   <rect x="80" y="180" width="280" height="150" rx="16" class="hair" />

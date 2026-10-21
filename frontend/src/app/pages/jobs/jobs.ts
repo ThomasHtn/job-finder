@@ -7,12 +7,14 @@ import {
   computed,
   DestroyRef,
   effect,
+  ElementRef,
   inject,
   Injector,
   input,
   linkedSignal,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -40,7 +42,7 @@ import { Brand } from '@shared/brand/brand';
 import { Button } from '@shared/button/button';
 import { EmptyState } from '@shared/empty-state/empty-state';
 import { Icon } from '@shared/icon/icon';
-import { LanguageToggle } from '@shared/language-toggle/language-toggle';
+import { IconButton } from '@shared/icon-button/icon-button';
 import { Notice } from '@shared/notice/notice';
 import { ScanLine } from '@shared/scan-line/scan-line';
 
@@ -55,6 +57,7 @@ import {
   sourceName,
   toShellTab,
 } from './jobs.utils';
+import { SettingsMenu } from './settings-menu/settings-menu';
 import { SinceVisitLabelPipe } from './since-visit-label/since-visit-label.pipe';
 import { SourceBoard } from './source-board/source-board';
 import { SourceHealth } from './source-health';
@@ -71,12 +74,13 @@ import { SyncLabelPipe } from './sync-label/sync-label.pipe';
     Button,
     EmptyState,
     Icon,
+    IconButton,
     JobRow,
     JobTabs,
-    LanguageToggle,
     Notice,
     RouterOutlet,
     ScanLine,
+    SettingsMenu,
     SinceVisitLabelPipe,
     SourceBoard,
     SyncLabelPipe,
@@ -88,7 +92,7 @@ import { SyncLabelPipe } from './sync-label/sync-label.pipe';
 })
 export class JobsPage {
   /**
-   * Writes on one offer: star, hide.
+   * Writes on one offer: the star.
    */
   private readonly jobsApi = inject(JobsApi);
 
@@ -126,6 +130,11 @@ export class JobsPage {
    * Page document: scrolled to the top on a tab change, frozen behind an open sheet.
    */
   private readonly document = inject(DOCUMENT);
+
+  /**
+   * The feed column, which scrolls on its own on a wide screen.
+   */
+  private readonly feed = viewChild<ElementRef<HTMLElement>>('feed');
 
   /**
    * Name of the on-site tab, from the public settings.
@@ -167,6 +176,11 @@ export class JobsPage {
    * True while the sources tab replaces the feed.
    */
   protected readonly showingSources = computed(() => this.currentView() === SOURCES_TAB);
+
+  /**
+   * The sources view, reached from the settings rather than from the tabs.
+   */
+  protected readonly sourcesTab = SOURCES_TAB;
 
   /**
    * Offer list behind the current view; the sources tab keeps the default one for the counts.
@@ -232,7 +246,7 @@ export class JobsPage {
   protected readonly refreshing = signal(false);
 
   /**
-   * Why the last refresh, star or hide failed: a notice above the list, which stays in place.
+   * Why the last refresh or star failed: a notice above the list, which stays in place.
    */
   protected readonly actionError = signal<string | null>(null);
 
@@ -359,6 +373,7 @@ export class JobsPage {
         firstView = false;
         /* Another tab is another list: it starts at its first offer, not where the last one ended. */
         this.document.defaultView?.scrollTo({ top: 0 });
+        this.feed()?.nativeElement.scrollTo({ top: 0 });
       });
     });
 
@@ -443,22 +458,6 @@ export class JobsPage {
       this.list.reload();
     } catch (error: unknown) {
       this.actionError.set(translate('feed.favoriteFailed', { detail: describeHttpError(error) }));
-    }
-  }
-
-  /**
-   * Hides the offer, then reloads; an offer hidden while open leaves the panel with it.
-   */
-  protected async hideJob(id: string): Promise<void> {
-    this.actionError.set(null);
-    try {
-      await this.jobsApi.hide(id);
-      if (id === this.selectedId()) {
-        void this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
-      }
-      this.list.reload();
-    } catch (error: unknown) {
-      this.actionError.set(translate('feed.hideFailed', { detail: describeHttpError(error) }));
     }
   }
 

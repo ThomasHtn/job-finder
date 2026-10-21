@@ -6,6 +6,7 @@ import type { JobSource } from '@job-finder/contract';
 
 import type { Env } from '../shared/config/env.schema.js';
 import { PROFILE } from '../shared/config/search-profile.fixtures.js';
+import { DAY_MS } from '../shared/helpers/time.constants.js';
 import type { JobSourceConnector } from '../sources/job-source-connector.js';
 import { rawJob } from '../sources/raw-job.fixtures.js';
 import type { RawJob } from '../sources/raw-job.js';
@@ -38,7 +39,7 @@ function repository(outcome: PersistOutcome = 'inserted') {
     lastSuccessAt: vi.fn(async (): Promise<Date | null> => null),
     countJobsBySource: vi.fn(async () => new Map([['FRANCE_TRAVAIL', 4]])),
     persistJob: vi.fn(async () => outcome),
-    purgeStaleJobs: vi.fn(async () => 2),
+    purgeOldJobs: vi.fn(async () => 2),
   };
 }
 
@@ -48,9 +49,12 @@ function repository(outcome: PersistOutcome = 'inserted') {
 const geo: GeoPort = { geocode: async () => null, isWithinArea: () => true };
 
 /**
- * Config stub answering the purge delay only.
+ * Config stub answering the maximum age and the sources switched off.
  */
-const config = { get: () => 30 } as unknown as ConfigService<Env, true>;
+function config(disabled: JobSource[] = []) {
+  const values: Partial<Env> = { INGESTION_MAX_AGE_DAYS: 30, INGESTION_DISABLED_SOURCES: disabled };
+  return { get: (key: keyof Env) => values[key] } as unknown as ConfigService<Env, true>;
+}
 
 /**
  * Heartbeat stub recording every report.
@@ -62,13 +66,18 @@ function heartbeat() {
 /**
  * Service wired with the stubs above.
  */
-function service(connectors: JobSourceConnector[], repo = repository(), beat = heartbeat()) {
+function service(
+  connectors: JobSourceConnector[],
+  repo = repository(),
+  beat = heartbeat(),
+  disabled: JobSource[] = [],
+) {
   return new IngestionService(
     connectors,
     PROFILE,
     geo,
     repo as unknown as IngestionRepository,
-    config,
+    config(disabled),
     beat as unknown as IngestionHeartbeat,
   );
 }
@@ -103,10 +112,44 @@ describe('IngestionService.run', () => {
     });
   });
 
+  it('skips the offers published before the cutoff, then purges up to it', async () => {
+    const repo = repository();
+    const recent = new Date(Date.now() - 29 * DAY_MS);
+    const old = new Date(Date.now() - 31 * DAY_MS);
+    const summary = await service(
+      [
+        connector('FRANCE_TRAVAIL', [
+          rawJob({ publishedAt: recent }),
+          rawJob({ sourceId: '2', publishedAt: old }),
+        ]),
+      ],
+      repo,
+    ).run();
+
+    expect(summary).toMatchObject({ fetched: 2, kept: 1, inserted: 1 });
+    const [cutoff] = repo.purgeOldJobs.mock.calls[0] as unknown as [Date];
+    expect(cutoff.getTime()).toBeGreaterThan(old.getTime());
+    expect(cutoff.getTime()).toBeLessThan(recent.getTime());
+  });
+
   it('skips disabled sources without opening a run', async () => {
     const repo = repository();
     const summary = await service([connector('ADZUNA', [], false)], repo).run();
     expect(summary?.skippedSources).toEqual(['ADZUNA']);
+    expect(repo.startRun).not.toHaveBeenCalled();
+  });
+
+  it('skips a configured source switched off, without opening a run', async () => {
+    const repo = repository();
+    const fetchJobs = vi.fn(async () => [rawJob()]);
+    const summary = await service(
+      [{ name: 'APEC', isEnabled: () => true, fetchJobs }],
+      repo,
+      heartbeat(),
+      ['APEC'],
+    ).run();
+    expect(summary?.skippedSources).toEqual(['APEC']);
+    expect(fetchJobs).not.toHaveBeenCalled();
     expect(repo.startRun).not.toHaveBeenCalled();
   });
 
@@ -147,7 +190,7 @@ describe('IngestionService.run', () => {
 
   it('reports a crashed run as down, then rethrows', async () => {
     const repo = repository();
-    repo.purgeStaleJobs.mockRejectedValueOnce(new Error('database gone'));
+    repo.purgeOldJobs.mockRejectedValueOnce(new Error('database gone'));
     const beat = heartbeat();
     const svc = service([connector('FRANCE_TRAVAIL', [])], repo, beat);
 
@@ -227,5 +270,15 @@ describe('IngestionService.status', () => {
       ],
     });
     expect(adz).toMatchObject({ enabled: false, ok: false, lastRunAt: null, jobCount: 0 });
+  });
+
+  it('reports a source switched off as disabled', async () => {
+    const [apec] = await service(
+      [connector('APEC', [])],
+      repository(),
+      heartbeat(),
+      ['APEC'],
+    ).status();
+    expect(apec).toMatchObject({ source: 'APEC', enabled: false, ok: false });
   });
 });

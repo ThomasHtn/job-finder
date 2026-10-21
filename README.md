@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/icon.svg" alt="The Job Finder icon: a teal dot over three lines" width="96">
+  <img src="frontend/public/icon.svg" alt="The Job Finder icon: an orange dot over three lines" width="96">
 </p>
 
 <h1 align="center">Job Finder</h1>
@@ -11,14 +11,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/self--hosted-yours-0E6E63" alt="Self-hosted">
-  <img src="https://img.shields.io/badge/tracking-none-3FB8A6" alt="No tracking">
-  <img src="https://img.shields.io/badge/contracts-permanent_only-0E6E63" alt="Permanent contracts only">
-  <img src="https://img.shields.io/badge/auto--apply-never-3FB8A6" alt="Never applies for you">
+  <img src="https://img.shields.io/badge/self--hosted-yours-B84D00" alt="Self-hosted">
+  <img src="https://img.shields.io/badge/tracking-none-FB923C" alt="No tracking">
+  <img src="https://img.shields.io/badge/contracts-permanent_only-B84D00" alt="Permanent contracts only">
+  <img src="https://img.shields.io/badge/auto--apply-never-FB923C" alt="Never applies for you">
 </p>
 
 <p align="center">
-  <img src="docs/media/tour.webp" alt="Tour of Job Finder: the feed of what is new since the last visit, an offer opened next to the list, a star and two hidden offers, the full remote tab and the health of every source" width="100%">
+  <img src="docs/media/tour.webp" alt="Tour of Job Finder: the feed of what is new since the last visit, an offer opened next to the list, a star, the full remote tab and the health of every source" width="100%">
   <br>
   <sub>A 40-second tour. Fictitious offers, real app.</sub>
 </p>
@@ -37,7 +37,7 @@ An hour a day, for three genuinely new offers.
 ## A peek inside
 
 <p align="center">
-  <img src="docs/media/screen-feed.png" alt="The feed: seven new offers since yesterday's visit" width="19%">
+  <img src="docs/media/screen-feed.png" alt="The feed: five new offers since yesterday's visit, one card each" width="19%">
   <img src="docs/media/screen-detail.png" alt="An offer: salary, contract, date and the stack it names" width="19%">
   <img src="docs/media/screen-remote.png" alt="Full remote: its own tab, with a seen-up-to-here divider" width="19%">
   <img src="docs/media/screen-sources.png" alt="Sources: the health of every board" width="19%">
@@ -52,7 +52,7 @@ An hour a day, for three genuinely new offers.
   alt="Funnel: 55 sources, role filter, permanent filter, area filter,
     duplicate merging, your list" />
 
-Every two hours, Job Finder reads fifty-five sources and throws away everything that is not for
+Morning and evening, Job Finder reads fifty-five sources and throws away everything that is not for
 you. An offer posted on three boards shows up once, in its most complete version, with a link to
 each board. An offer taken down disappears from the list. Your favorites stay.
 
@@ -78,9 +78,9 @@ dropped in silence.
     </td>
     <td width="50%" valign="top">
       <img src="docs/media/icons/star.svg" alt="" width="32"><br>
-      <b>Star it or bin it</b><br>
-      A <b>New</b> badge on whatever arrived since your last visit, a star to keep it, a cross to
-      never see it again. Favorites are never purged.
+      <b>Star it, or let it go</b><br>
+      A <b>New</b> badge on whatever arrived since your last visit, a star to keep it. Every other
+      offer is deleted a month after its publication; favorites are never purged.
     </td>
   </tr>
   <tr>
@@ -129,8 +129,10 @@ light or dark, following the phone.
 France Travail (which also relays Indeed, DirectEmploi and its other partners), Adzuna, APEC,
 EURES, Free-Work, Jooble, and 49 company careers sites read directly (Doctolib, Dataiku, Alan,
 Qonto, Swile, and in Normandy Sopra Steria, Matmut and Capgemini). A source that is down or not
-configured is simply skipped, the others keep filling the list, and the Sources tab tells you which
-one is sulking.
+configured is simply skipped, the others keep filling the list, and the Sources screen, behind the
+gear at the top right, tells you which one is sulking. APEC answers every script with a bot
+challenge since October 2026, so the example settings switch it off (`INGESTION_DISABLED_SOURCES`);
+its offers still arrive relayed by Adzuna and France Travail.
 
 ## Get it
 
@@ -159,7 +161,7 @@ Then open http://localhost:8001 and sign in with `job-finder-demo-password`.
     the contract carries the types both share" />
 
 - **Contract**: the API types in one npm workspace, imported by both halves, so a renamed field breaks the build rather than a screen.
-- **Frontend**: Angular 22 (standalone, zoneless, signals, `httpResource`), Tailwind 4 for layout, SCSS for visuals, Transloco for French and English, self-hosted Archivo, served by nginx.
+- **Frontend**: Angular 22 (standalone, zoneless, signals, `httpResource`), Tailwind 4 for layout, SCSS for visuals, Transloco for French and English, self-hosted Figtree, served by nginx.
 - **Backend**: NestJS 12 on Node 22, Prisma 7 and PostgreSQL 17, a zod-validated environment, one connector per job board.
 - **Auth**: one shared password (scrypt), a session token, a sign-in throttle, and a production API that refuses to run open.
 - **Deployment**: two images. Your proxy sends the domain to the frontend, which relays the API to the backend; `/readyz`, `/healthz` and an ingestion heartbeat feed your uptime monitor.

@@ -1,6 +1,6 @@
 # Job Finder backend
 
-The part that goes looking. Every two hours a NestJS API reads seven job boards, keeps the permanent
+The part that goes looking. Morning and evening a NestJS API reads seven job boards, keeps the permanent
 developer offers within the commute, merges the ones published twice, and leaves PostgreSQL with a
 list worth opening.
 

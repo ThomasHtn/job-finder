@@ -1,7 +1,8 @@
 /**
- * Time given to one ATS request.
+ * Time given to one ATS request: every board downloads at once, and the largest (Pigment, 2 MB)
+ * sometimes needed more than 20 s while sharing the line with the others.
  */
-export const TIMEOUT_MS = 20_000;
+export const TIMEOUT_MS = 30_000;
 
 /**
  * Offers asked per request where a board caps its listing (Capgemini, SmartRecruiters).

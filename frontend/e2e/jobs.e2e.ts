@@ -51,18 +51,23 @@ test.describe('feed', () => {
 
   test('switches the whole shell to English and back', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'Passer en anglais' }).click();
+    await page.getByRole('button', { name: 'Paramètres' }).click();
+    await page.getByRole('button', { name: 'English' }).click();
 
     await expect(tab(page, /^Favorites/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Search for new offers' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Switch to French' }).click();
+    await page.getByRole('button', { name: 'Settings' }).click();
+    await page.getByRole('button', { name: 'Français' }).click();
     await expect(tab(page, /^Favoris/)).toBeVisible();
   });
 
-  test('shows the health of every source, a failing one included', async ({ page }) => {
+  test('shows the health of every source from the settings, a failing one included', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await tab(page, 'Sources').click();
+    await page.getByRole('button', { name: 'Paramètres' }).click();
+    await page.getByRole('button', { name: 'Sources' }).click();
 
     await expect(page).toHaveURL(/tab=sources/);
     await expect(page.locator('app-source-board')).toContainText('France Travail');

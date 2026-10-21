@@ -11,10 +11,10 @@ export function tab(page: Page, name: string | RegExp): Locator {
 }
 
 /**
- * Offers counted on a tab, read from its label ("Favoris 2").
+ * Offers counted on a tab, read from its accessible name ("Favoris 2"), whatever the visual order.
  */
 export async function tabCount(page: Page, name: string): Promise<number> {
-  const label = await tab(page, new RegExp(`^${name}`)).innerText();
+  const label = (await tab(page, new RegExp(`^${name}`)).getAttribute('aria-label')) ?? '';
   return Number(/(\d+)\s*$/.exec(label)?.[1] ?? Number.NaN);
 }
 

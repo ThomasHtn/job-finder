@@ -68,7 +68,8 @@ await page.goto(`${APP_URL}/`);
 await page.locator(ROW_TITLE).first().waitFor();
 await openTab(page, 1);
 await shoot(page, 'remote');
-await openTab(page, 3);
+await page.locator('.settings-menu__trigger').filter({ visible: true }).click();
+await page.locator('.settings-menu__item--sources').click();
 await shoot(page, 'sources');
 await shoot(await openFeed('dark'), 'dark');
 

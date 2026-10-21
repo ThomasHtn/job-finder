@@ -19,13 +19,18 @@
     "searching": "Searching…",
     "refresh": "Search for new offers"
   },
+  "settings": {
+    "open": "Settings",
+    "sources": "Sources",
+    "language": "Language"
+  },
   "sync": {
     "never": "Never synced",
     "justNow": "Just now",
     "minutesAgo": "{{ minutes }} min ago",
     "hoursAgo": "{{ hours }} h ago",
     "yesterday": "Yesterday",
-    "onDate": "On {{ date }}"
+    "daysAgo": "{{ days }} d ago"
   },
   "published": {
     "today": "Today",
@@ -36,7 +41,6 @@
     "areaPlaceholder": "On site",
     "remote": "Full remote",
     "favorites": "Favorites",
-    "sources": "Sources",
     "label": "Sections"
   },
   "sources": {
@@ -98,17 +102,21 @@
     "sourcesUnavailable": "Unavailable source(s): {{ sources }}.",
     "refreshFailed": "Could not fetch new offers. {{ detail }}",
     "loadFailed": "Could not load the offers. {{ detail }}",
-    "favoriteFailed": "Could not update the favorite. {{ detail }}",
-    "hideFailed": "Could not hide the offer. {{ detail }}"
+    "favoriteFailed": "Could not update the favorite. {{ detail }}"
   },
   "row": {
     "unknownCompany": "Company not stated",
     "approximateCity": "town not stated",
     "unknownSalary": "Not stated",
     "new": "New",
-    "hide": "Not interested, hide this offer",
     "addFavorite": "Add to favorites",
     "removeFavorite": "Remove from favorites"
+  },
+  "salary": {
+    "yearly": "€{{ amount }}",
+    "yearlyFrom": "From €{{ amount }}",
+    "monthly": "€{{ amount }} / month",
+    "monthlyFrom": "From €{{ amount }} / month"
   },
   "place": {
     "remote": "Full remote",

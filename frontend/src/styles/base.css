@@ -27,6 +27,40 @@
     background: var(--color-accent-soft);
   }
 
+  /* Thin scrollbars on every scroller: a quiet rounded thumb on no track, darker on hover. */
+  * {
+    --scrollbar-thumb: color-mix(in srgb, var(--color-ink-3) 40%, transparent);
+  }
+
+  :hover {
+    --scrollbar-thumb: color-mix(in srgb, var(--color-ink-3) 70%, transparent);
+  }
+
+  /* Chrome and Safari: the WebKit pseudo-elements, which drop the arrow buttons; `scrollbar-color` would override them. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: var(--scrollbar-thumb) padding-box;
+  }
+
+  /* Firefox: the standard properties. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: var(--scrollbar-thumb) transparent;
+      scrollbar-width: thin;
+    }
+  }
+
   /* Behind an open sheet: frozen, so the sheet is the only thing that scrolls. */
   body.is-sheet-open {
     overflow: hidden;

@@ -31,7 +31,6 @@ describe('job mapper', () => {
     const summary = toSummary(jobRow(), stack);
 
     expect(summary).not.toHaveProperty('dedupeHash');
-    expect(summary).not.toHaveProperty('isHidden');
     expect(summary).not.toHaveProperty('description');
   });
 

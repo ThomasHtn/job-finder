@@ -59,7 +59,6 @@ export function buildTabItems(areaLabel: string | null, counts: JobCounts): JobT
       count: counts.favorites,
       icon: 'star',
     },
-    { tab: SOURCES_TAB, label: translate('tabs.sources'), count: null, icon: 'pulse' },
   ];
 }
 

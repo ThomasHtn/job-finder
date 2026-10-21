@@ -28,7 +28,7 @@ export interface IngestionSummary {
   merged: number;
 
   /**
-   * Stale offers deleted at the end of the run.
+   * Offers past the maximum age deleted at the end of the run.
    */
   purged: number;
 

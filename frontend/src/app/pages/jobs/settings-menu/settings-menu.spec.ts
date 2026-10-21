@@ -1,0 +1,117 @@
+import { TestBed } from '@angular/core/testing';
+
+import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
+import { Language } from '@core/i18n/language';
+import { useCleanStorage } from '@core/storage/storage.fixtures';
+
+import { SettingsMenu } from './settings-menu';
+
+/**
+ * The menu in French, closed, with the given inputs.
+ */
+async function create(inputs: { sourcesActive?: boolean; degraded?: boolean } = {}) {
+  localStorage.setItem('job-finder-locale', 'fr');
+  await TestBed.inject(Language).start();
+  const fixture = TestBed.createComponent(SettingsMenu);
+  for (const [name, value] of Object.entries(inputs)) {
+    fixture.componentRef.setInput(name, value);
+  }
+  fixture.detectChanges();
+  return fixture;
+}
+
+/**
+ * The gear button.
+ */
+function trigger(host: HTMLElement): HTMLButtonElement {
+  return host.querySelector<HTMLButtonElement>('.settings-menu__trigger')!;
+}
+
+describe('SettingsMenu', () => {
+  useFrenchTexts();
+  useCleanStorage();
+
+  it('opens and closes from the gear, telling assistive tech', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(trigger(host).getAttribute('aria-label')).toBe('Paramètres');
+    expect(trigger(host).getAttribute('aria-expanded')).toBe('false');
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+
+    trigger(host).click();
+    fixture.detectChanges();
+    expect(trigger(host).getAttribute('aria-expanded')).toBe('true');
+    expect(host.querySelector('.settings-menu__panel')?.textContent).toContain('Sources');
+
+    trigger(host).click();
+    fixture.detectChanges();
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+  });
+
+  it('emits the sources pick and closes', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    const picked = vi.fn();
+    fixture.componentInstance.sourcesSelected.subscribe(picked);
+
+    trigger(host).click();
+    fixture.detectChanges();
+    host.querySelector<HTMLButtonElement>('.settings-menu__item--sources')!.click();
+    fixture.detectChanges();
+
+    expect(picked).toHaveBeenCalledOnce();
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+  });
+
+  it('marks the sources board on screen, and a source down on the gear', async () => {
+    const fixture = await create({ sourcesActive: true, degraded: true });
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(host.querySelector('.settings-menu__alert-dot')).not.toBeNull();
+    trigger(host).click();
+    fixture.detectChanges();
+    const sources = host.querySelector('.settings-menu__item--sources')!;
+    expect(sources.getAttribute('aria-current')).toBe('page');
+    expect(sources.classList).toContain('settings-menu__item--alert');
+  });
+
+  it('names each language in itself and switches to the one picked', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+
+    trigger(host).click();
+    fixture.detectChanges();
+    const french = host.querySelector<HTMLButtonElement>('.settings-menu__item[lang="fr"]')!;
+    const english = host.querySelector<HTMLButtonElement>('.settings-menu__item[lang="en"]')!;
+    expect(french.textContent?.trim()).toBe('Français');
+    expect(french.getAttribute('aria-pressed')).toBe('true');
+    expect(english.textContent?.trim()).toBe('English');
+
+    english.click();
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Language).active()).toBe('en');
+    expect(localStorage.getItem('job-finder-locale')).toBe('en');
+  });
+
+  it('closes on a press outside, and on Escape with the focus back on the gear', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    document.body.append(host);
+
+    trigger(host).click();
+    fixture.detectChanges();
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    fixture.detectChanges();
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+
+    trigger(host).click();
+    fixture.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+    expect(document.activeElement).toBe(trigger(host));
+    host.remove();
+  });
+});

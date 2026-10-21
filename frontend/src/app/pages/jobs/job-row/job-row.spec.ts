@@ -53,11 +53,17 @@ describe('JobRow', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Nouveau');
   });
 
-  it('shows only an unusual contract wording, and the salary', () => {
+  it('shows only an unusual contract wording, and the salary in thousands', () => {
     const fixture = create(jobSummary({ contractLabel: 'Full-time', salary: '45 k€' }), null);
 
     expect(fixture.nativeElement.textContent).toContain('Full-time');
-    expect(fixture.nativeElement.textContent).toContain('45 k€');
+    expect(fixture.nativeElement.textContent).toContain('45K €');
+  });
+
+  it('keeps the source wording of a salary with no amount to shorten', () => {
+    const fixture = create(jobSummary({ salary: 'A négocier' }), null);
+
+    expect(fixture.nativeElement.textContent).toContain('A négocier');
   });
 
   it('says when the salary is not stated', () => {
@@ -74,17 +80,13 @@ describe('JobRow', () => {
     expect(fixture.nativeElement.textContent).not.toContain('PostgreSQL');
   });
 
-  it('emits the star and hide presses without opening the offer', () => {
+  it('emits the star press without opening the offer', () => {
     const fixture = create(jobSummary(), null);
     const starred: string[] = [];
-    const hidden: string[] = [];
     fixture.componentInstance.favoriteToggled.subscribe((id) => starred.push(id));
-    fixture.componentInstance.hidden.subscribe((id) => hidden.push(id));
 
     (fixture.nativeElement.querySelector('.job-row__star') as HTMLButtonElement).click();
-    (fixture.nativeElement.querySelector('.job-row__hide') as HTMLButtonElement).click();
 
     expect(starred).toEqual(['job-1']);
-    expect(hidden).toEqual(['job-1']);
   });
 });

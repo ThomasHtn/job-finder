@@ -1,0 +1,59 @@
+<!-- The gear; its expanded state tells assistive tech whether the panel is showing. -->
+<button
+  #trigger
+  app-icon-button
+  type="button"
+  class="settings-menu__trigger"
+  [class.settings-menu__trigger--open]="open()"
+  [attr.aria-label]="'settings.open' | transloco"
+  [attr.title]="'settings.open' | transloco"
+  [attr.aria-expanded]="open()"
+  aria-controls="settings-panel"
+  (click)="toggle()"
+>
+  <app-icon name="settings" />
+  <!-- A source down: a dot on the gear, the way to the board that explains it. -->
+  @if (degraded()) {
+    <span class="settings-menu__alert-dot" aria-hidden="true"></span>
+  }
+</button>
+
+<!-- The panel, under the gear and flush with its right edge. -->
+@if (open()) {
+  <div id="settings-panel" class="settings-menu__panel">
+    <!-- The sources board, marked when it is the view on screen. -->
+    <button
+      type="button"
+      class="settings-menu__item settings-menu__item--sources flex w-full items-center gap-3"
+      [class.settings-menu__item--current]="sourcesActive()"
+      [class.settings-menu__item--alert]="degraded()"
+      [attr.aria-current]="sourcesActive() ? 'page' : null"
+      (click)="showSources()"
+    >
+      <app-icon class="settings-menu__icon" [name]="degraded() ? 'alert' : 'pulse'" />
+      <span class="flex-1">{{ 'settings.sources' | transloco }}</span>
+    </button>
+
+    <!-- The languages, each named in itself; the one in use is pressed. -->
+    <div class="settings-menu__group" role="group" aria-labelledby="settings-language">
+      <p id="settings-language" class="settings-menu__heading">
+        {{ 'settings.language' | transloco }}
+      </p>
+      @for (locale of locales; track locale) {
+        <button
+          type="button"
+          class="settings-menu__item flex w-full items-center gap-3"
+          [class.settings-menu__item--current]="locale === language.active()"
+          [attr.aria-pressed]="locale === language.active()"
+          [attr.lang]="locale"
+          (click)="useLanguage(locale)"
+        >
+          <span class="flex-1">{{ names[locale] }}</span>
+          @if (locale === language.active()) {
+            <app-icon class="settings-menu__icon" name="check" />
+          }
+        </button>
+      }
+    </div>
+  </div>
+}

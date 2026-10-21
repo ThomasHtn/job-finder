@@ -73,9 +73,9 @@ The three folders are npm workspaces sharing one lockfile at the root, and one E
 
 **The whole domain lives in the `.env`**: job title, keywords, stack, commute area. It is validated by zod (`backend/src/shared/config/env.schema.ts`) and exposed as an injectable `SearchProfile`. Changing job needs no code.
 
-**The job boards** (`backend/src/sources/`) share one contract, `JobSourceConnector`: `name`, `isEnabled()`, `fetchJobs()`, everything normalised into `RawJob`. Missing keys mean skipped, not failed. The 49 company career sites go through one connector iterating `sources/ats/companies.config.ts`.
+**The job boards** (`backend/src/sources/`) share one contract, `JobSourceConnector`: `name`, `isEnabled()`, `fetchJobs()`, everything normalised into `RawJob`. Missing keys mean skipped, not failed, and so does a source listed in `INGESTION_DISABLED_SOURCES`. The 49 company career sites go through one connector iterating `sources/ats/companies.config.ts`.
 
-**An ingestion** runs on a cron and on `POST /api/ingestion/run`: hard filters (title, stack, permanent contract, remote, commute area), an upsert on `(source, sourceId)` that merges the same offer published by two boards, then a purge of what was not seen for thirty days, favourites spared. Each board's run is recorded on its own, and the run reports to `INGESTION_HEARTBEAT_URL` when set.
+**An ingestion** runs on a cron and on `POST /api/ingestion/run`: hard filters (title, stack, permanent contract, remote, commute area), an upsert on `(source, sourceId)` that merges the same offer published by two boards, then a purge of what was published more than thirty days ago (first seen, when the board gives no date), favourites spared; an offer already past that age is not ingested again. Each board's run is recorded on its own, and the run reports to `INGESTION_HEARTBEAT_URL` when set.
 
 **The commute area** is a driving-time polygon generated once by OpenRouteService and committed (`backend/src/geo/isochrone.geojson`): a point-in-polygon test at ingestion, no network call. Geocoding is cached in the database, failures included.
 

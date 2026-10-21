@@ -55,6 +55,8 @@ FT_CLIENT_SECRET=
 ADZUNA_APP_ID=
 ADZUNA_APP_KEY=
 JOOBLE_API_KEY=
+# Sources not run although configured. APEC answers every script with a bot challenge since October 2026
+INGESTION_DISABLED_SOURCES=APEC
 
 # Uptime-kuma push monitor (or any URL answering a GET), pinged after every ingestion; empty turns it off
 INGESTION_HEARTBEAT_URL=
@@ -67,12 +69,12 @@ These already have the right default. Leave them alone unless you know why:
 ```properties
 NODE_ENV=production
 PORT=3000
-# Every two hours; a restart never replays a crawl
-INGESTION_CRON=0 0 */2 * * *
+# Morning and evening, in UTC; a restart never replays a crawl
+INGESTION_CRON=0 30 6,17 * * *
 INGESTION_CRON_ENABLED=true
 INGESTION_ON_STARTUP=false
-# Offers not seen for this many days are deleted, favourites excepted
-INGESTION_STALE_DAYS=30
+# Offers published more than this many days ago are deleted, favourites excepted
+INGESTION_MAX_AGE_DAYS=30
 ```
 
 The frontend reads a single setting. Set it when the frontend sits on a network shared with other apps, where "backend" may well be somebody else's:
@@ -93,7 +95,7 @@ Then open the site and try a wrong password. It should be refused.
 
 ## Backups
 
-The favourites, the hidden offers and the sessions live in the database; the offers come back by themselves on the next ingestion. Dump it every night, copy the dumps off the machine, and practise a restore now and then.
+The favourites and the sessions live in the database; the offers come back by themselves on the next ingestion. Dump it every night, copy the dumps off the machine, and practise a restore now and then.
 
 Dump:
 
@@ -120,4 +122,4 @@ http://jobfinder-backend:3000/livez           the Node process is alive, even wi
 INGESTION_HEARTBEAT_URL                       pushed after every ingestion: up, or down with the failing sources
 ```
 
-The heartbeat is the one that tells about the job boards. It is pushed after every run, scheduled or manual, with `status=up` or `status=down`, a short message naming the failing sources and their error, and the run's duration as `ping`. A source down for one run is often a hiccup: let your monitor wait for two in a row before it alerts. No push for two and a half hours means the ingestion itself has stopped.
+The heartbeat is the one that tells about the job boards. It is pushed after every run, scheduled or manual, with `status=up` or `status=down`, a short message naming the failing sources and their error, and the run's duration as `ping`. A source down for one run is often a hiccup: let your monitor wait for two in a row before it alerts. No push for fourteen hours means the ingestion itself has stopped.

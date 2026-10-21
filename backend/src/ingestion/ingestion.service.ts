@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { IngestionSummary, SourceStatus } from '@job-finder/contract';
+import type { IngestionSummary, JobSource, SourceStatus } from '@job-finder/contract';
 
 import { GeoService } from '../geo/geo.service.js';
 import type { Env } from '../shared/config/env.schema.js';
@@ -34,9 +34,14 @@ export class IngestionService {
   private running = false;
 
   /**
-   * Offers not seen for this long are dropped, unless they were favourited.
+   * Offers older than this are dropped, unless they were favourited.
    */
-  private readonly staleAfterDays: number;
+  private readonly maxAgeDays: number;
+
+  /**
+   * Sources switched off in the settings, skipped like those missing their keys.
+   */
+  private readonly disabledSources: ReadonlySet<JobSource>;
 
   /**
    * Connectors are injected as a list so adding a source never touches this class.
@@ -51,7 +56,8 @@ export class IngestionService {
     config: ConfigService<Env, true>,
     private readonly heartbeat: IngestionHeartbeat,
   ) {
-    this.staleAfterDays = config.get('INGESTION_STALE_DAYS', { infer: true });
+    this.maxAgeDays = config.get('INGESTION_MAX_AGE_DAYS', { infer: true });
+    this.disabledSources = new Set(config.get('INGESTION_DISABLED_SOURCES', { infer: true }));
   }
 
   /**
@@ -66,22 +72,23 @@ export class IngestionService {
     this.running = true;
 
     const startedAt = Date.now();
+    const cutoff = new Date(startedAt - this.maxAgeDays * DAY_MS);
     const summary = emptySummary();
     const failures: SourceFailure[] = [];
     let enabledSources = 0;
     try {
       for (const connector of this.connectors) {
-        if (!connector.isEnabled()) {
-          this.logger.warn(`Source ${connector.name} is not configured, skipping`);
+        const skipReason = this.skipReason(connector);
+        if (skipReason) {
+          this.logger.warn(`Source ${connector.name} ${skipReason}, skipping`);
           summary.skippedSources.push(connector.name);
           continue;
         }
         enabledSources += 1;
-        const failure = await this.runSource(connector, summary);
+        const failure = await this.runSource(connector, summary, cutoff);
         if (failure) failures.push(failure);
       }
-      const threshold = new Date(Date.now() - this.staleAfterDays * DAY_MS);
-      summary.purged = await this.repository.purgeStaleJobs(threshold);
+      summary.purged = await this.repository.purgeOldJobs(cutoff);
     } catch (error) {
       this.logger.error('Ingestion crashed', (error as Error).stack);
       await this.heartbeat.send(describeCrash(error), Date.now() - startedAt);
@@ -109,7 +116,7 @@ export class IngestionService {
 
     return Promise.all(
       this.connectors.map(async (connector) => {
-        const enabled = connector.isEnabled();
+        const enabled = this.skipReason(connector) === null;
         const [runs, lastSuccessAt] = await Promise.all([
           this.repository.recentRuns(connector.name, RECENT_RUNS),
           this.repository.lastSuccessAt(connector.name),
@@ -131,12 +138,22 @@ export class IngestionService {
   }
 
   /**
-   * Fetches one source, persists what passes the filters, and records the run.
+   * Why a source is not run, for the log line, or null when it runs.
+   */
+  private skipReason(connector: JobSourceConnector): string | null {
+    if (this.disabledSources.has(connector.name)) return 'is switched off (INGESTION_DISABLED_SOURCES)';
+    if (!connector.isEnabled()) return 'is not configured';
+    return null;
+  }
+
+  /**
+   * Fetches one source, persists what passes the filters and is not past the cutoff, and records the run.
    * Errors are captured on the run row and in the summary, never rethrown: the failure is returned.
    */
   private async runSource(
     connector: JobSourceConnector,
     summary: IngestionSummary,
+    cutoff: Date,
   ): Promise<SourceFailure | null> {
     const runId = await this.repository.startRun(connector.name);
 
@@ -148,6 +165,8 @@ export class IngestionService {
       let merged = 0;
 
       for (const raw of rawJobs) {
+        /* The purge would delete it at the end of this run, and the next run would bring it back. */
+        if (raw.publishedAt && raw.publishedAt < cutoff) continue;
         const prepared = await prepareJob(raw, this.profile, this.geo);
         if (!prepared) continue;
         kept += 1;

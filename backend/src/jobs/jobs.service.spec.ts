@@ -61,7 +61,6 @@ describe('JobsService not found', () => {
     const { service } = build([]);
     await expect(service.detail('nope')).rejects.toBeInstanceOf(NotFoundException);
     await expect(service.toggleFavorite('nope')).rejects.toBeInstanceOf(NotFoundException);
-    await expect(service.hide('nope')).rejects.toBeInstanceOf(NotFoundException);
   });
 });
 
@@ -88,7 +87,7 @@ describe('JobsService.list', () => {
     const { jobs } = await service.list('remote');
 
     expect(prisma.job.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { isRemote: true, isHidden: false } }),
+      expect.objectContaining({ where: { isRemote: true } }),
     );
     expect(jobs.map((job) => job.id)).toEqual(['job-1']);
   });
@@ -105,7 +104,7 @@ describe('JobsService.list', () => {
 });
 
 /**
- * Flags written by the detail, favourite and hide routes.
+ * Flags written by the detail and favourite routes.
  */
 describe('JobsService flags', () => {
   it('marks an unseen offer as viewed when it is opened', async () => {
@@ -134,17 +133,5 @@ describe('JobsService flags', () => {
 
     const on = build([], jobRow({ isFavorite: true }));
     expect((await on.service.toggleFavorite('job-1')).isFavorite).toBe(false);
-  });
-
-  it('hides the offer and drops its star so the purge can take it', async () => {
-    const { service, prisma } = build([], jobRow({ isFavorite: true }));
-
-    const hidden = await service.hide('job-1');
-
-    expect(prisma.job.update).toHaveBeenCalledWith({
-      where: { id: 'job-1' },
-      data: { isHidden: true, isFavorite: false },
-    });
-    expect(hidden.isFavorite).toBe(false);
   });
 });

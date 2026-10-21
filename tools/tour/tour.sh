@@ -47,7 +47,7 @@ wait_for() {
 python3 -I -c 'from PIL import features; assert features.check("webp")' ||
   { echo 'Python 3 with Pillow (WebP support) is needed.' >&2; exit 1; }
 
-# Replays the fictitious offers: each take stars and hides some.
+# Replays the fictitious offers: each take stars some.
 seed() {
   psql "$TOUR_URL" -q -v ON_ERROR_STOP=1 -f "$TOUR/seed.sql"
 }

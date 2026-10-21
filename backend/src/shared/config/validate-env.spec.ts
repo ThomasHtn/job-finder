@@ -39,9 +39,23 @@ describe('validateEnv', () => {
 
   it('applies the ingestion defaults', () => {
     const env = validateEnv(MINIMAL);
-    expect(env.INGESTION_STALE_DAYS).toBe(30);
+    expect(env.INGESTION_MAX_AGE_DAYS).toBe(30);
     expect(env.INGESTION_ON_STARTUP).toBe(false);
     expect(env.INGESTION_CRON_ENABLED).toBe(true);
+  });
+
+  it('runs every source unless some are switched off', () => {
+    expect(validateEnv(MINIMAL).INGESTION_DISABLED_SOURCES).toEqual([]);
+    expect(
+      validateEnv({ ...MINIMAL, INGESTION_DISABLED_SOURCES: ' APEC , EURES' })
+        .INGESTION_DISABLED_SOURCES,
+    ).toEqual(['APEC', 'EURES']);
+  });
+
+  it('rejects an unknown source to switch off', () => {
+    expect(() => validateEnv({ ...MINIMAL, INGESTION_DISABLED_SOURCES: 'APECC' })).toThrow(
+      /INGESTION_DISABLED_SOURCES/,
+    );
   });
 
   it('rejects a malformed cron expression', () => {

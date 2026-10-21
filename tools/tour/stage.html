@@ -7,23 +7,23 @@
     <style>
       /* Stage styles: the app's palette and typeface, served by the app itself on the same origin. */
 
-      /* The app's Archivo, so captions and screens share one typeface. */
+      /* The app's Figtree, so captions and screens share one typeface. */
       @font-face {
-        font-family: Archivo;
-        font-weight: 400 700;
-        src: url('/fonts/archivo/archivo-latin-wght.woff2') format('woff2-variations');
+        font-family: Figtree;
+        font-weight: 300 900;
+        src: url('/fonts/figtree/figtree-latin-wght.woff2') format('woff2-variations');
       }
 
-      /* The light tokens of frontend/src/styles/tokens/colors.css, plus the bright teal of the icon. */
+      /* The light tokens of frontend/src/styles/tokens/colors.css, plus the bright orange of the icon. */
       :root {
         --paper: #fbfcfd;
         --surface: #fff;
         --ink: #101822;
         --ink-2: #545f6d;
         --ink-3: #6c7784;
-        --accent: #0e6e63;
-        --accent-soft: rgb(14 110 99 / 9%);
-        --bright: #3fb8a6;
+        --accent: #b84d00;
+        --accent-soft: rgb(184 77 0 / 9%);
+        --bright: #fb923c;
       }
 
       /* No default margins anywhere. */
@@ -44,11 +44,11 @@
       body {
         position: relative;
         background: var(--paper);
-        font-family: Archivo, system-ui, sans-serif;
+        font-family: Figtree, system-ui, sans-serif;
         color: var(--ink);
       }
 
-      /* Soft teal blobs, the only decoration. */
+      /* Soft orange blobs, the only decoration. */
       .blob {
         position: absolute;
         border-radius: 50%;
@@ -64,13 +64,13 @@
         top: -240px;
       }
 
-      /* Bottom right blob, in the brighter teal. */
+      /* Bottom right blob, in the brighter orange. */
       .blob--b {
         width: 420px;
         height: 420px;
         right: -140px;
         bottom: -220px;
-        background: rgb(63 184 166 / 12%);
+        background: rgb(251 146 60 / 12%);
       }
 
       /* Bottom middle blob. */
@@ -367,9 +367,9 @@
         width: 44px;
         height: 44px;
         margin: -22px 0 0 -22px;
-        border: 2px solid rgb(14 110 99 / 55%);
+        border: 2px solid rgb(184 77 0 / 55%);
         border-radius: 50%;
-        background: rgb(14 110 99 / 28%);
+        background: rgb(184 77 0 / 28%);
         opacity: 0;
         transform: scale(0.4);
         pointer-events: none;

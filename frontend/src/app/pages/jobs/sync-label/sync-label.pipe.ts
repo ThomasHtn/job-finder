@@ -30,10 +30,10 @@ export class SyncLabelPipe implements PipeTransform {
     if (elapsed < DAY_MS) {
       return translate('sync.hoursAgo', { hours: Math.floor(elapsed / HOUR_MS) });
     }
-    if (calendarDaysBetween(new Date(value), now) === 1) {
+    const days = calendarDaysBetween(new Date(value), now);
+    if (days === 1) {
       return translate('sync.yesterday');
     }
-    const date = new Date(value).toLocaleDateString(translate('date.tag'));
-    return translate('sync.onDate', { date });
+    return translate('sync.daysAgo', { days });
   }
 }

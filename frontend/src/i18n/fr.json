@@ -19,13 +19,18 @@
     "searching": "Recherche en cours…",
     "refresh": "Rechercher de nouvelles offres"
   },
+  "settings": {
+    "open": "Paramètres",
+    "sources": "Sources",
+    "language": "Langue"
+  },
   "sync": {
     "never": "Jamais synchronisé",
     "justNow": "À l'instant",
     "minutesAgo": "Il y a {{ minutes }} min",
     "hoursAgo": "Il y a {{ hours }} h",
     "yesterday": "Hier",
-    "onDate": "Le {{ date }}"
+    "daysAgo": "Il y a {{ days }} j"
   },
   "published": {
     "today": "Aujourd'hui",
@@ -36,7 +41,6 @@
     "areaPlaceholder": "Sur site",
     "remote": "Full remote",
     "favorites": "Favoris",
-    "sources": "Sources",
     "label": "Rubriques"
   },
   "sources": {
@@ -98,17 +102,21 @@
     "sourcesUnavailable": "Source(s) indisponible(s) : {{ sources }}.",
     "refreshFailed": "Impossible de récupérer de nouvelles offres. {{ detail }}",
     "loadFailed": "Impossible de charger les offres. {{ detail }}",
-    "favoriteFailed": "Impossible de modifier le favori. {{ detail }}",
-    "hideFailed": "Impossible de masquer l'offre. {{ detail }}"
+    "favoriteFailed": "Impossible de modifier le favori. {{ detail }}"
   },
   "row": {
     "unknownCompany": "Entreprise non précisée",
     "approximateCity": "commune non précisée",
     "unknownSalary": "Non communiqué",
     "new": "Nouveau",
-    "hide": "Pas intéressé, masquer cette offre",
     "addFavorite": "Ajouter aux favoris",
     "removeFavorite": "Retirer des favoris"
+  },
+  "salary": {
+    "yearly": "{{ amount }} €",
+    "yearlyFrom": "Dès {{ amount }} €",
+    "monthly": "{{ amount }} € / mois",
+    "monthlyFrom": "Dès {{ amount }} € / mois"
   },
   "place": {
     "remote": "Full remote",

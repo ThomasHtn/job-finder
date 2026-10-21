@@ -14,9 +14,9 @@ export type ShellTab = JobTab | typeof SOURCES_TAB;
  */
 export interface JobTabItem {
   /**
-   * Tab this entry selects.
+   * Tab this entry selects; the sources view is reached from the settings, not from here.
    */
-  tab: ShellTab;
+  tab: JobTab;
 
   /**
    * Wording shown to the reader.
@@ -24,9 +24,9 @@ export interface JobTabItem {
   label: string;
 
   /**
-   * Offers currently in that tab, `null` for a tab that does not list offers.
+   * Offers currently in that tab.
    */
-  count: number | null;
+  count: number;
 
   /**
    * Glyph drawn before the label.

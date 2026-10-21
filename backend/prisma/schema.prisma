@@ -41,17 +41,14 @@ model Job {
   isLocationApproximate Boolean @default(false)
 
   isViewed Boolean @default(false)
-  /// Set from the "not interested" action: excluded from every tab, unlike a stale purge.
-  isHidden Boolean @default(false)
 
   url             String
   /// Links to the same offer found on other sources during deduplication.
   alternativeUrls String[] @default([])
 
+  /// With firstSeenAt as fallback, the age that drives the purge.
   publishedAt DateTime?
   firstSeenAt DateTime  @default(now())
-  /// Set by the ingestion each time a source lists the offer; drives the stale purge.
-  lastSeenAt  DateTime  @default(now())
 
   /// Similarity key used to merge the same offer republished across sources.
   dedupeHash String

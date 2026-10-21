@@ -42,12 +42,4 @@ export class JobsController {
   public toggleFavorite(@Param('id') id: string): Promise<JobSummary> {
     return this.jobs.toggleFavorite(id);
   }
-
-  /**
-   * "Not interested": the offer leaves every tab.
-   */
-  @Patch(':id/hide')
-  public hide(@Param('id') id: string): Promise<JobSummary> {
-    return this.jobs.hide(id);
-  }
 }

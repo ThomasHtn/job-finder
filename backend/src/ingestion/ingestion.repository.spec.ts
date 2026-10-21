@@ -70,7 +70,6 @@ describe('IngestionRepository.persistJob', () => {
         sourceId: '1',
         dedupeHash: 'hash',
         alternativeUrls: [],
-        lastSeenAt: expect.any(Date),
       }),
     });
   });
@@ -91,7 +90,6 @@ describe('IngestionRepository.persistJob', () => {
     const data = updatedData(prisma);
     expect(data.url).toBe('https://example.test/1');
     expect(data.alternativeUrls).toEqual(['https://other.test/1']);
-    expect(data.lastSeenAt).toBeInstanceOf(Date);
     expect(prisma.job.findFirst).not.toHaveBeenCalled();
     expect(prisma.job.create).not.toHaveBeenCalled();
   });
@@ -154,7 +152,6 @@ describe('IngestionRepository.persistJob', () => {
     );
     const data = updatedData(prisma);
     expect(data.alternativeUrls).toEqual(['https://example.test/1']);
-    expect(data.lastSeenAt).toBeInstanceOf(Date);
     expect(prisma.job.create).not.toHaveBeenCalled();
   });
 });
@@ -189,22 +186,25 @@ describe('IngestionRepository runs and purge', () => {
     await expect(repository.lastSuccessAt('ADZUNA')).resolves.toBe(finishedAt);
   });
 
-  it('counts the visible offers per source', async () => {
-    const { repository, prisma } = build({});
+  it('counts the offers per source', async () => {
+    const { repository } = build({});
 
     await expect(repository.countJobsBySource()).resolves.toEqual(new Map([['ADZUNA', 5]]));
-    expect(prisma.job.groupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { isHidden: false } }),
-    );
   });
 
-  it('purges the stale offers but never a favourite', async () => {
+  it('purges the offers past the cutoff, dated by publication or first sight, but never a favourite', async () => {
     const { repository, prisma } = build({});
-    const threshold = new Date('2026-09-21T00:00:00.000Z');
+    const cutoff = new Date('2026-09-21T00:00:00.000Z');
 
-    await expect(repository.purgeStaleJobs(threshold)).resolves.toBe(3);
+    await expect(repository.purgeOldJobs(cutoff)).resolves.toBe(3);
     expect(prisma.job.deleteMany).toHaveBeenCalledWith({
-      where: { lastSeenAt: { lt: threshold }, isFavorite: false },
+      where: {
+        isFavorite: false,
+        OR: [
+          { publishedAt: { lt: cutoff } },
+          { publishedAt: null, firstSeenAt: { lt: cutoff } },
+        ],
+      },
     });
   });
 });

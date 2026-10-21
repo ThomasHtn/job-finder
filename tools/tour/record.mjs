@@ -105,14 +105,14 @@ await stage(
   'caption',
   'The feed',
   'Only what is new.<br><em>Since your last visit.</em>',
-  'Fifty-five sources, read every two hours. Each offer shows up once, however many boards carry it.',
+  'Fifty-five sources, read morning and evening. Each offer shows up once, however many boards carry it.',
 );
 await stage('layout', 'phone');
 await stage('show', 'scene');
 await wait(2400);
-await scroll('phone', 900);
+await scroll('phone', 900, '.jobs__feed');
 await wait(2200);
-await scroll('phone', 0);
+await scroll('phone', 0, '.jobs__feed');
 await wait(1600);
 
 /* 3. An offer opens on a desktop, the list stays. */
@@ -126,20 +126,16 @@ await wait(1800);
 await stage('tap', 'desktop', ROW_TITLE, 0);
 await wait(2600);
 
-/* 4. Sorting with two buttons, on a phone. */
+/* 4. Keeping one, on a phone. */
 await stage(
   'caption',
-  'Sort',
-  'Star it.<br><em>Or never see it again.</em>',
-  'Favorites are kept for good. A hidden one stays out of your way.',
+  'Keep',
+  'Star it.<br><em>The rest clears itself.</em>',
+  'Favorites are kept for good. Every other offer goes after a month.',
 );
 await stage('layout', 'phone');
 await wait(1800);
 await stage('tap', 'phone', '.job-row__star', 1);
-await wait(1300);
-await stage('tap', 'phone', '.job-row__hide', 2);
-await wait(1300);
-await stage('tap', 'phone', '.job-row__hide', 2);
 await wait(1800);
 
 /* 5. Full remote. */
@@ -157,7 +153,9 @@ await wait(3000);
 await stage('caption', 'Sources', 'Every source.<em>One glance.</em>', '');
 await stage('layout', 'desktop');
 await wait(1400);
-await stage('tap', 'desktop', '.job-tabs__item', 3);
+await stage('tap', 'desktop', '.settings-menu__trigger', 0);
+await wait(900);
+await stage('tap', 'desktop', '.settings-menu__item--sources', 0);
 await wait(3200);
 
 /* 7. The way out. */

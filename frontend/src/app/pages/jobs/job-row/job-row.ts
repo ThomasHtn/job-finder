@@ -14,11 +14,11 @@ import { Icon } from '@shared/icon/icon';
 import { IconButton } from '@shared/icon-button/icon-button';
 
 import { ROW_STACK_LIMIT } from './job-row.constants';
-import { unusualContract } from './job-row.utils';
+import { parseSalary, salaryAmounts, unusualContract } from './job-row.utils';
 import { PublishedLabelPipe } from './published-label.pipe';
 
 /**
- * One line of the feed: title, who and where, the stack and provenance, the salary beside them.
+ * One offer of the feed as a card: who and where, the title, its facts, then the date.
  */
 @Component({
   selector: 'app-job-row',
@@ -66,11 +66,6 @@ export class JobRow {
   public readonly favoriteToggled = output<string>();
 
   /**
-   * Emits the offer id when the hide button is pressed.
-   */
-  public readonly hidden = output<string>();
-
-  /**
    * True when the offer first appeared after the previous time the feed was consulted.
    */
   protected readonly isNew = computed(() => isNewSince(this.job(), this.lastVisit.previousVisitAt));
@@ -93,11 +88,21 @@ export class JobRow {
   );
 
   /**
-   * Salary wording from the source, or the short "not stated".
+   * Salary shortened to thousands when its amounts can be read, else the source's wording, or "not stated".
    */
   protected readonly salary = computed(() => {
     this.language.active();
-    return this.job().salary ?? translate('row.unknownSalary');
+    const text = this.job().salary;
+    if (!text) {
+      return translate('row.unknownSalary');
+    }
+    const range = parseSalary(text);
+    if (!range) {
+      return text;
+    }
+    const amount = salaryAmounts(range, translate('date.tag'));
+    const key = `${range.monthly ? 'monthly' : 'yearly'}${range.from ? 'From' : ''}`;
+    return translate(`salary.${key}`, { amount });
   });
 
   /**
@@ -115,14 +120,5 @@ export class JobRow {
     event.preventDefault();
     event.stopPropagation();
     this.favoriteToggled.emit(this.job().id);
-  }
-
-  /**
-   * Hide pressed; same event handling as the star.
-   */
-  protected hide(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.hidden.emit(this.job().id);
   }
 }

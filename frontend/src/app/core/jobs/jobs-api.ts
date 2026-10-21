@@ -23,11 +23,4 @@ export class JobsApi {
   public toggleFavorite(id: string): Promise<JobSummary> {
     return firstValueFrom(this.http.patch<JobSummary>(API_ENDPOINTS.favorite(id), {}));
   }
-
-  /**
-   * "Not interested": the offer stops appearing in every tab.
-   */
-  public hide(id: string): Promise<JobSummary> {
-    return firstValueFrom(this.http.patch<JobSummary>(API_ENDPOINTS.hide(id), {}));
-  }
 }

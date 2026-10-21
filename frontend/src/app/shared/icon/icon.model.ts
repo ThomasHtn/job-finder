@@ -22,6 +22,8 @@ export const ICON_NAMES = [
   'calendar',
   'eye',
   'filter',
+  'settings',
+  'check',
 ] as const;
 
 /**

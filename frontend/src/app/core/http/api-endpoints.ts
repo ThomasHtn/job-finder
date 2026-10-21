@@ -33,11 +33,6 @@ export const API_ENDPOINTS = {
   favorite: (id: string): string => `${API_PREFIX}/jobs/${encodeURIComponent(id)}/favorite`,
 
   /**
-   * "Not interested": the offer leaves every tab.
-   */
-  hide: (id: string): string => `${API_PREFIX}/jobs/${encodeURIComponent(id)}/hide`,
-
-  /**
    * Reads every source again, by hand.
    */
   ingestionRun: `${API_PREFIX}/ingestion/run`,

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 /**
- * The JobFinder signature: the mark, and the wordmark next to it unless it is hidden.
+ * The JobFinder signature: the mark, and the wordmark next to it.
  */
 @Component({
   selector: 'app-brand',
@@ -10,9 +10,4 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styleUrl: './brand.scss',
   host: { class: 'brand' },
 })
-export class Brand {
-  /**
-   * False on screens too narrow for the wordmark; the mark alone still identifies the app.
-   */
-  public readonly showName = input(true);
-}
+export class Brand {}

@@ -79,19 +79,6 @@ export class JobsService {
   }
 
   /**
-   * "Not interested": excludes the offer from every tab. No undo in the UI yet. The star goes too,
-   * or the stale purge, which spares favourites, would keep the invisible row forever.
-   */
-  public async hide(id: string): Promise<JobSummary> {
-    await this.requireJob(id);
-    const updated = await this.prisma.job.update({
-      where: { id },
-      data: { isHidden: true, isFavorite: false },
-    });
-    return toSummary(updated, this.profile.stackKeywords);
-  }
-
-  /**
    * Loads one offer or answers 404, the same way for every mutating route.
    */
   private async requireJob(id: string): Promise<JobModel> {
@@ -102,12 +89,11 @@ export class JobsService {
 
   /**
    * Counts of the three tabs from a single grouped query instead of three counts.
-   * The groups are the (isRemote, isFavorite) pairs of the visible offers.
+   * The groups are the (isRemote, isFavorite) pairs of the offers.
    */
   private async counts(): Promise<JobCounts> {
     const groups = await this.prisma.job.groupBy({
       by: ['isRemote', 'isFavorite'],
-      where: { isHidden: false },
       _count: { _all: true },
     });
 

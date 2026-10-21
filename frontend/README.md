@@ -85,7 +85,7 @@ In a template:
 {{ 'login.title' | transloco }} {{ 'detail.applyOn' | transloco: { source: job.sourceLabel } }}
 ```
 
-In TypeScript, translate at the moment you need the text, never in a constant at the top of a file. A `computed` that builds a text reads `language.active()` first, so it follows a switch from the header:
+In TypeScript, translate at the moment you need the text, never in a constant at the top of a file. A `computed` that builds a text reads `language.active()` first, so it follows a switch from the settings menu:
 
 ```ts
 protected readonly place = computed(() => {
@@ -117,7 +117,7 @@ Tailwind classes in the template, for layout only. Everything visual goes in the
 }
 ```
 
-The palette, both schemes, lives in `src/styles/tokens/colors.css`. Animations always sit inside the `motion` mixin, so they hold still for anyone who asked for less motion. One typeface, Archivo, self-hosted under `public/fonts/archivo`.
+The palette, both schemes, lives in `src/styles/tokens/colors.css`. Animations always sit inside the `motion` mixin, so they hold still for anyone who asked for less motion. One typeface, Figtree, self-hosted under `public/fonts/figtree`.
 
 ## Banana peels
 

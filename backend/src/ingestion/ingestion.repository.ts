@@ -75,12 +75,11 @@ export class IngestionRepository {
   }
 
   /**
-   * Visible offers per source, keyed by source name.
+   * Offers per source, keyed by source name.
    */
   public async countJobsBySource(): Promise<Map<string, number>> {
     const groups = await this.prisma.job.groupBy({
       by: ['source'],
-      where: { isHidden: false },
       _count: { _all: true },
     });
     return new Map(groups.map((group) => [group.source, group._count._all]));
@@ -88,10 +87,8 @@ export class IngestionRepository {
 
   /**
    * Upserts by (source, sourceId); a twin from another source is enriched, not duplicated.
-   * Every path marks the offer as seen now: only the ingestion keeps it from the stale purge.
    */
   public async persistJob(job: PreparedJob): Promise<PersistOutcome> {
-    const lastSeenAt = new Date();
     const data = {
       sourceLabel: job.sourceLabel,
       title: job.title,
@@ -108,7 +105,6 @@ export class IngestionRepository {
       url: job.url,
       publishedAt: job.publishedAt,
       dedupeHash: job.dedupeHash,
-      lastSeenAt,
     };
 
     const own = await this.prisma.job.findUnique({
@@ -151,7 +147,7 @@ export class IngestionRepository {
     if (twin) {
       await this.prisma.job.update({
         where: { id: twin.id },
-        data: { ...planMerge(twin, job), lastSeenAt },
+        data: planMerge(twin, job),
       });
       return 'merged';
     }
@@ -168,11 +164,18 @@ export class IngestionRepository {
   }
 
   /**
-   * Deletes offers not seen since the threshold, keeping favourites.
+   * Deletes offers published before the cutoff, or first seen before it when the date is unknown,
+   * keeping favourites.
    */
-  public async purgeStaleJobs(threshold: Date): Promise<number> {
+  public async purgeOldJobs(cutoff: Date): Promise<number> {
     const { count } = await this.prisma.job.deleteMany({
-      where: { lastSeenAt: { lt: threshold }, isFavorite: false },
+      where: {
+        isFavorite: false,
+        OR: [
+          { publishedAt: { lt: cutoff } },
+          { publishedAt: null, firstSeenAt: { lt: cutoff } },
+        ],
+      },
     });
     return count;
   }

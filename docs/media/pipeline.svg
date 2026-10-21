@@ -6,10 +6,10 @@
     .ink { fill: #101822 }
     .ink2 { fill: #545f6d }
     .ink3 { fill: #6c7784 }
-    .acc { fill: #0e6e63 }
-    .funnel { fill: #0e6e63; fill-opacity: .09 }
-    .edge { stroke: #0e6e63; stroke-opacity: .5; fill: none; stroke-width: 1.5 }
-    .gate { stroke: #0e6e63; stroke-opacity: .3; stroke-width: 1.5 }
+    .acc { fill: #b84d00 }
+    .funnel { fill: #b84d00; fill-opacity: .09 }
+    .edge { stroke: #b84d00; stroke-opacity: .5; fill: none; stroke-width: 1.5 }
+    .gate { stroke: #b84d00; stroke-opacity: .3; stroke-width: 1.5 }
     .hair { stroke: #101822; stroke-opacity: .1; stroke-width: 1; fill: none }
     .tick { stroke: #101822; stroke-opacity: .18; stroke-width: 1 }
     .arrow { stroke: #6c7784; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round }
@@ -19,10 +19,10 @@
       .ink { fill: #e9edf1 }
       .ink2 { fill: #a0aab5 }
       .ink3 { fill: #838e9a }
-      .acc { fill: #3fb8a6 }
-      .funnel { fill: #3fb8a6; fill-opacity: .14 }
-      .edge { stroke: #3fb8a6; stroke-opacity: .55 }
-      .gate { stroke: #3fb8a6; stroke-opacity: .35 }
+      .acc { fill: #fb923c }
+      .funnel { fill: #fb923c; fill-opacity: .14 }
+      .edge { stroke: #fb923c; stroke-opacity: .55 }
+      .gate { stroke: #fb923c; stroke-opacity: .35 }
       .hair { stroke: #ffffff; stroke-opacity: .13 }
       .tick { stroke: #ffffff; stroke-opacity: .2 }
       .arrow { stroke: #838e9a }
@@ -31,7 +31,7 @@
 
   <rect class="bg" width="1400" height="520" rx="26" />
 
-  <text class="ink" x="140" y="72" font-size="23" font-weight="600" letter-spacing="-.3">55 sources, every two hours</text>
+  <text class="ink" x="140" y="72" font-size="23" font-weight="600" letter-spacing="-.3">55 sources, twice a day</text>
   <text class="ink3" x="140" y="98" font-size="17">6 platforms and 49 company careers pages</text>
 
   <path class="funnel" d="M140 110 L1010 218 L1010 282 L140 390 Z" />

@@ -75,11 +75,11 @@ INSERT INTO "Job" (
   id, source, "sourceId", "sourceLabel", title, company, "companyDescription", description,
   "hasFullDescription", "contractLabel", salary, city, "postalCode", "isRemote",
   "isLocationApproximate", "isFavorite", url, "alternativeUrls", "publishedAt", "firstSeenAt",
-  "lastSeenAt", "dedupeHash"
+  "dedupeHash"
 )
 SELECT 'tour-' || n, source::"JobSourceType", 'tour-' || n, label, title, company, cdescr, descr,
   full_desc, 'CDI', salary, city, pc, remote, approx, fav, 'https://jobs.example/tour-' || n, alts,
-  now() - make_interval(hours => pub_h), now() - make_interval(hours => seen_h), now(), 'tour-' || n
+  now() - make_interval(hours => pub_h), now() - make_interval(hours => seen_h), 'tour-' || n
 FROM offer;
 
 -- Every board healthy, two runs each, so the sources tab reads green.

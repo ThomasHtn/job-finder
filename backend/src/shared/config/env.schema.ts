@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { JOB_SOURCES } from '@job-finder/contract';
+
 import {
   booleanFromString,
   coordinates,
@@ -48,16 +50,24 @@ const rawSchema = z.object({
   SEARCH_AREA_APEC_LOCATION: z.string().min(1),
   SEARCH_AREA_FREE_WORK_LOCATIONS: requiredCsvList,
 
-  INGESTION_CRON: cronExpression.default('0 0 */2 * * *'),
+  /**
+   * Twice a day, morning and evening (UTC): offers rarely change faster, and the boards are spared.
+   */
+  INGESTION_CRON: cronExpression.default('0 30 6,17 * * *'),
   /**
    * Off in the demo and its browser tests: they show seeded offers and never call the job boards.
    */
   INGESTION_CRON_ENABLED: booleanFromString(true),
   INGESTION_ON_STARTUP: booleanFromString(false),
   /**
-   * Offers not seen for this many days are purged, favourites excepted.
+   * Offers published, or first seen when the date is unknown, more than this many days ago are purged,
+   * favourites excepted.
    */
-  INGESTION_STALE_DAYS: z.coerce.number().int().positive().default(30),
+  INGESTION_MAX_AGE_DAYS: z.coerce.number().int().positive().default(30),
+  /**
+   * Comma-separated sources not run although configured, such as a board that now blocks automated access.
+   */
+  INGESTION_DISABLED_SOURCES: csvList.pipe(z.array(z.enum(JOB_SOURCES))),
 
   /**
    * Off only in development and the demo, where the browser tests sign in again and again.

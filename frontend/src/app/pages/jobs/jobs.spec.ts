@@ -122,7 +122,7 @@ describe('JobsPage', () => {
     return (fixture.nativeElement as HTMLElement).querySelector<T>(selector)!;
   }
 
-  it('loads the local tab by default and renders rows like the France Travail feed', async () => {
+  it('loads the local tab by default and renders its rows', async () => {
     const fixture = await create();
 
     const request = http.expectOne((req) => req.url === '/api/jobs');
@@ -136,7 +136,6 @@ describe('JobsPage', () => {
     expect(text(fixture)).toContain('76 - Le Havre');
     expect(text(fixture)).toContain('Angular');
     expect(text(fixture)).toContain("Aujourd'hui");
-    expect(text(fixture)).toContain('France Travail');
     expect(find(fixture, 'a.job-row__title').getAttribute('href')).toBe('/offres/job-1');
   });
 
@@ -188,18 +187,6 @@ describe('JobsPage', () => {
 
     expect(text(fixture)).toContain('Développeur Angular');
     expect(text(fixture)).toContain('1 nouvelle offre.');
-  });
-
-  it('hides an offer and reloads the list', async () => {
-    const fixture = await create();
-    await answerList(fixture);
-
-    find<HTMLButtonElement>(fixture, '.job-row__hide').click();
-    http.expectOne('/api/jobs/job-1/hide').flush(jobSummary());
-    await settle(fixture);
-    await answerList(fixture, []);
-
-    expect(text(fixture)).toContain("Aucune offre pour l'instant.");
   });
 
   it('flags a failed source after a manual refresh', async () => {
@@ -259,17 +246,6 @@ describe('JobsPage', () => {
     expect(find(fixture, '.job-row__star').getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('says why hiding failed', async () => {
-    const fixture = await create();
-    await answerList(fixture);
-
-    find<HTMLButtonElement>(fixture, '.job-row__hide').click();
-    http.expectOne('/api/jobs/job-1/hide').flush(null, { status: 500, statusText: 'Server Error' });
-    await settle(fixture);
-
-    expect(find(fixture, 'app-notice').textContent).toContain("Impossible de masquer l'offre.");
-  });
-
   it('marks the refresh button and warns when a source is down', async () => {
     const down: SourceStatus = {
       source: 'FREE_WORK',
@@ -327,13 +303,31 @@ describe('JobsPage', () => {
     expect(fixture.nativeElement.querySelector('app-source-board')).not.toBeNull();
   });
 
-  it('renders the whole shell in the language picked from the header', async () => {
+  it('opens the sources board from the settings, not from the tabs', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    expect(text(fixture)).not.toContain('Sources');
+    find<HTMLButtonElement>(fixture, '.settings-menu__trigger').click();
+    await settle(fixture);
+    find<HTMLButtonElement>(fixture, '.settings-menu__item--sources').click();
+
+    expect(navigate).toHaveBeenCalledWith(['/'], {
+      queryParams: { tab: 'sources' },
+      replaceUrl: true,
+    });
+  });
+
+  it('renders the whole shell in the language picked from the settings', async () => {
     const fixture = await create();
     await answerList(fixture);
 
     expect(text(fixture)).toContain('Favoris');
 
-    find<HTMLButtonElement>(fixture, '.language-toggle__button').click();
+    find<HTMLButtonElement>(fixture, '.settings-menu__trigger').click();
+    await settle(fixture);
+    find<HTMLButtonElement>(fixture, '.settings-menu__item[lang="en"]').click();
     await settle(fixture);
 
     expect(text(fixture)).toContain('Favorites');
@@ -368,40 +362,6 @@ describe('JobsPage', () => {
     const selected = harness.routeNativeElement?.querySelectorAll('.job-row--selected');
     expect(selected).toHaveLength(1);
     expect(selected?.[0].textContent).toContain('Ouverte');
-  });
-
-  it('closes the panel when the offer it shows is hidden', async () => {
-    const harness = await routed('/offres/job-1');
-    http
-      .expectOne((request) => request.url === '/api/jobs')
-      .flush(jobList([jobSummary(), jobSummary({ id: 'job-2' })]));
-    await settle(harness.fixture);
-
-    harness.routeNativeElement!.querySelector<HTMLButtonElement>('.job-row__hide')!.click();
-    http.expectOne('/api/jobs/job-1/hide').flush(jobSummary());
-    await settle(harness.fixture);
-    http
-      .expectOne((request) => request.url === '/api/jobs')
-      .flush(jobList([jobSummary({ id: 'job-2' })]));
-    await settle(harness.fixture);
-
-    expect(TestBed.inject(Router).url).toBe('/');
-  });
-
-  it('keeps the panel open when another offer is hidden', async () => {
-    const harness = await routed('/offres/job-1');
-    http
-      .expectOne((request) => request.url === '/api/jobs')
-      .flush(jobList([jobSummary(), jobSummary({ id: 'job-2' })]));
-    await settle(harness.fixture);
-
-    harness.routeNativeElement!.querySelectorAll<HTMLButtonElement>('.job-row__hide')[1].click();
-    http.expectOne('/api/jobs/job-2/hide').flush(jobSummary({ id: 'job-2' }));
-    await settle(harness.fixture);
-    http.expectOne((request) => request.url === '/api/jobs').flush(jobList([jobSummary()]));
-    await settle(harness.fixture);
-
-    expect(TestBed.inject(Router).url).toBe('/offres/job-1');
   });
 
   it('puts the feed out of reach behind an open sheet, then gives the focus back', async () => {

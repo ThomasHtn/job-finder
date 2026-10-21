@@ -1,104 +1,70 @@
-<!-- Publication label, read twice: inline on a wide screen, on its own line on a phone. -->
+<!-- Publication label, shown in the footer pill. -->
 @let published = job().publishedAt | publishedLabel: language.active() : now();
 
-<!-- The accent dot of an offer new since the last visit. -->
-<span class="job-row__dot" aria-hidden="true"></span>
-
-<!-- Title, who and where, then stack, provenance and date. -->
-<div class="min-w-0">
-  <!-- Title links to the detail; the link stretches over the whole row. -->
-  <a class="job-row__title" [routerLink]="detailLink()" queryParamsHandling="preserve">
-    {{ job().title }}
-  </a>
-  <!-- The dot says "new" to the eye; this says it to a screen reader. -->
-  @if (isNew()) {
-    <span class="sr-only">{{ 'row.new' | transloco }}</span>
-  }
-
-  <!-- Company and place; region-only offers say so. -->
-  <p class="job-row__meta mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5 max-sm:gap-x-3">
-    <span class="job-row__company inline-flex min-w-0 items-center gap-1.5">
-      <app-icon class="job-row__icon" name="building" />
-      {{ job().company ?? ('row.unknownCompany' | transloco) }}
-    </span>
-    <span class="inline-flex min-w-0 items-center gap-1.5">
-      <app-icon class="job-row__icon" [name]="job().isRemote ? 'remote' : 'pin'" />
-      {{ place() }}
-    </span>
-    @if (job().isLocationApproximate && !job().isRemote) {
-      <span class="job-row__note">{{ 'row.approximateCity' | transloco }}</span>
-    }
-  </p>
-
-  <!-- Salary on a phone, stack on a wide screen, then source, unusual contract and date. -->
-  <p class="job-row__facts mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 max-sm:gap-x-3">
-    <span
-      class="job-row__salary-inline tabular-nums sm:hidden"
-      [class.job-row__salary--unknown]="!job().salary"
-    >
-      {{ salary() }}
-    </span>
-    @if (stack(); as stack) {
-      <span class="job-row__stack inline-flex items-center gap-1.25 max-sm:hidden">
-        <app-icon class="job-row__icon job-row__icon--small" name="code" />
-        {{ stack }}
-      </span>
-    }
-    <span class="inline-flex items-center gap-1.25">
-      <app-icon class="job-row__icon job-row__icon--small" name="source" />
-      {{ job().sourceLabel }}
-    </span>
-    @if (contract(); as contract) {
-      <span>{{ contract }}</span>
-    }
-    @if (published) {
-      <span class="inline-flex items-center gap-1.25 max-sm:hidden">
-        <app-icon class="job-row__icon job-row__icon--small" name="clock" />
-        {{ published }}
-      </span>
-    }
-  </p>
-
-  <!-- A phone has no room for the date on the line above: it gets its own. -->
-  @if (published) {
-    <p class="job-row__facts mt-1 flex items-center gap-1.25 sm:hidden">
-      <app-icon class="job-row__icon job-row__icon--small" name="clock" />
-      {{ published }}
-    </p>
-  }
-</div>
-
-<!-- Salary column on a wide screen, and the actions under it. -->
-<div class="job-row__side flex flex-col items-end justify-between gap-2 max-sm:justify-start">
-  <span
-    class="job-row__salary tabular-nums max-sm:hidden"
-    [class.job-row__salary--unknown]="!job().salary"
-  >
-    {{ salary() }}
+<!-- Who and where: the employer's tile, its name, then the place; region-only offers say so. -->
+<div class="job-row__head flex items-center gap-3.5">
+  <span class="job-row__logo" aria-hidden="true">
+    <app-icon name="building" />
   </span>
-
-  <!-- Actions: hide, then star; stacked star first on a phone. -->
-  <div class="job-row__actions flex gap-0.5 max-sm:flex-col-reverse">
-    <!-- "Not interested". -->
-    <button
-      app-icon-button
-      type="button"
-      class="job-row__hide"
-      [attr.aria-label]="'row.hide' | transloco"
-      (click)="hide($event)"
-    >
-      <app-icon name="dismiss" />
-    </button>
-    <!-- Favourite toggle, filled when starred. -->
-    <button
-      app-icon-button
-      type="button"
-      class="job-row__star"
-      [attr.aria-label]="(job().isFavorite ? 'row.removeFavorite' : 'row.addFavorite') | transloco"
-      [attr.aria-pressed]="job().isFavorite"
-      (click)="toggleFavorite($event)"
-    >
-      <app-icon [name]="job().isFavorite ? 'star-filled' : 'star'" />
-    </button>
+  <div class="min-w-0">
+    <p class="job-row__company">{{ job().company ?? ('row.unknownCompany' | transloco) }}</p>
+    <p class="job-row__place">
+      {{ place() }}
+      @if (job().isLocationApproximate && !job().isRemote) {
+        <span class="job-row__note">{{ 'row.approximateCity' | transloco }}</span>
+      }
+    </p>
   </div>
 </div>
+
+<!-- Title links to the detail; the link stretches over the whole card. -->
+<a class="job-row__title" [routerLink]="detailLink()" queryParamsHandling="preserve">
+  {{ job().title }}
+</a>
+
+<!-- One fact per line behind its glyph: stack, salary, then an unusual contract. -->
+<ul class="job-row__facts flex flex-col gap-2">
+  @if (stack(); as stack) {
+    <li class="job-row__fact flex items-start gap-3">
+      <app-icon class="job-row__icon" name="code" />
+      <span class="min-w-0">{{ stack }}</span>
+    </li>
+  }
+  <li
+    class="job-row__fact flex items-start gap-3 tabular-nums"
+    [class.job-row__fact--unknown]="!job().salary"
+  >
+    <app-icon class="job-row__icon" name="salary" />
+    <span class="job-row__salary min-w-0">{{ salary() }}</span>
+  </li>
+  @if (contract(); as contract) {
+    <li class="job-row__fact flex items-start gap-3">
+      <app-icon class="job-row__icon" name="contract" />
+      <span class="min-w-0">{{ contract }}</span>
+    </li>
+  }
+</ul>
+
+<!-- Footer: the "new" pill on the left, the publication pill on the right; the source is told in the detail. -->
+@if (isNew() || published) {
+  <p class="job-row__foot flex flex-wrap items-center gap-2">
+    @if (isNew()) {
+      <span class="job-row__pill job-row__pill--new">{{ 'row.new' | transloco }}</span>
+    }
+    @if (published) {
+      <span class="job-row__pill job-row__pill--date">{{ published }}</span>
+    }
+  </p>
+}
+
+<!-- Favourite toggle, filled when starred; above the stretched title link. -->
+<button
+  app-icon-button
+  type="button"
+  class="job-row__star"
+  [attr.aria-label]="(job().isFavorite ? 'row.removeFavorite' : 'row.addFavorite') | transloco"
+  [attr.aria-pressed]="job().isFavorite"
+  (click)="toggleFavorite($event)"
+>
+  <app-icon [name]="job().isFavorite ? 'star-filled' : 'star'" />
+</button>
