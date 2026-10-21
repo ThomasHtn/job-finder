@@ -28,14 +28,19 @@ export class IngestionScheduler implements OnApplicationBootstrap {
   ) {}
 
   /**
-   * Registers the cron once every module is ready, then optionally runs at once.
+   * Registers the cron once every module is ready, unless it is switched off, then optionally runs
+   * at once.
    */
   public onApplicationBootstrap(): void {
-    const expression = this.config.get('INGESTION_CRON', { infer: true });
-    const job = new CronJob(expression, () => this.trigger());
-    this.scheduler.addCronJob(CRON_JOB_NAME, job);
-    job.start();
-    this.logger.log(`Ingestion scheduled with cron "${expression}"`);
+    if (this.config.get('INGESTION_CRON_ENABLED', { infer: true })) {
+      const expression = this.config.get('INGESTION_CRON', { infer: true });
+      const job = new CronJob(expression, () => this.trigger());
+      this.scheduler.addCronJob(CRON_JOB_NAME, job);
+      job.start();
+      this.logger.log(`Ingestion scheduled with cron "${expression}"`);
+    } else {
+      this.logger.log('Ingestion cron disabled: runs only on demand');
+    }
 
     if (this.config.get('INGESTION_ON_STARTUP', { infer: true })) this.trigger();
   }

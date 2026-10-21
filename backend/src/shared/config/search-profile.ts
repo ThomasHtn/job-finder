@@ -18,7 +18,7 @@ export interface SearchArea {
   driveKm: number;
 
   /**
-   * City name understood by sources that search by place (Adzuna).
+   * City name understood by sources that search by place (Adzuna, Jooble).
    */
   city: string;
 

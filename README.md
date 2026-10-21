@@ -1,25 +1,50 @@
 <p align="center">
-  <img src="docs/media/hero.svg" width="900"
-    alt="Job Finder: three tabs, a job list already sorted" />
+  <img src="frontend/public/icon.svg" alt="The Job Finder icon: a teal dot over three lines" width="96">
+</p>
+
+<h1 align="center">Job Finder</h1>
+
+<p align="center">
+  <b>Your job watch, done before your coffee.</b><br>
+  Fifty-five sources, one list: permanent jobs, in your stack, within your commute.<br>
+  Only what is new since yesterday.
 </p>
 
 <p align="center">
-  <b>A job aggregator for one person: you.</b><br />
-  Permanent contracts only, your job only, only where you are willing to commute.<br />
-  No search form, no filters to tick again, no email alerts to sort through.
+  <img src="https://img.shields.io/badge/self--hosted-yours-0E6E63" alt="Self-hosted">
+  <img src="https://img.shields.io/badge/tracking-none-3FB8A6" alt="No tracking">
+  <img src="https://img.shields.io/badge/contracts-permanent_only-0E6E63" alt="Permanent contracts only">
+  <img src="https://img.shields.io/badge/auto--apply-never-3FB8A6" alt="Never applies for you">
 </p>
 
-<br />
+<p align="center">
+  <img src="docs/media/tour.webp" alt="Tour of Job Finder: the feed of what is new since the last visit, an offer opened next to the list, a star and two hidden offers, the full remote tab and the health of every source" width="100%">
+  <br>
+  <sub>A 40-second tour. Fictitious offers, real app.</sub>
+</p>
 
-## The problem
+## Job hunting is a daily chore
 
-Looking for a job means doing the same round every single day. France Travail in the morning,
-Adzuna at noon, APEC in the evening, Free-Work when you remember it, and the "Careers" pages of
-the companies you would actually like to join. Every time: retype the job title, tick permanent
-again, narrow the area again, scroll past yesterday's listings, stumble three times on the same
-offer republished by three platforms, and lose the one you had spotted the day before.
+France Travail with the morning coffee, Adzuna at lunch, APEC in the evening, Free-Work when you
+remember it, and the careers pages of the companies you would actually love to join. Retype the
+job title. Tick "permanent" again. Narrow the area again. Scroll past yesterday's listings. Meet the
+same offer three times, on three boards.
 
-An hour a day of handling, for three genuinely new offers.
+An hour a day, for three genuinely new offers.
+
+**Job Finder does the round for you.**
+
+## A peek inside
+
+<p align="center">
+  <img src="docs/media/screen-feed.png" alt="The feed: seven new offers since yesterday's visit" width="19%">
+  <img src="docs/media/screen-detail.png" alt="An offer: salary, contract, date and the stack it names" width="19%">
+  <img src="docs/media/screen-remote.png" alt="Full remote: its own tab, with a seen-up-to-here divider" width="19%">
+  <img src="docs/media/screen-sources.png" alt="Sources: the health of every board" width="19%">
+  <img src="docs/media/screen-dark.png" alt="The feed again, in the dark theme" width="19%">
+  <br>
+  <sub><b>The&nbsp;feed</b> · <b>The&nbsp;offer</b> · <b>Full&nbsp;remote</b> · <b>Sources</b> · <b>After&nbsp;dark</b></sub>
+</p>
 
 ## The round is done before you get there
 
@@ -27,34 +52,9 @@ An hour a day of handling, for three genuinely new offers.
   alt="Funnel: 55 sources, role filter, permanent filter, area filter,
     duplicate merging, your list" />
 
-Job Finder queries fifty-five sources every two hours and keeps only what concerns you. An offer
-published on three platforms shows up once: the most complete version is kept, the links to each
-one are gathered on the same row. An offer pulled from the sites disappears from the list. Your
-favorites stay.
-
-## Three tabs, nothing else
-
-<p>
-  <img src="docs/media/icons/pin.svg" width="20" align="middle" alt="" />
-  <b> Your area</b><br />
-  The jobs actually reachable from home, measured in driving time.
-</p>
-
-<p>
-  <img src="docs/media/icons/remote.svg" width="20" align="middle" alt="" />
-  <b> Full remote</b><br />
-  The one hundred percent remote jobs, wherever they are.
-</p>
-
-<p>
-  <img src="docs/media/icons/star.svg" width="20" align="middle" alt="" />
-  <b> Favorites</b><br />
-  What you have set aside. Protected, never purged.
-</p>
-
-On every row: the **New** badge on whatever arrived since your last visit, a star to keep it, a
-cross to never see the listing again. One click opens the detail next to the list without making
-it disappear; a second one sends you to the original listing to apply.
+Every two hours, Job Finder reads fifty-five sources and throws away everything that is not for
+you. An offer posted on three boards shows up once, in its most complete version, with a link to
+each board. An offer taken down disappears from the list. Your favorites stay.
 
 ## A commute area, not a radius
 
@@ -62,67 +62,75 @@ it disappear; a second one sends you to the original listing to apply.
   alt="The driving-time contour keeps a job 100 km away by motorway
     and drops a job 60 km away on back roads" />
 
-The area is a real driving-time contour, computed once then checked offer by offer. A job 100 km
-away by motorway gets in, a job 60 km away on back roads does not. When the source does not give
-the town, the offer is kept and flagged rather than dropped in silence.
+The area is a real driving-time contour. A job 100 km away by motorway gets in, a job 60 km away
+on back roads does not. When a listing hides the town, the offer is kept and flagged rather than
+dropped in silence.
 
-## What sets it apart
+## Why you will like it
 
-<p>
-  <img src="docs/media/icons/filter.svg" width="20" align="middle" alt="" />
-  <b> The sorting is strict</b><br />
-  Apprenticeships, internships, freelance missions and "business developer" roles never make it
-  through the door. Neither does a listing that mentions no technology from your stack.
-</p>
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/filter.svg" alt="" width="32"><br>
+      <b>Picky on your behalf</b><br>
+      Internships, apprenticeships, freelance missions and "business developer" roles never get
+      through the door. Neither does an ad that names none of your technologies.
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/star.svg" alt="" width="32"><br>
+      <b>Star it or bin it</b><br>
+      A <b>New</b> badge on whatever arrived since your last visit, a star to keep it, a cross to
+      never see it again. Favorites are never purged.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/remote.svg" alt="" width="32"><br>
+      <b>Remote has its own tab</b><br>
+      One hundred percent remote offers from anywhere, next to the ones a short drive away.
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/shield.svg" alt="" width="32"><br>
+      <b>Nothing moves without you</b><br>
+      No automatic application, no message sent in your name, no profile dropped anywhere. It
+      reads public listings, you decide.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/lock.svg" alt="" width="32"><br>
+      <b>It is yours</b><br>
+      Your machine or your server, one password. Favorites and history stay in your database. No
+      tracker, nothing resold.
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/media/icons/sliders.svg" alt="" width="32"><br>
+      <b>Any job, any town</b><br>
+      Job title, keywords, stack, home town and commute time live in one file. Angular developer
+      in Le Havre today, sales engineer in Nantes tomorrow.
+    </td>
+  </tr>
+</table>
 
-<p>
-  <img src="docs/media/icons/shield.svg" width="20" align="middle" alt="" />
-  <b> Nothing moves without you</b><br />
-  No automatic applications, no message sent on your behalf, no profile dropped anywhere. The app
-  reads public listings and presents them to you.
-</p>
+Add it to the home screen and it feels like an app: full screen, its own icon, French or English,
+light or dark, following the phone.
 
-<p>
-  <img src="docs/media/icons/lock.svg" width="20" align="middle" alt="" />
-  <b> It is yours</b><br />
-  The app runs on your machine or your server, behind a single password. Your favorites, your
-  hidden offers and your history never leave your database. No tracker is loaded, no data is
-  resold.
-</p>
-
-<p>
-  <img src="docs/media/icons/sliders.svg" width="20" align="middle" alt="" />
-  <b> It adapts to you</b><br />
-  The job title, the keywords, the technologies, the reference town and the commute time all fit
-  in one configuration page. Angular developer in Le Havre today, sales engineer in Nantes
-  tomorrow: same app, one file edited.
-</p>
-
-## A typical day
+## A typical morning
 
 |          |                                                                 |
 | -------- | --------------------------------------------------------------- |
 | **8:02** | You open the app from the icon on your home screen.             |
 | **8:03** | Four offers flagged New. Two do not speak to you: cross, cross. |
 | **8:05** | A third one interests you: star. You apply to the fourth.       |
-| **8:06** | Done. The day's watch is over.                                  |
+| **8:06** | Done. The day's watch is over. Coffee is still hot.             |
 
-## The sources covered
+## Where the offers come from
 
 France Travail (which also relays Indeed, DirectEmploi and its other partners), Adzuna, APEC,
-EURES, Free-Work, Jooble, and 49 company careers sites queried directly (Doctolib, Dataiku, Alan,
-Qonto, Swile, and in Normandy Sopra Steria, Matmut and Capgemini). A source that is unavailable or
-not configured is simply skipped: the others keep filling the list. The Sources tab shows each
-one's health, last successful sync, offer count and recent runs.
-
-## Where it lives
-
-Installed on a server, it opens from any browser, on desktop as well as on a phone. Added to the
-home screen, it behaves like a native app: full screen, its own icon, light or dark theme
-following your system.
-
-It speaks French and English. It opens in whichever of the two your browser asks for, and the
-button in the header switches it at any time, including before the password screen.
+EURES, Free-Work, Jooble, and 49 company careers sites read directly (Doctolib, Dataiku, Alan,
+Qonto, Swile, and in Normandy Sopra Steria, Matmut and Capgemini). A source that is down or not
+configured is simply skipped, the others keep filling the list, and the Sources tab tells you which
+one is sulking.
 
 ## Get it
 
@@ -138,7 +146,7 @@ Then open http://localhost:8001 and sign in with `job-finder-demo-password`.
 
 **Host it** for yourself: two Docker images (web and API, amd64) and a PostgreSQL database. Your server writes its own compose, chart or PaaS settings from the contract in [docs/deployment.md](docs/deployment.md): one route, a few variables, one database.
 
-**Hack on it**: `make setup && make dev`, then [CONTRIBUTING.md](CONTRIBUTING.md#up-and-running).
+**Hack on it**: `make setup && make db && make migrate && make dev`, then [CONTRIBUTING.md](CONTRIBUTING.md#up-and-running).
 
 ## Under the hood
 
@@ -164,3 +172,4 @@ Then open http://localhost:8001 and sign in with `job-finder-demo-password`.
 - [backend/README.md](backend/README.md): daily commands, password, probes, packages.
 - [frontend/README.md](frontend/README.md): daily commands, folders, translations, styles.
 - [docs/deployment.md](docs/deployment.md): images, routing, variables, backups, monitoring.
+- [tools/tour/README.md](tools/tour/README.md): how the tour and the screens above are recorded.

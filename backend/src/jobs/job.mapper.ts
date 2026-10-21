@@ -15,7 +15,6 @@ export function toSummary(job: JobModel, stackKeywords: readonly string[]): JobS
     postalCode: job.postalCode,
     isRemote: job.isRemote,
     isLocationApproximate: job.isLocationApproximate,
-    source: job.source,
     sourceLabel: job.sourceLabel,
     url: job.url,
     hasFullDescription: job.hasFullDescription,

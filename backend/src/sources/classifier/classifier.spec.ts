@@ -103,8 +103,8 @@ describe('isWanted', () => {
     expect(
       isWanted(
         job({
-          title: 'Développeur Full Stack H/F',
-          description: 'Poste basé à Rouen, à pourvoir rapidement.',
+          title: 'Développeur H/F',
+          description: 'Poste basé à Rouen.',
           hasFullDescription: false,
         }),
         PROFILE,
@@ -190,6 +190,29 @@ describe('detectPermanent', () => {
   it('trusts the source when it states the contract', () => {
     expect(detectPermanent(job({ isPermanent: true }))).toBe(true);
     expect(detectPermanent(job({ isPermanent: false, description: 'CDI' }))).toBe(false);
+  });
+
+  it('reads an explicit permanent wording over contracts named in passing', () => {
+    expect(
+      detectPermanent(job({ description: "CDI, nous cultivons l'apprentissage continu" })),
+    ).toBe(true);
+    expect(detectPermanent(job({ description: 'Permanent role, no freelance or interim' }))).toBe(
+      true,
+    );
+  });
+
+  it('trusts the title and label over the description', () => {
+    expect(
+      detectPermanent(job({ contractLabel: 'CDD', description: 'Possible CDI ensuite' })),
+    ).toBe(false);
+    expect(detectPermanent(job({ title: 'Développeur Java (stage)', description: 'CDI' }))).toBe(
+      false,
+    );
+  });
+
+  it('does not read "apprentissage" as an apprenticeship', () => {
+    expect(permanentFromLabel('Apprentissage')).toBeNull();
+    expect(permanentFromLabel('Apprenti')).toBe(false);
   });
 
   it('falls back to the text otherwise', () => {

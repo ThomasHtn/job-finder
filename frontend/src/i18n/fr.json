@@ -11,7 +11,8 @@
     "en": "anglais"
   },
   "language": {
-    "switchTo": "Passer en {{ name }}"
+    "switchTo": "Passer en {{ name }}",
+    "toggleLabel": "{{ code }}, {{ action }}"
   },
   "head": {
     "lastSync": "Dernière synchronisation :",

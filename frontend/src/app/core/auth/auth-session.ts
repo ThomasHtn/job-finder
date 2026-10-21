@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import type { LoginResponse } from '@job-finder/contract';
 
 import { API_ENDPOINTS } from '@core/http/api-endpoints';
-import { storageOf } from '@core/storage/storage.utils';
+import { storageOf, writeStorage } from '@core/storage/storage.utils';
 
 import { TOKEN_STORAGE_KEY } from './auth.constants';
 
@@ -44,7 +44,7 @@ export class AuthSession {
     const { token } = await firstValueFrom(
       this.http.post<LoginResponse>(API_ENDPOINTS.login, { password }),
     );
-    this.storage?.setItem(TOKEN_STORAGE_KEY, token);
+    writeStorage(this.storage, TOKEN_STORAGE_KEY, token);
     this.token.set(token);
   }
 
@@ -52,7 +52,7 @@ export class AuthSession {
    * Forgets the token, after the API refused it.
    */
   public signOut(): void {
-    this.storage?.removeItem(TOKEN_STORAGE_KEY);
+    writeStorage(this.storage, TOKEN_STORAGE_KEY, null);
     this.token.set(null);
   }
 }

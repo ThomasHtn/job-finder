@@ -20,11 +20,12 @@ function geo(overrides: Partial<GeoPort> = {}): GeoPort {
  * Hard filters and enrichment applied to every raw offer.
  */
 describe('prepareJob', () => {
-  it('keeps a matching offer inside the area and computes its dedupe hash', async () => {
+  it('keeps a matching offer inside the area, computes its dedupe hash and drops its coordinates', async () => {
     const prepared = await prepareJob(rawJob(), PROFILE, geo());
     expect(prepared).not.toBeNull();
     expect(prepared?.dedupeHash).toMatch(/^[0-9a-f]{40}$/);
     expect(prepared?.isRemote).toBe(false);
+    expect(prepared).not.toHaveProperty('latitude');
   });
 
   it('drops offers that do not match the profile', async () => {
@@ -94,9 +95,10 @@ describe('prepareJob', () => {
       g,
     );
     expect(g.geocode).toHaveBeenCalledWith('Montivilliers (76)');
+    expect(g.isWithinArea).toHaveBeenCalledWith(
+      expect.objectContaining({ latitude: 49.5, longitude: 0.1 }),
+    );
     expect(out).toMatchObject({
-      latitude: 49.5,
-      longitude: 0.1,
       city: 'Montivilliers',
       postalCode: '76290',
     });

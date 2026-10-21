@@ -1,9 +1,12 @@
 /**
  * Sets (or clears) the shared app password in the database and revokes every session.
- *   npm run auth:set-password -- <password>          development
- *   node dist/cli/set-password.js <password>         inside the image
+ *   printf %s "$P" | npm run auth:set-password -- -  development, read from stdin
+ *   printf %s "$P" | node dist/cli/set-password.js - inside the image
+ *   ... <password>                                   as an argument, visible to `ps` and the history
  *   ... --clear                                      remove it: the app becomes open
  */
+import { readFileSync } from 'node:fs';
+
 import { PrismaPg } from '@prisma/adapter-pg';
 import { config } from 'dotenv';
 
@@ -11,9 +14,14 @@ import { hashPassword } from '../auth/password-hash.js';
 import { PrismaClient } from '../generated/prisma/client.js';
 
 /**
- * The new password, or --clear.
+ * The new password, `-` to read it from stdin, or --clear.
  */
-const arg = process.argv[2];
+const given = process.argv[2];
+
+/**
+ * The password itself; stdin keeps it out of the process list. Its trailing newline is dropped.
+ */
+const arg = given === '-' ? readFileSync(0, 'utf8').replace(/\r?\n$/, '') : given;
 
 /**
  * Shortest password accepted.
@@ -21,7 +29,7 @@ const arg = process.argv[2];
 const MIN_PASSWORD_LENGTH = 8;
 
 if (!arg) {
-  console.error('usage: set-password <password> | --clear');
+  console.error('usage: set-password - (password on stdin) | <password> | --clear');
   process.exit(1);
 }
 if (arg !== '--clear' && arg.length < MIN_PASSWORD_LENGTH) {

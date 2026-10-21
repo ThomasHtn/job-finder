@@ -6,3 +6,5 @@ frontend/
 contract/
 CLAUDE.md
 .claude/
+graphify-out/
+.playwright-mcp/

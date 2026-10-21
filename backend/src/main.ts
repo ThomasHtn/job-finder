@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
     !(await app.get(AuthService).isRequired())
   ) {
     Logger.error(
-      'No app password set: every non-public route answers 503. Run `node dist/cli/set-password.js <password>` in the backend container.',
+      'No app password set: every non-public route answers 503. Pipe it to `node dist/cli/set-password.js -` in the backend container.',
       'Bootstrap',
     );
   }

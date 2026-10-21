@@ -14,8 +14,15 @@ import {
  * missing network never loops. Runs in the router's injection context.
  */
 export function reloadOnStaleBuild(error: NavigationError): void {
-  const window = inject(DOCUMENT).defaultView;
-  if (!window?.navigator.onLine || !isStaleBuildError(error.error) || reloadedLately(window)) {
+  reloadIfStaleBuild(inject(DOCUMENT).defaultView, error.error, error.url);
+}
+
+/**
+ * Loads `url` afresh when `error` is a chunk of a replaced build, under the same guards; shared by
+ * the router and the lazy pieces it does not load, such as the translations.
+ */
+export function reloadIfStaleBuild(window: Window | null, error: unknown, url: string): void {
+  if (!window?.navigator.onLine || !isStaleBuildError(error) || reloadedLately(window)) {
     return;
   }
   try {
@@ -23,7 +30,7 @@ export function reloadOnStaleBuild(error: NavigationError): void {
   } catch {
     return;
   }
-  window.location.assign(error.url);
+  window.location.assign(url);
 }
 
 /**

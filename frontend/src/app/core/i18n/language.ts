@@ -4,7 +4,7 @@ import { inject, Service, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 
-import { storageOf } from '@core/storage/storage.utils';
+import { storageOf, writeStorage } from '@core/storage/storage.utils';
 
 import { LOCALE_STORAGE_KEY } from './i18n.constants';
 import { AppLocale } from './i18n.model';
@@ -49,11 +49,12 @@ export class Language {
   }
 
   /**
-   * Switches language and remembers it for the next visit.
+   * Switches language and remembers it. The choice is stored first, so the reload that recovers a
+   * translation chunk gone with a deployment lands in the language asked for.
    */
   public async use(locale: AppLocale): Promise<void> {
+    writeStorage(this.storage, LOCALE_STORAGE_KEY, locale);
     await this.apply(locale);
-    this.storage?.setItem(LOCALE_STORAGE_KEY, locale);
   }
 
   /**

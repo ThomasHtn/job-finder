@@ -1,6 +1,8 @@
+import { permanentFromText } from '../classifier/detect-permanent.js';
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
-import { DETAILS_URL, DIRECT_HIRE, NON_PERMANENT_TEXT } from './eures.constants.js';
+import { toDate } from '../to-date.js';
+import { DETAILS_URL, DIRECT_HIRE } from './eures.constants.js';
 import type { EuresJob } from './eures.types.js';
 
 /**
@@ -21,7 +23,8 @@ export function toRawJob(job: EuresJob, areaLabel: string): RawJob {
     description,
     hasFullDescription: Boolean(description),
     contractLabel: isDirectHire ? 'Embauche directe' : (job.positionOfferingCode ?? null),
-    isPermanent: isDirectHire && !NON_PERMANENT_TEXT.test(`${job.title} ${description ?? ''}`),
+    /* A direct hire is permanent unless its text says otherwise. */
+    isPermanent: isDirectHire && (permanentFromText(job.title, description ?? '') ?? true),
     salary: null,
     /* Only the region is known, so no geocoding is attempted. */
     locationText: null,
@@ -32,6 +35,6 @@ export function toRawJob(job: EuresJob, areaLabel: string): RawJob {
     isRemote: false,
     isLocationApproximate: true,
     url: `${DETAILS_URL}/${job.id}?lang=fr`,
-    publishedAt: job.creationDate ? new Date(job.creationDate) : null,
+    publishedAt: toDate(job.creationDate),
   };
 }

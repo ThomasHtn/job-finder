@@ -10,7 +10,6 @@ export const STATUS_ERROR_CODES: ReadonlyMap<number, ApiErrorCode> = new Map([
   [0, 'UNAVAILABLE'],
   [HttpStatusCode.BadGateway, 'UNAVAILABLE'],
   [HttpStatusCode.GatewayTimeout, 'TIMEOUT'],
-  [HttpStatusCode.BadRequest, 'BAD_REQUEST'],
   [HttpStatusCode.Unauthorized, 'UNAUTHORIZED'],
   [HttpStatusCode.NotFound, 'NOT_FOUND'],
   [HttpStatusCode.Conflict, 'CONFLICT'],

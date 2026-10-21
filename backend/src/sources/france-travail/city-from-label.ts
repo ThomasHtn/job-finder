@@ -1,9 +1,9 @@
 /**
- * Labels come as "76 - LE HAVRE" or plain "Le Havre"; keep only the town name.
+ * Labels come as "76 - LE HAVRE", "2A - AJACCIO" or plain "Le Havre"; keep only the town name.
  */
 export function cityFromLabel(label: string | undefined): string | null {
   if (!label) return null;
-  const name = label.replace(/^\s*\d{2,3}\s*-\s*/, '').trim();
+  const name = label.replace(/^\s*(\d{2,3}|2[AB])\s*-\s*/i, '').trim();
   if (!name) return null;
   /* Most labels are fully uppercased, which reads badly in the UI. */
   return name === name.toUpperCase()

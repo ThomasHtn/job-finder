@@ -1,6 +1,7 @@
 import { permanentFromLabel } from '../classifier/detect-permanent.js';
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
+import { toDate } from '../to-date.js';
 import type { JoobleJob } from './jooble.types.js';
 import { joobleId } from './jooble-id.js';
 
@@ -16,7 +17,7 @@ export function toRawJob(job: JoobleJob): RawJob {
     company: job.company || null,
     companyDescription: null,
     description: htmlToText(job.snippet),
-    /* Jooble only exposes a snippet, so the UI must link out. */
+    /* Jooble only exposes a snippet, shown as an excerpt. */
     hasFullDescription: false,
     contractLabel: job.type || null,
     isPermanent: permanentFromLabel(job.type),
@@ -29,6 +30,6 @@ export function toRawJob(job: JoobleJob): RawJob {
     isRemote: false,
     isLocationApproximate: false,
     url: job.link,
-    publishedAt: job.updated ? new Date(job.updated) : null,
+    publishedAt: toDate(job.updated),
   };
 }

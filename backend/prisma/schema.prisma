@@ -29,15 +29,13 @@ model Job {
   company            String?
   companyDescription String?
   description        String?
-  /// False when the source only exposes a truncated description: the UI links out instead.
+  /// False when the source only exposes a truncated description: the UI flags it as an excerpt.
   hasFullDescription Boolean @default(false)
   contractLabel      String?
   salary             String?
 
   city                  String?
   postalCode            String?
-  latitude              Float?
-  longitude             Float?
   isRemote              Boolean @default(false)
   /// True when only the region is known, so the commute is unverified.
   isLocationApproximate Boolean @default(false)

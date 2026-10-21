@@ -25,7 +25,6 @@ const STATUSES: SourceStatus[] = [
         fetched: 0,
         kept: 0,
         inserted: 0,
-        updated: 0,
         error: 'timeout',
       },
     ],

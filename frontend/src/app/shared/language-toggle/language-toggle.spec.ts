@@ -21,7 +21,8 @@ describe('LanguageToggle', () => {
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button')!;
     expect(button.textContent?.trim()).toBe('FR');
-    expect(button.getAttribute('aria-label')).toBe('Passer en anglais');
+    expect(button.getAttribute('aria-label')).toBe('FR, Passer en anglais');
+    expect(button.getAttribute('title')).toBe('Passer en anglais');
   });
 
   it('switches to the other language and remembers it', async () => {
@@ -34,8 +35,28 @@ describe('LanguageToggle', () => {
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button')!;
     expect(button.textContent?.trim()).toBe('EN');
-    expect(button.getAttribute('aria-label')).toBe('Switch to French');
+    expect(button.getAttribute('aria-label')).toBe('EN, Switch to French');
     expect(localStorage.getItem('job-finder-locale')).toBe('en');
     expect(document.documentElement.lang).toBe('en');
+  });
+
+  it('reloads the page when the other language left with a deployment', async () => {
+    sessionStorage.clear();
+    const assign = vi.fn();
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
+      assign,
+      href: 'http://localhost/?tab=remote',
+    } as unknown as Location);
+    vi.spyOn(TestBed.inject(Language), 'use').mockRejectedValue(
+      new TypeError('Failed to fetch dynamically imported module: en-ABC.js'),
+    );
+    const fixture = TestBed.createComponent(LanguageToggle);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelector('button')!.click();
+    await fixture.whenStable();
+
+    expect(assign).toHaveBeenCalledWith('http://localhost/?tab=remote');
+    vi.restoreAllMocks();
   });
 });

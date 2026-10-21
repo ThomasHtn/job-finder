@@ -7,9 +7,9 @@ import { THIN_DESCRIPTION_LENGTH } from './classifier.constants.js';
 /**
  * True when the offer is the trade described by the profile: the title looks
  * like the role, is not excluded, and the ad mentions one of the wanted technologies.
- * Sources that only expose a short snippet (Adzuna) are exempted from the stack
- * check once the title has already matched the trade, since there is no fuller
- * text to search and the snippet alone would otherwise reject valid offers.
+ * A truncated description too short to judge (under THIN_DESCRIPTION_LENGTH) is
+ * exempted from the stack check once the title has matched the trade: there is
+ * no fuller text to search. A longer snippet, like Adzuna's, is still checked.
  */
 export function isWanted(job: RawJob, profile: SearchProfile): boolean {
   const title = normalize(job.title);

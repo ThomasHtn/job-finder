@@ -69,6 +69,7 @@ NODE_ENV=production
 PORT=3000
 # Every two hours; a restart never replays a crawl
 INGESTION_CRON=0 0 */2 * * *
+INGESTION_CRON_ENABLED=true
 INGESTION_ON_STARTUP=false
 # Offers not seen for this many days are deleted, favourites excepted
 INGESTION_STALE_DAYS=30
@@ -85,7 +86,7 @@ BACKEND_URL=http://jobfinder-backend:3000
 The whole app sits behind one shared password, hashed in the database. Without one the backend answers 503 on every route, so a forgotten password never publishes the API. Set or rotate it (this signs every session out):
 
 ```bash
-docker compose exec -T -e P='<password>' backend sh -c 'node dist/cli/set-password.js "$P"'
+read -rs P && printf %s "$P" | docker compose exec -T backend node dist/cli/set-password.js -
 ```
 
 Then open the site and try a wrong password. It should be refused.

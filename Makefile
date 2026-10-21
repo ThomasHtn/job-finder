@@ -47,7 +47,7 @@ ingest: ## Run one ingestion now against the development API (the database start
 password: ## Set the app password, typed without echo (empty clears it)
 	@read -rsp 'Password: ' pass; echo >&2; \
 	if [ -z "$$pass" ]; then npm run --silent auth:set-password -w backend -- --clear; \
-	else npm run --silent auth:set-password -w backend -- "$$pass"; fi
+	else printf '%s' "$$pass" | npm run --silent auth:set-password -w backend -- -; fi
 
 ##@ Quality
 

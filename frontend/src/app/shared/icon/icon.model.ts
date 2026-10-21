@@ -1,5 +1,5 @@
 /**
- * Every glyph of `public/assets/icons`, one single-colour SVG file per entry; keep both in step.
+ * Every glyph of `public/assets/icons`, one single-colour SVG file per entry; a spec keeps both in step.
  */
 export const ICON_NAMES = [
   'star',

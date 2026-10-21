@@ -24,4 +24,9 @@ describe('password hashing', () => {
     expect(verifyPassword(['s3cret-long'], stored)).toBe(false);
     expect(verifyPassword('s3cret-long', 'plain')).toBe(false);
   });
+
+  it('rejects any password against a hash whose key is not valid hex', () => {
+    expect(verifyPassword('anything', 'scrypt$aa$zz')).toBe(false);
+    expect(verifyPassword('anything', 'scrypt$aa$abcd')).toBe(false);
+  });
 });

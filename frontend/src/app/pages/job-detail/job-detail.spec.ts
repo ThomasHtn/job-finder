@@ -1,15 +1,18 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
 import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
 import { jobDetail, jobSummary } from '@core/jobs/job.fixtures';
 import { JobPatchBus } from '@core/jobs/job-patch-bus';
+import { Viewport } from '@core/layout/viewport';
 import { useCleanStorage } from '@core/storage/storage.fixtures';
 import { settle } from '@core/testing/testing.fixtures';
 
 import { JobDetailPage } from './job-detail';
+import { DISMISS_DISTANCE_PX } from './job-detail.constants';
 
 describe('JobDetailPage', () => {
   useFrenchTexts();
@@ -17,9 +20,20 @@ describe('JobDetailPage', () => {
 
   let http: HttpTestingController;
 
+  /**
+   * Whether the panel renders as a phone sheet, set before a spec opens it.
+   */
+  const compact = signal(false);
+
   beforeEach(() => {
+    compact.set(false);
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: Viewport, useValue: { isCompact: compact } },
+      ],
     });
     http = TestBed.inject(HttpTestingController);
   });
@@ -142,6 +156,72 @@ describe('JobDetailPage', () => {
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(navigate).toHaveBeenCalled();
+  });
+
+  it('takes the focus as a sheet over the feed, and leaves it alone in the column', async () => {
+    compact.set(true);
+    const sheet = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(sheet);
+    expect(document.activeElement).toBe(sheet.nativeElement.querySelector('.job-detail__close'));
+    sheet.destroy();
+
+    compact.set(false);
+    const column = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(column);
+    expect(document.activeElement).not.toBe(
+      column.nativeElement.querySelector('.job-detail__close'),
+    );
+  });
+
+  /**
+   * Drags the sheet handle from y=100 down by `distance` pixels and lets go.
+   */
+  async function drag(fixture: ComponentFixture<JobDetailPage>, distance: number): Promise<void> {
+    const bar = fixture.nativeElement.querySelector('.job-detail__bar') as HTMLElement;
+    bar.setPointerCapture = vi.fn();
+    bar.dispatchEvent(new MouseEvent('pointerdown', { clientY: 100 }));
+    bar.dispatchEvent(new MouseEvent('pointermove', { clientY: 100 + distance }));
+    await settle(fixture);
+    bar.dispatchEvent(new MouseEvent('pointerup'));
+    await settle(fixture);
+  }
+
+  it('closes a sheet pulled down past the threshold', async () => {
+    compact.set(true);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+
+    await drag(fixture, DISMISS_DISTANCE_PX + 1);
+
+    expect(navigate).toHaveBeenCalledWith(['/'], { queryParamsHandling: 'preserve' });
+  });
+
+  it('springs a sheet pulled down a little back into place', async () => {
+    compact.set(true);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+
+    await drag(fixture, DISMISS_DISTANCE_PX - 1);
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect((fixture.nativeElement as HTMLElement).style.transform).toBe('');
+  });
+
+  it('cannot be dragged in the column', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+
+    await drag(fixture, DISMISS_DISTANCE_PX + 1);
+
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it('asks again later when the offer could not load', async () => {

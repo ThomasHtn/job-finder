@@ -1,4 +1,5 @@
 import type { RawJob } from '../raw-job.js';
+import { toDate } from '../to-date.js';
 import type { AdzunaJob } from './adzuna.types.js';
 import { formatSalary } from './format-salary.js';
 
@@ -16,7 +17,7 @@ export function toRawJob(job: AdzunaJob, isRemote: boolean): RawJob {
     company: job.company?.display_name ?? null,
     companyDescription: null,
     description: job.description ?? null,
-    /* Adzuna only exposes a truncated snippet, so the UI must link out. */
+    /* Adzuna only exposes a truncated snippet, shown as an excerpt. */
     hasFullDescription: false,
     contractLabel: job.contract_type === 'permanent' ? 'CDI' : (job.contract_type ?? null),
     isPermanent: job.contract_type === 'permanent',
@@ -30,6 +31,6 @@ export function toRawJob(job: AdzunaJob, isRemote: boolean): RawJob {
     isRemote,
     isLocationApproximate: false,
     url: job.redirect_url,
-    publishedAt: job.created ? new Date(job.created) : null,
+    publishedAt: toDate(job.created),
   };
 }

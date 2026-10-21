@@ -1,6 +1,7 @@
 import { htmlToText } from '../../html-to-text.js';
 import type { RawJob } from '../../raw-job.js';
-import { TIMEOUT_MS } from '../ats.constants.js';
+import { toDate } from '../../to-date.js';
+import { ATS_PAGE_SIZE, TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
 import { isFrance } from '../france-location.js';
@@ -21,10 +22,10 @@ const DESCRIPTION_SECTIONS = [
  * SmartRecruiters postings API, one extra call per offer for the description.
  */
 export async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJob[]> {
-  /* Only the first 100 postings come back: a large board needs its `filter` to reach the area. */
+  /* Only the first page of postings comes back: a large board needs its `filter` to reach the area. */
   const filter = company.filter ? `&${company.filter}` : '';
   const body = await getJson<{ content?: SmartRecruitersPosting[] }>(
-    `https://api.smartrecruiters.com/v1/companies/${company.board}/postings?limit=100${filter}`,
+    `https://api.smartrecruiters.com/v1/companies/${company.board}/postings?limit=${ATS_PAGE_SIZE}${filter}`,
     TIMEOUT_MS,
   );
 
@@ -53,7 +54,7 @@ export async function fetchSmartRecruiters(company: CompanyConfig): Promise<RawJ
         isRemote: posting.location?.remote === true,
         isLocationApproximate: false,
         url: `https://jobs.smartrecruiters.com/${company.board}/${posting.id}`,
-        publishedAt: posting.releasedDate ? new Date(posting.releasedDate) : null,
+        publishedAt: toDate(posting.releasedDate),
       } satisfies RawJob;
     }),
   );

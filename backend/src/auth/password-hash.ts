@@ -19,6 +19,8 @@ export function verifyPassword(candidate: unknown, stored: string): boolean {
   const [scheme, saltHex, keyHex] = stored.split('$');
   if (scheme !== 'scrypt' || !saltHex || !keyHex) return false;
   const expected = Buffer.from(keyHex, 'hex');
+  /* A malformed key decodes short, and two empty buffers would compare equal. */
+  if (expected.length !== KEY_LENGTH) return false;
   const key = scryptSync(candidate, Buffer.from(saltHex, 'hex'), expected.length, SCRYPT_OPTIONS);
   return timingSafeEqual(key, expected);
 }

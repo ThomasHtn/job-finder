@@ -17,6 +17,7 @@ import {
 } from './jooble.constants.js';
 import { toRawJob } from './jooble.mapper.js';
 import type { JoobleJob, JoobleSearchResponse } from './jooble.types.js';
+import { joobleId } from './jooble-id.js';
 
 /**
  * Jooble connector: an aggregator, snippet-only, kept for the boards it reaches that others miss.
@@ -48,7 +49,8 @@ export class JoobleSource implements JobSourceConnector {
   }
 
   /**
-   * One query per leading keyword around the configured city, deduplicated by link.
+   * One query per leading keyword around the configured city, deduplicated by offer id: the link
+   * may carry query-specific parameters.
    * A failing query is skipped; the source only fails when every query did.
    */
   public async fetchJobs(): Promise<RawJob[]> {
@@ -58,7 +60,7 @@ export class JoobleSource implements JobSourceConnector {
     for (const [index, keywords] of this.profile.keywords.slice(0, MAX_KEYWORDS).entries()) {
       if (index > 0) await sleep(DELAY_BETWEEN_REQUESTS_MS);
       for (const job of await tally.run(`"${keywords}"`, () => this.search(keywords))) {
-        jobs.set(job.link, job);
+        jobs.set(joobleId(job.link), job);
       }
     }
     tally.throwIfAllFailed();

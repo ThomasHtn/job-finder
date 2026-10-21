@@ -31,6 +31,34 @@ describe('toRawJob (EURES)', () => {
     expect(job.isPermanent).toBe(false);
   });
 
+  it('keeps a direct hire permanent when its text only mentions other contracts in passing', () => {
+    const job = toRawJob(
+      {
+        id: 'abc',
+        title: 'Développeur',
+        description: "<p>Une culture de l'apprentissage continu.</p>",
+        positionOfferingCode: DIRECT_HIRE,
+      },
+      'Normandie',
+    );
+
+    expect(job.isPermanent).toBe(true);
+  });
+
+  it('trusts a fixed-term title over a permanent wording in the text', () => {
+    const job = toRawJob(
+      {
+        id: 'abc',
+        title: 'Développeur CDD',
+        description: 'Possible CDI ensuite',
+        positionOfferingCode: DIRECT_HIRE,
+      },
+      'Normandie',
+    );
+
+    expect(job.isPermanent).toBe(false);
+  });
+
   it('is not permanent without a direct hire', () => {
     expect(toRawJob({ id: 'abc', title: 'Développeur' }, 'Normandie').isPermanent).toBe(false);
   });

@@ -48,7 +48,7 @@ describe('authGuard', () => {
     expect(((await result) as UrlTree).toString()).toBe('/login');
   });
 
-  it('lets the page load when no password is set or the API is out of reach', async () => {
+  it('lets the page load when no password is set', async () => {
     const open = run();
     await new Promise((resolve) => setTimeout(resolve));
     http.expectOne('/api/config').flush({ areaLabel: 'Normandie', authRequired: false });

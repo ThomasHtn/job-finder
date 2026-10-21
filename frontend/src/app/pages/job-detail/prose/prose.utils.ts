@@ -5,7 +5,7 @@ import { DescriptionBlock } from './prose.model';
  * Sources hand us one plain-text blob with meaningful newlines. Restores its structure so a
  * job ad reads as paragraphs and lists instead of a wall of pre-wrapped text.
  */
-export function toDescriptionBlocks(text: string | null): DescriptionBlock[] {
+export function toDescriptionBlocks(text: string): DescriptionBlock[] {
   if (!text) {
     return [];
   }

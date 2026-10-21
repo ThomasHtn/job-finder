@@ -14,15 +14,8 @@ export function keywordRegex(keyword: string): RegExp {
 }
 
 /**
- * True when the normalized text contains the keyword.
- */
-function matchesKeyword(text: string, keyword: string): boolean {
-  return keywordRegex(keyword).test(text);
-}
-
-/**
  * True when the normalized text contains at least one of the keywords.
  */
 export function matchesAny(text: string, keywords: readonly string[]): boolean {
-  return keywords.some((keyword) => matchesKeyword(text, keyword));
+  return keywords.some((keyword) => keywordRegex(keyword).test(text));
 }

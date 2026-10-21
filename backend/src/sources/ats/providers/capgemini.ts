@@ -1,7 +1,8 @@
 import { permanentFromLabel } from '../../classifier/detect-permanent.js';
 import { htmlToText } from '../../html-to-text.js';
 import type { RawJob } from '../../raw-job.js';
-import { TIMEOUT_MS } from '../ats.constants.js';
+import { toDate } from '../../to-date.js';
+import { ATS_PAGE_SIZE, TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
 import { getJson } from '../get-json.js';
@@ -15,7 +16,7 @@ import type { CapgeminiJob } from './capgemini.types.js';
 export async function fetchCapgemini(company: CompanyConfig): Promise<RawJob[]> {
   const params = new URLSearchParams({
     page: '1',
-    size: '100',
+    size: String(ATS_PAGE_SIZE),
     country_code: 'fr-fr',
     search: company.board,
   });
@@ -48,7 +49,7 @@ export async function fetchCapgemini(company: CompanyConfig): Promise<RawJob[]> 
         isRemote: false,
         isLocationApproximate: false,
         url: job.apply_job_url,
-        publishedAt: job.updated_at ? new Date(job.updated_at) : null,
+        publishedAt: toDate(job.updated_at),
       } satisfies RawJob;
     });
 }

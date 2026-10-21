@@ -40,7 +40,7 @@ export interface RawJob {
   description: string | null;
 
   /**
-   * False when the source truncates the text: the UI links out instead of opening a detail page.
+   * False when the source truncates the text: the detail page flags it as an excerpt.
    */
   hasFullDescription: boolean;
 

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -91,6 +92,13 @@ export class JobDetailPage {
   private readonly scroller = viewChild<ElementRef<HTMLElement>>('scroller');
 
   /**
+   * The way back, focused when the panel opens as a sheet over the feed.
+   */
+  private readonly closeButton = viewChild<unknown, ElementRef<HTMLElement>>('closeButton', {
+    read: ElementRef,
+  });
+
+  /**
    * The offer, fetched again on every id change: the panel stays mounted while the reader moves
    * down the feed. The API marks it viewed.
    */
@@ -156,9 +164,15 @@ export class JobDetailPage {
 
   /**
    * Starts every offer at its top, tells the feed behind that the loaded one is now viewed, and
-   * follows a star pressed on its row in the feed.
+   * follows a star pressed on its row in the feed. A sheet takes the focus, the feed behind being
+   * out of reach.
    */
   constructor() {
+    afterNextRender(() => {
+      if (this.compact()) {
+        this.closeButton()?.nativeElement.focus();
+      }
+    });
     effect(() => {
       this.id();
       untracked(() => {

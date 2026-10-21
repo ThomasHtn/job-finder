@@ -10,17 +10,12 @@ import { config } from 'dotenv';
 import { hashPassword } from '../auth/password-hash.js';
 import { PrismaClient } from '../generated/prisma/client.js';
 import { computeDedupeHash } from '../ingestion/dedupe.js';
-import { DAY_MS } from '../shared/helpers/time.constants.js';
+import { DAY_MS, HOUR_MS, SECOND_MS } from '../shared/helpers/time.constants.js';
 
 /**
  * The password the README and the browser tests sign in with.
  */
 const DEMO_PASSWORD = 'job-finder-demo-password';
-
-/**
- * Milliseconds in an hour, for the fake dates.
- */
-const HOUR_MS = 60 * 60 * 1000;
 
 /**
  * Obviously fictitious offers covering every state a screen shows: on-site, approximate, remote,
@@ -98,13 +93,13 @@ const RUNS = [
   { source: 'FREE_WORK', error: 'Free-Work search failed (502): demo outage' },
 ] as const;
 
+/* Read before the guard, so a .env aimed at production is refused too. */
+config({ path: '.env', quiet: true });
+
 if (process.env.NODE_ENV === 'production' && !process.argv.includes('--demo')) {
   console.error('Refusing to seed a production database: pass --demo if this one is a demo.');
   process.exit(1);
 }
-
-/* The .env is only read in development; in a container the variables come from the environment. */
-config({ path: '.env', quiet: true });
 
 /**
  * Closed once the demo is written.
@@ -135,7 +130,7 @@ try {
       data: RUNS.map(({ source, error }) => ({
         source,
         startedAt: new Date(now - 2 * HOUR_MS),
-        finishedAt: new Date(now - 2 * HOUR_MS + 30_000),
+        finishedAt: new Date(now - 2 * HOUR_MS + 30 * SECOND_MS),
         fetched: error ? 0 : 40,
         kept: error ? 0 : 3,
         inserted: error ? 0 : 3,

@@ -12,7 +12,6 @@ export function jobSummary(overrides: Partial<JobSummary> = {}): JobSummary {
     postalCode: '76600',
     isRemote: false,
     isLocationApproximate: false,
-    source: 'FRANCE_TRAVAIL',
     sourceLabel: 'France Travail',
     url: 'https://example.test/offer',
     hasFullDescription: true,

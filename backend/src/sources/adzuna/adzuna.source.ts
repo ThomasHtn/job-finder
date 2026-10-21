@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../shared/config/env.schema.js';
 import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { collectPages } from '../collect-pages.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import type { SearchScope } from '../search-scope.js';
@@ -88,40 +89,51 @@ export class AdzunaSource implements JobSourceConnector {
   /**
    * One search, paged up to MAX_PAGES.
    */
-  private async search(criteria: Record<string, string>, scope: SearchScope): Promise<AdzunaJob[]> {
-    const collected: AdzunaJob[] = [];
+  private search(criteria: Record<string, string>, scope: SearchScope): Promise<AdzunaJob[]> {
+    return collectPages(
+      {
+        label: JSON.stringify(criteria),
+        maxPages: MAX_PAGES,
+        pageSize: RESULTS_PER_PAGE,
+        logger: this.logger,
+      },
+      (index) => this.searchPage(criteria, scope, index + 1),
+    );
+  }
 
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
-      const params = new URLSearchParams({
-        app_id: this.appId!,
-        app_key: this.appKey!,
-        results_per_page: String(RESULTS_PER_PAGE),
-        ...criteria,
-        /* Adzuna's permanent-contract filter; `contract_type` is output only and gets a 400. */
-        permanent: '1',
-        /* Newest first, so the single page holds what changed since the last run. */
-        sort_by: 'date',
-        max_days_old: String(MAX_DAYS_OLD),
-        'content-type': 'application/json',
-      });
-      if (scope === 'local') {
-        params.set('where', this.profile.area.city);
-        /* A straight line is never longer than the road: this radius holds the whole drive. */
-        params.set('distance', String(this.profile.area.driveKm));
-      }
-
-      const response = await this.request(`${BASE_URL}/${page}?${params}`);
-      if (!response.ok) {
-        throw new Error(await describeFailure(response));
-      }
-
-      const body = (await response.json()) as AdzunaSearchResponse;
-      const results = body.results ?? [];
-      collected.push(...results);
-      if (results.length < RESULTS_PER_PAGE) break;
+  /**
+   * One page of a search, one-based.
+   */
+  private async searchPage(
+    criteria: Record<string, string>,
+    scope: SearchScope,
+    page: number,
+  ): Promise<AdzunaJob[]> {
+    const params = new URLSearchParams({
+      app_id: this.appId!,
+      app_key: this.appKey!,
+      results_per_page: String(RESULTS_PER_PAGE),
+      ...criteria,
+      /* Adzuna's permanent-contract filter; `contract_type` is output only and gets a 400. */
+      permanent: '1',
+      /* Newest first, so the first page holds what changed since the last run. */
+      sort_by: 'date',
+      max_days_old: String(MAX_DAYS_OLD),
+      'content-type': 'application/json',
+    });
+    if (scope === 'local') {
+      params.set('where', this.profile.area.city);
+      /* A straight line is never longer than the road: this radius holds the whole drive. */
+      params.set('distance', String(this.profile.area.driveKm));
     }
 
-    return collected;
+    const response = await this.request(`${BASE_URL}/${page}?${params}`);
+    if (!response.ok) {
+      throw new Error(await describeFailure(response));
+    }
+
+    const body = (await response.json()) as AdzunaSearchResponse;
+    return body.results ?? [];
   }
 
   /**

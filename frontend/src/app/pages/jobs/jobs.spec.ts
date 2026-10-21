@@ -1,8 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
 import type { IngestionSummary, SourceStatus } from '@job-finder/contract';
@@ -12,6 +12,7 @@ import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
 import { jobList, jobSummary } from '@core/jobs/job.fixtures';
 import { JobPatchBus } from '@core/jobs/job-patch-bus';
 import { LAST_VISIT_STORAGE_KEY } from '@core/jobs/jobs.constants';
+import { Viewport } from '@core/layout/viewport';
 import { useCleanStorage } from '@core/storage/storage.fixtures';
 import { settle } from '@core/testing/testing.fixtures';
 
@@ -78,6 +79,33 @@ describe('JobsPage', () => {
   async function answerList(fixture: ComponentFixture<JobsPage>, jobs = [jobSummary()]) {
     http.expectOne((request) => request.url === '/api/jobs').flush(jobList(jobs));
     await settle(fixture);
+  }
+
+  /**
+   * Mounts the page under the router, the detail stub as its child, on `url`, on a phone when
+   * `compact`; answers the boot calls.
+   */
+  async function routed(url: string, compact = false) {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          {
+            path: '',
+            component: JobsPage,
+            children: [{ path: 'offres/:id', component: DetailStub }],
+          },
+        ]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: Viewport, useValue: { isCompact: signal(compact) } },
+      ],
+    });
+    http = TestBed.inject(HttpTestingController);
+    const harness = await RouterTestingHarness.create(url);
+    http.expectOne('/api/config').flush({ areaLabel: 'Seine-Maritime', authRequired: false });
+    http.expectOne('/api/ingestion/status').flush([]);
+    return harness;
   }
 
   /**
@@ -331,24 +359,7 @@ describe('JobsPage', () => {
   });
 
   it('marks the row of the offer the URL has open', async () => {
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        provideRouter([
-          {
-            path: '',
-            component: JobsPage,
-            children: [{ path: 'offres/:id', component: DetailStub }],
-          },
-        ]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
-    });
-    http = TestBed.inject(HttpTestingController);
-    const harness = await RouterTestingHarness.create('/offres/job-2');
-    http.expectOne('/api/config').flush({ areaLabel: 'Seine-Maritime', authRequired: false });
-    http.expectOne('/api/ingestion/status').flush([]);
+    const harness = await routed('/offres/job-2');
     http
       .expectOne((request) => request.url === '/api/jobs')
       .flush(jobList([jobSummary(), jobSummary({ id: 'job-2', title: 'Ouverte' })]));
@@ -357,5 +368,121 @@ describe('JobsPage', () => {
     const selected = harness.routeNativeElement?.querySelectorAll('.job-row--selected');
     expect(selected).toHaveLength(1);
     expect(selected?.[0].textContent).toContain('Ouverte');
+  });
+
+  it('closes the panel when the offer it shows is hidden', async () => {
+    const harness = await routed('/offres/job-1');
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush(jobList([jobSummary(), jobSummary({ id: 'job-2' })]));
+    await settle(harness.fixture);
+
+    harness.routeNativeElement!.querySelector<HTMLButtonElement>('.job-row__hide')!.click();
+    http.expectOne('/api/jobs/job-1/hide').flush(jobSummary());
+    await settle(harness.fixture);
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush(jobList([jobSummary({ id: 'job-2' })]));
+    await settle(harness.fixture);
+
+    expect(TestBed.inject(Router).url).toBe('/');
+  });
+
+  it('keeps the panel open when another offer is hidden', async () => {
+    const harness = await routed('/offres/job-1');
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush(jobList([jobSummary(), jobSummary({ id: 'job-2' })]));
+    await settle(harness.fixture);
+
+    harness.routeNativeElement!.querySelectorAll<HTMLButtonElement>('.job-row__hide')[1].click();
+    http.expectOne('/api/jobs/job-2/hide').flush(jobSummary({ id: 'job-2' }));
+    await settle(harness.fixture);
+    http.expectOne((request) => request.url === '/api/jobs').flush(jobList([jobSummary()]));
+    await settle(harness.fixture);
+
+    expect(TestBed.inject(Router).url).toBe('/offres/job-1');
+  });
+
+  it('puts the feed out of reach behind an open sheet, then gives the focus back', async () => {
+    const harness = await routed('/', true);
+    http.expectOne((request) => request.url === '/api/jobs').flush(jobList([jobSummary()]));
+    await settle(harness.fixture);
+    const page = harness.routeNativeElement!;
+    const link = page.querySelector<HTMLAnchorElement>('a.job-row__title')!;
+    link.focus();
+
+    await harness.navigateByUrl('/offres/job-1');
+    await settle(harness.fixture);
+
+    expect(page.querySelector('.jobs__feed')!.hasAttribute('inert')).toBe(true);
+    expect(page.querySelector('.jobs__head')!.hasAttribute('inert')).toBe(true);
+    expect(document.body.classList).toContain('is-sheet-open');
+
+    await harness.navigateByUrl('/');
+    await settle(harness.fixture);
+
+    expect(page.querySelector('.jobs__feed')!.hasAttribute('inert')).toBe(false);
+    expect(document.body.classList).not.toContain('is-sheet-open');
+    expect(document.activeElement).toBe(link);
+  });
+
+  it('leaves the feed reachable next to the column on a wide screen', async () => {
+    const harness = await routed('/offres/job-1');
+    http.expectOne((request) => request.url === '/api/jobs').flush(jobList([jobSummary()]));
+    await settle(harness.fixture);
+
+    expect(harness.routeNativeElement!.querySelector('.jobs__feed')!.hasAttribute('inert')).toBe(
+      false,
+    );
+  });
+
+  it('keeps the offers on screen when reloading them fails', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+
+    find<HTMLButtonElement>(fixture, '.job-row__star').click();
+    http.expectOne('/api/jobs/job-1/favorite').flush(jobSummary({ isFavorite: true }));
+    await settle(fixture);
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush(null, { status: 502, statusText: 'Bad Gateway' });
+    await settle(fixture);
+
+    expect(find(fixture, 'app-notice').textContent).toContain('Impossible de charger les offres');
+    expect(text(fixture)).toContain('Développeur Angular');
+    expect(fixture.nativeElement.querySelector('app-empty-state')).toBeNull();
+  });
+
+  it('blocks on the error when another tab fails to load, rather than showing the last one', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+
+    fixture.componentRef.setInput('tab', 'remote');
+    await settle(fixture);
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush(null, { status: 502, statusText: 'Bad Gateway' });
+    await settle(fixture);
+
+    expect(find(fixture, 'app-empty-state').textContent).toContain(
+      'Impossible de charger les offres',
+    );
+    expect(text(fixture)).not.toContain('Développeur Angular');
+  });
+
+  it('announces the outcome of a refresh, not the passing minutes', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+
+    expect(find(fixture, '#jobs-sync').hasAttribute('aria-live')).toBe(false);
+    find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
+    http.expectOne('/api/ingestion/run').flush(ingestion(2));
+    await settle(fixture);
+    await answerList(fixture);
+    http.expectOne('/api/ingestion/status').flush([]);
+    await settle(fixture);
+
+    expect(find(fixture, '[aria-live="polite"]').textContent).toContain('2 nouvelles offres.');
   });
 });

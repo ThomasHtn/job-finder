@@ -8,3 +8,19 @@ export function storageOf(document: Document): Storage | null {
     return null;
   }
 }
+
+/**
+ * Stores the value, or removes the key for `null`. A full or locked storage is ignored: what it
+ * keeps is a convenience, and a throw here would break the service writing it.
+ */
+export function writeStorage(storage: Storage | null, key: string, value: string | null): void {
+  try {
+    if (value === null) {
+      storage?.removeItem(key);
+    } else {
+      storage?.setItem(key, value);
+    }
+  } catch {
+    /* Nothing to do: the value simply does not outlive the page. */
+  }
+}

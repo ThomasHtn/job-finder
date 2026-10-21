@@ -3,6 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { translate } from '@jsverse/transloco';
 
 import { DAY_MS, HOUR_MS, MINUTE_MS } from '@core/date/date.constants';
+import { calendarDaysBetween } from '@core/date/date.utils';
 import { AppLocale } from '@core/i18n/i18n.model';
 
 /**
@@ -29,7 +30,7 @@ export class SyncLabelPipe implements PipeTransform {
     if (elapsed < DAY_MS) {
       return translate('sync.hoursAgo', { hours: Math.floor(elapsed / HOUR_MS) });
     }
-    if (elapsed < 2 * DAY_MS) {
+    if (calendarDaysBetween(new Date(value), now) === 1) {
       return translate('sync.yesterday');
     }
     const date = new Date(value).toLocaleDateString(translate('date.tag'));

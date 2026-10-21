@@ -33,6 +33,11 @@ if (!env.ORS_API_KEY) {
 const { center, driveKm } = env.searchProfile.area;
 
 /**
+ * ORS takes distance ranges in metres.
+ */
+const METERS_PER_KM = 1000;
+
+/**
  * Isochrone request: one location, one distance range, in metres.
  */
 const response = await fetch('https://api.openrouteservice.org/v2/isochrones/driving-car', {
@@ -43,7 +48,7 @@ const response = await fetch('https://api.openrouteservice.org/v2/isochrones/dri
   },
   body: JSON.stringify({
     locations: [[center.longitude, center.latitude]],
-    range: [driveKm * 1000],
+    range: [driveKm * METERS_PER_KM],
     range_type: 'distance',
     /* Smooths the spiky raw output without meaningfully changing coverage. */
     smoothing: 15,

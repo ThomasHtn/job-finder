@@ -110,9 +110,10 @@ export interface HeartbeatReport {
 }
 
 /**
- * A raw offer that passed the filters, with its similarity key computed.
+ * A raw offer that passed the filters, with its similarity key computed. Its coordinates only serve
+ * the area check, so they stop here.
  */
-export type PreparedJob = RawJob & { dedupeHash: string };
+export type PreparedJob = Omit<RawJob, 'latitude' | 'longitude'> & { dedupeHash: string };
 
 /**
  * The slice of GeoService the pipeline needs, so tests can fake it.

@@ -29,13 +29,19 @@ export const NEGATION_LOOKBEHIND = 12;
  * Wording of every contract that is not a permanent hire.
  */
 export const NON_PERMANENT =
-  /\bcdd\b|\binterim\b|\bstage\b|\bstagiaire\b|\balternance\b|\bapprenti|\bfreelance\b|\bintern\b|internship|working student|fixed[ -]?term|temporary|\bcontractor\b|duree determinee|part[ -]?time/;
+  /\bcdd\b|\binterim\b|\bstage\b|\bstagiaire\b|\balternance\b|\bapprenti(e|es|s)?\b|\bfreelance\b|\bintern\b|internship|working student|fixed[ -]?term|temporary|\bcontractor\b|duree determinee|part[ -]?time/;
 
 /**
  * English boards say "Full-time" or "Unlimited Contract" where French ones say CDI.
  */
 export const PERMANENT =
   /\bcdi\b|permanent|unlimited contract|duree indeterminee|full[ -]?time|temps plein/;
+
+/**
+ * Wording that can only mean a permanent hire, unlike "full-time" which a fixed-term contract
+ * also is. A description stating it wins over other contracts it mentions in passing.
+ */
+export const EXPLICIT_PERMANENT = /\bcdi\b|permanent|unlimited contract|duree indeterminee/;
 
 /**
  * Below this length a truncated description has nothing to check the stack against.

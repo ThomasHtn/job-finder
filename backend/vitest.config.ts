@@ -20,10 +20,10 @@ export default defineConfig({
       ],
       /* Floors only ever go up: raise them when coverage grows, never lower them. */
       thresholds: {
-        statements: 59,
-        branches: 56,
-        functions: 53,
-        lines: 60,
+        statements: 95,
+        branches: 87,
+        functions: 91,
+        lines: 95,
       },
     },
   },

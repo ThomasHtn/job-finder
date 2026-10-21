@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../shared/prisma/prisma.service.js';
-import type { FinishedRun, PersistOutcome, RunCounters } from './ingestion.types.js';
-import type { PreparedJob } from './ingestion.types.js';
+import type { FinishedRun, PersistOutcome, PreparedJob, RunCounters } from './ingestion.types.js';
 import { planMerge } from './plan-merge.js';
 
 /**
@@ -104,8 +103,6 @@ export class IngestionRepository {
       salary: job.salary,
       city: job.city,
       postalCode: job.postalCode,
-      latitude: job.latitude,
-      longitude: job.longitude,
       isRemote: job.isRemote,
       isLocationApproximate: job.isLocationApproximate,
       url: job.url,
@@ -118,15 +115,31 @@ export class IngestionRepository {
       where: {
         source_sourceId: { source: job.source, sourceId: job.sourceId },
       },
-      select: { id: true, alternativeUrls: true },
+      select: {
+        id: true,
+        url: true,
+        sourceLabel: true,
+        hasFullDescription: true,
+        alternativeUrls: true,
+      },
     });
     if (own) {
-      /* Links merged in from other sources stay; the source's own ones are added. */
-      const links = new Set([...own.alternativeUrls, ...(job.alternativeUrls ?? [])]);
-      links.delete(job.url);
+      /* A richer text merged in from another source must survive its own source's next pass. */
+      const keepsRicher = own.hasFullDescription && !job.hasFullDescription;
+      /* A merge promotion is the only way the row shows another source's label and link. */
+      const promoted = own.sourceLabel !== job.sourceLabel;
+      const { url, description, hasFullDescription, sourceLabel, ...facts } = data;
+      const links = new Set([...own.alternativeUrls, ...(job.alternativeUrls ?? []), job.url]);
+      if (promoted) links.add(own.url);
+      links.delete(keepsRicher ? own.url : job.url);
       await this.prisma.job.update({
         where: { id: own.id },
-        data: { ...data, alternativeUrls: [...links] },
+        data: {
+          ...(keepsRicher
+            ? facts
+            : { ...facts, url, description, hasFullDescription, sourceLabel }),
+          alternativeUrls: [...links],
+        },
       });
       return 'updated';
     }

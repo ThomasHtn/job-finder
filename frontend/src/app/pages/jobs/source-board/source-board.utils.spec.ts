@@ -14,7 +14,6 @@ function run(fetched: number, kept: number, inserted: number): SourceRun {
     fetched,
     kept,
     inserted,
-    updated: 0,
     error: null,
   };
 }

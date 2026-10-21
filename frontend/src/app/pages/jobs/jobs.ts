@@ -1,13 +1,16 @@
 import { DOCUMENT } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
   effect,
   inject,
+  Injector,
   input,
+  linkedSignal,
   signal,
   untracked,
 } from '@angular/core';
@@ -23,7 +26,7 @@ import { AppConfigApi } from '@core/config/app-config-api';
 import { Clock } from '@core/date/clock';
 import { API_ENDPOINTS } from '@core/http/api-endpoints';
 import { apiErrorCode, describeHttpError } from '@core/http/api-error.utils';
-import { lastValue } from '@core/http/resource.utils';
+import { lastValue, resourceValue } from '@core/http/resource.utils';
 import { isSingular } from '@core/i18n/i18n.utils';
 import { Language } from '@core/i18n/language';
 import { IngestionApi } from '@core/ingestion/ingestion-api';
@@ -145,6 +148,11 @@ export class JobsPage {
   protected readonly compact = inject(Viewport).isCompact;
 
   /**
+   * Schedules the focus handed back once the sheet has closed.
+   */
+  private readonly injector = inject(Injector);
+
+  /**
    * Bound from the `?tab=` query parameter, so a reload or a shared link reopens the same tab. A tab
    * switch replaces the history entry: back leaves the app instead of stepping through the tabs.
    */
@@ -179,6 +187,15 @@ export class JobsPage {
   private readonly data = lastValue<JobListResponse | null>(this.list, null);
 
   /**
+   * Tab whose offers `data` holds: a failed reload of that same tab leaves them on screen.
+   */
+  private readonly loadedTab = linkedSignal<JobListResponse | undefined, JobTab | null>({
+    source: () => resourceValue(this.list, undefined),
+    computation: (loaded, previous) =>
+      loaded ? untracked(this.currentTab) : (previous?.value ?? null),
+  });
+
+  /**
    * True while the list is being (re)loaded.
    */
   protected readonly loading = this.list.isLoading;
@@ -200,6 +217,16 @@ export class JobsPage {
   protected readonly detailOpen = signal(false);
 
   /**
+   * True while the panel covers the feed as a sheet: what lies behind is then out of reach.
+   */
+  protected readonly sheetOpen = computed(() => this.compact() && this.detailOpen());
+
+  /**
+   * Element focused when the sheet opened, given the focus back when it closes.
+   */
+  private sheetOpener: HTMLElement | null = null;
+
+  /**
    * True while a manual ingestion is running.
    */
   protected readonly refreshing = signal(false);
@@ -210,13 +237,30 @@ export class JobsPage {
   protected readonly actionError = signal<string | null>(null);
 
   /**
-   * Blocking error shown instead of the list: a list that could not load.
+   * Why the list of the current tab could not load.
    */
-  protected readonly error = computed(() => {
+  private readonly loadFailure = computed(() => {
     this.language.active();
     const failure = this.list.error();
     return failure ? translate('feed.loadFailed', { detail: describeHttpError(failure) }) : null;
   });
+
+  /**
+   * True when the offers on screen belong to the current tab, from an earlier load.
+   */
+  private readonly showsCurrentTab = computed(() => this.loadedTab() === this.currentTab());
+
+  /**
+   * Blocking error shown instead of the list: nothing of this tab to show.
+   */
+  protected readonly error = computed(() => (this.showsCurrentTab() ? null : this.loadFailure()));
+
+  /**
+   * A reload that failed while the tab's offers stay on screen: said above them.
+   */
+  protected readonly reloadError = computed(() =>
+    this.showsCurrentTab() ? this.loadFailure() : null,
+  );
 
   /**
    * Transient outcome of the last manual refresh.
@@ -326,8 +370,7 @@ export class JobsPage {
     });
 
     effect(() => {
-      const locked = this.compact() && this.detailOpen();
-      this.document.body.classList.toggle('is-sheet-open', locked);
+      this.document.body.classList.toggle('is-sheet-open', this.sheetOpen());
     });
 
     inject(DestroyRef).onDestroy(() => {
@@ -404,15 +447,40 @@ export class JobsPage {
   }
 
   /**
-   * Hides the offer, then reloads.
+   * Hides the offer, then reloads; an offer hidden while open leaves the panel with it.
    */
   protected async hideJob(id: string): Promise<void> {
     this.actionError.set(null);
     try {
       await this.jobsApi.hide(id);
+      if (id === this.selectedId()) {
+        void this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
+      }
       this.list.reload();
     } catch (error: unknown) {
       this.actionError.set(translate('feed.hideFailed', { detail: describeHttpError(error) }));
+    }
+  }
+
+  /**
+   * An offer rendered in the panel; as a sheet, it takes the focus from the row that opened it.
+   */
+  protected panelActivated(): void {
+    this.detailOpen.set(true);
+    if (this.compact()) {
+      this.sheetOpener = this.document.activeElement as HTMLElement | null;
+    }
+  }
+
+  /**
+   * The panel emptied; a closed sheet gives the focus back once the feed is reachable again.
+   */
+  protected panelDeactivated(): void {
+    this.detailOpen.set(false);
+    const opener = this.sheetOpener;
+    this.sheetOpener = null;
+    if (opener) {
+      afterNextRender(() => opener.focus(), { injector: this.injector });
     }
   }
 

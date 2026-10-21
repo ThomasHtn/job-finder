@@ -1,5 +1,6 @@
 import { htmlToText } from '../html-to-text.js';
 import type { RawJob } from '../raw-job.js';
+import { toDate } from '../to-date.js';
 import { toNumber } from '../to-number.js';
 import { DEFAULT_JOB_SLUG, DETAIL_URL, FULL_REMOTE, PERMANENT } from './free-work.constants.js';
 import type { FreeWorkJob } from './free-work.types.js';
@@ -37,6 +38,6 @@ export function toRawJob(job: FreeWorkJob): RawJob {
     /* Region-wide offers give the region centroid, which says nothing about the commute. */
     isLocationApproximate: Boolean(place) && !place?.locality,
     url: `${DETAIL_URL}/${job.job?.slug ?? DEFAULT_JOB_SLUG}/${job.slug}`,
-    publishedAt: job.publishedAt ? new Date(job.publishedAt) : null,
+    publishedAt: toDate(job.publishedAt),
   };
 }

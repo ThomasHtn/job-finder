@@ -27,4 +27,15 @@ describe('Notice', () => {
     expect(info.classList).not.toContain('notice--alert');
     expect(alert.classList).toContain('notice--alert');
   });
+
+  it('makes only the alert one announced as soon as it appears', () => {
+    const fixture = TestBed.createComponent(NoticeHost);
+    fixture.detectChanges();
+
+    const [info, alert] = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('app-notice'),
+    );
+    expect(info.getAttribute('role')).toBeNull();
+    expect(alert.getAttribute('role')).toBe('alert');
+  });
 });

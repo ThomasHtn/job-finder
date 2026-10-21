@@ -12,6 +12,14 @@ on:
       - 'package-lock.json'
       - 'eslint.base.js'
       - '.github/workflows/backend-ci.yml'
+      # The root format check runs here: the docs, workflows and formatter settings it reads.
+      - '*.md'
+      - 'docs/**'
+      - 'compose.yaml'
+      - '.github/**'
+      - '.prettierrc.json'
+      - '.prettierignore'
+      - '.editorconfig'
 
   workflow_dispatch:
 

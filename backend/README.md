@@ -47,7 +47,7 @@ The first one fixes lint and formatting, the second runs the tests once with the
 ## Run a single test
 
 ```bash
-npx vitest run src/geo/commuting-area.spec.ts
+npx vitest run src/geo/is-within-area.spec.ts
 npx vitest run -t "promotes the fuller description"
 ```
 
@@ -57,14 +57,15 @@ One shared password for the whole app, hashed (scrypt) in the database, never in
 rotate it, which also signs everybody out:
 
 ```bash
-npm run auth:set-password -- '<password>'
+make -C .. password                     # typed without echo, never on a command line
+printf %s "$P" | npm run auth:set-password -- -
 npm run auth:set-password -- --clear
 ```
 
 In the image, the same tool is compiled:
 
 ```bash
-docker compose exec backend node dist/cli/set-password.js '<password>'
+read -rs P && printf %s "$P" | docker compose exec -T backend node dist/cli/set-password.js -
 ```
 
 With no password, a production API (`NODE_ENV=production`) answers 503 `NO_PASSWORD` on every route

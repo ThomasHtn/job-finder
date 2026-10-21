@@ -55,9 +55,10 @@ jobs:
       contents: read
       packages: write
 
-    # One job for both images: the smoke test and the browser tests need them side by side.
+    # One job for both images: the smoke test and the browser tests need them side by side. Only main
+    # and release tags publish: a manual run on another branch must not leave deployable-looking tags.
     env:
-      PUSH: ${{ github.event_name != 'pull_request' }}
+      PUSH: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
 
     steps:
       - name: Checkout repository

@@ -12,7 +12,6 @@ export function toSourceRun(run: FinishedRun): SourceRun {
     fetched: run.fetched,
     kept: run.kept,
     inserted: run.inserted,
-    updated: run.updated,
     error: run.error,
   };
 }

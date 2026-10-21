@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { NavigationError } from '@angular/router';
 
 import { STALE_BUILD_RELOAD_KEY } from './stale-build.constants';
-import { isStaleBuildError, reloadOnStaleBuild } from './stale-build.utils';
+import { isStaleBuildError, reloadIfStaleBuild, reloadOnStaleBuild } from './stale-build.utils';
 
 describe('isStaleBuildError', () => {
   it('recognises a missing lazy bundle in Chrome, Firefox and Safari', () => {
@@ -58,6 +58,14 @@ describe('reloadOnStaleBuild', () => {
     expect(assign).toHaveBeenCalledOnce();
     expect(assign).toHaveBeenCalledWith('/offres/job-1');
     expect(sessionStorage.getItem(STALE_BUILD_RELOAD_KEY)).not.toBeNull();
+  });
+
+  it('reloads any page whose lazy piece is gone, and nothing on another error', () => {
+    reloadIfStaleBuild(window, new Error('Translation file 404'), '/');
+    expect(assign).not.toHaveBeenCalled();
+
+    reloadIfStaleBuild(window, new TypeError('Importing a module script failed.'), '/?tab=remote');
+    expect(assign).toHaveBeenCalledWith('/?tab=remote');
   });
 
   it('does nothing offline, where a reload would show the browser error page', () => {

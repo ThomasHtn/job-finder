@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { collectPages } from '../collect-pages.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import { SearchTally } from '../search-tally.js';
@@ -67,39 +68,38 @@ export class FreeWorkSource implements JobSourceConnector {
   }
 
   /**
-   * One search, paged until a short page or the cap. Fails when its first page does; a later
-   * page failing keeps what was collected.
+   * One search, paged until a short page or the cap.
    */
-  private async search(criteria: Record<string, string>): Promise<FreeWorkJob[]> {
-    const collected: FreeWorkJob[] = [];
+  private search(criteria: Record<string, string>): Promise<FreeWorkJob[]> {
+    return collectPages(
+      {
+        label: JSON.stringify(criteria),
+        maxPages: MAX_PAGES,
+        pageSize: PAGE_SIZE,
+        logger: this.logger,
+      },
+      (index) => this.searchPage(criteria, index + 1),
+    );
+  }
 
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
-      await sleep(DELAY_BETWEEN_REQUESTS_MS);
+  /**
+   * One page of a search, one-based.
+   */
+  private async searchPage(criteria: Record<string, string>, page: number): Promise<FreeWorkJob[]> {
+    await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
-      const params = new URLSearchParams({
-        ...criteria,
-        contracts: PERMANENT,
-        itemsPerPage: String(PAGE_SIZE),
-        page: String(page),
-      });
-      const response = await fetch(`${SEARCH_URL}?${params}`, {
-        headers: { Accept: 'application/json' },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
+    const params = new URLSearchParams({
+      ...criteria,
+      contracts: PERMANENT,
+      itemsPerPage: String(PAGE_SIZE),
+      page: String(page),
+    });
+    const response = await fetch(`${SEARCH_URL}?${params}`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!response.ok) throw new Error(`Free-Work search failed (${response.status})`);
 
-      if (!response.ok) {
-        if (collected.length === 0) throw new Error(`Free-Work search failed (${response.status})`);
-        this.logger.warn(
-          `Search ${JSON.stringify(criteria)} stopped at ${response.status}, keeping ${collected.length} offers`,
-        );
-        break;
-      }
-
-      const results = (await response.json()) as FreeWorkJob[];
-      collected.push(...results);
-      if (results.length < PAGE_SIZE) break;
-    }
-
-    return collected;
+    return (await response.json()) as FreeWorkJob[];
   }
 }

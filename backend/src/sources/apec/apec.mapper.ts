@@ -1,4 +1,5 @@
 import type { RawJob } from '../raw-job.js';
+import { toDate } from '../to-date.js';
 import { toNumber } from '../to-number.js';
 import { DETAIL_URL } from './apec.constants.js';
 import type { ApecOffer } from './apec.types.js';
@@ -33,6 +34,6 @@ export function toRawJob(offer: ApecOffer, isRemote: boolean): RawJob {
     isRemote,
     isLocationApproximate: false,
     url: `${DETAIL_URL}/${offer.numeroOffre}`,
-    publishedAt: offer.datePublication ? new Date(offer.datePublication) : null,
+    publishedAt: toDate(offer.datePublication),
   };
 }

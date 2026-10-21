@@ -28,11 +28,6 @@ export interface SourceRun {
   inserted: number;
 
   /**
-   * Offers already known from this source.
-   */
-  updated: number;
-
-  /**
    * Failure message, null on success.
    */
   error: string | null;

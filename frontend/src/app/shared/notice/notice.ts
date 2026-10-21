@@ -18,6 +18,7 @@ import { NoticeTone } from './notice.model';
   host: {
     class: 'notice',
     '[class.notice--alert]': "tone() === 'alert'",
+    '[attr.role]': "tone() === 'alert' ? 'alert' : null",
   },
 })
 export class Notice {

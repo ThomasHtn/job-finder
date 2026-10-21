@@ -19,7 +19,6 @@ function list(items: string[]) {
  */
 describe('toDescriptionBlocks', () => {
   it('returns nothing without a description', () => {
-    expect(toDescriptionBlocks(null)).toEqual([]);
     expect(toDescriptionBlocks('')).toEqual([]);
   });
 

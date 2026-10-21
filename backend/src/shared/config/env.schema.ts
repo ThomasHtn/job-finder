@@ -49,6 +49,10 @@ const rawSchema = z.object({
   SEARCH_AREA_FREE_WORK_LOCATIONS: requiredCsvList,
 
   INGESTION_CRON: cronExpression.default('0 0 */2 * * *'),
+  /**
+   * Off in the demo and its browser tests: they show seeded offers and never call the job boards.
+   */
+  INGESTION_CRON_ENABLED: booleanFromString(true),
   INGESTION_ON_STARTUP: booleanFromString(false),
   /**
    * Offers not seen for this many days are purged, favourites excepted.

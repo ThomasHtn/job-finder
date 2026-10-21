@@ -18,30 +18,29 @@ export async function prepareJob(
   if (!detectPermanent(raw)) return null;
 
   const isRemote = detectRemote(raw);
-  let { latitude, longitude, city, postalCode } = raw;
+  const { latitude, longitude, ...offer } = raw;
+  let { city, postalCode } = offer;
 
   /*
    * Remote offers are kept wherever they are. Region-only offers cannot be checked
    * against the commuting area, so they are kept and flagged rather than dropped.
    */
   if (!isRemote && !raw.isLocationApproximate) {
-    if (latitude === null || longitude === null) {
+    let point = latitude === null || longitude === null ? null : { latitude, longitude };
+    if (!point) {
       const query = raw.locationText ?? raw.city;
       const resolved = query ? await geo.geocode(query) : null;
       if (!resolved) return null;
-      latitude = resolved.latitude;
-      longitude = resolved.longitude;
+      point = resolved;
       city ??= resolved.city;
       postalCode ??= resolved.postalCode;
     }
-    if (!geo.isWithinArea({ latitude, longitude })) return null;
+    if (!geo.isWithinArea(point)) return null;
   }
 
   return {
-    ...raw,
+    ...offer,
     isRemote,
-    latitude,
-    longitude,
     city,
     postalCode,
     dedupeHash: computeDedupeHash(raw.title, raw.company, isRemote ? 'remote' : city),

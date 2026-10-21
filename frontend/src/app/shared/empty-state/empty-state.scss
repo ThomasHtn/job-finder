@@ -11,7 +11,6 @@
 
 /* What is, or is not, there. */
 .empty-state__title {
-  margin: 0;
   font-size: 1.0625rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -20,7 +19,6 @@
 /* What to do about it. */
 .empty-state__hint {
   max-width: 26rem;
-  margin: 0;
   color: var(--color-ink-3);
   font-size: 0.9375rem;
 }

@@ -1,5 +1,6 @@
 import { permanentFromLabel } from '../../classifier/detect-permanent.js';
 import type { RawJob } from '../../raw-job.js';
+import { toDate } from '../../to-date.js';
 import { TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
@@ -39,7 +40,7 @@ export async function fetchAshby(company: CompanyConfig): Promise<RawJob[]> {
         isRemote: job.isRemote === true || job.workplaceType === 'Remote',
         isLocationApproximate: false,
         url: job.jobUrl,
-        publishedAt: job.publishedAt ? new Date(job.publishedAt) : null,
+        publishedAt: toDate(job.publishedAt),
       } satisfies RawJob;
     });
 }

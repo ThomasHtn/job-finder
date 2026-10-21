@@ -21,11 +21,10 @@ export async function tabCount(page: Page, name: string): Promise<number> {
 /**
  * Opens the first offer of the feed and waits for its panel.
  */
-export async function openFirstOffer(page: Page): Promise<string> {
+export async function openFirstOffer(page: Page): Promise<void> {
   const link = page.getByRole('main').getByRole('link').first();
   const title = (await link.innerText()).trim();
   await link.click();
   await expect(page).toHaveURL(/\/offres\//);
   await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
-  return title;
 }

@@ -63,8 +63,8 @@ ENV NODE_ENV=production PORT=3000 CHECKPOINT_DISABLE=1 PRISMA_HIDE_UPDATE_MESSAG
 EXPOSE 3000
 
 # Probes the database too, like the uptime probe. No curl in this image: node's fetch does it.
-# The start period covers `prisma migrate deploy`, which runs before the API listens.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+# The start period covers `prisma migrate deploy`, probed every 2 s so dependants start as soon as it is up.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --start-interval=2s --retries=3 \
   CMD ["node", "-e", "fetch(`http://127.0.0.1:${process.env.PORT}/readyz`).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
 
 # Migrations first, so the API never serves an older schema; exec hands PID 1 and the signals to node.

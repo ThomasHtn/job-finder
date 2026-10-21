@@ -1,4 +1,5 @@
 import type { RawJob } from '../raw-job.js';
+import { toDate } from '../to-date.js';
 import { cityFromLabel } from './city-from-label.js';
 import { DETAIL_URL, FULL_REMOTE_TEXT } from './france-travail.constants.js';
 import type { FranceTravailOffer } from './france-travail.types.js';
@@ -40,6 +41,6 @@ export function toRawJob(offer: FranceTravailOffer): RawJob {
     alternativeUrls: (offer.origineOffre?.partenaires ?? [])
       .map((partner) => partner.url)
       .filter((url): url is string => Boolean(url)),
-    publishedAt: offer.dateCreation ? new Date(offer.dateCreation) : null,
+    publishedAt: toDate(offer.dateCreation),
   };
 }

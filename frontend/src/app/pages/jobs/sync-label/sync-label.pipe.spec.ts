@@ -35,6 +35,10 @@ describe('SyncLabelPipe', () => {
     expect(pipe.transform('2026-09-07T10:00:00.000Z', 'fr', now)).toBe('Hier');
   });
 
+  it('gives the date rather than yesterday when two midnights have passed, even within 48 hours', () => {
+    expect(pipe.transform('2026-09-06T13:00:00.000Z', 'fr', now)).toBe('Le 06/09/2026');
+  });
+
   it('falls back to the date beyond two days', () => {
     expect(pipe.transform('2026-09-01T10:00:00.000Z', 'fr', now)).toBe('Le 01/09/2026');
   });

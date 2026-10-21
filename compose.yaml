@@ -34,14 +34,16 @@ services:
       - path: backend/.env.example
       - path: backend/.env
         required: false
-    # Replaces the localhost database of the env files with the one above. No crawl at boot: the
-    # demo shows seeded offers, and CI never calls the real job boards.
+    # Replaces the localhost database of the env files with the one above. No crawl, at boot or on
+    # the cron, and no heartbeat: the demo shows seeded offers, and CI never calls the real job boards.
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://jobfinder:jobfinder@postgres:5432/jobfinder
       PORT: 3000
       CORS_ORIGIN: http://localhost:8001
       INGESTION_ON_STARTUP: 'false'
+      INGESTION_CRON_ENABLED: 'false'
+      INGESTION_HEARTBEAT_URL: ''
     read_only: true
     tmpfs:
       - /tmp

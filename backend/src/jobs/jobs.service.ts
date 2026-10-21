@@ -35,7 +35,7 @@ export class JobsService {
     const [jobs, counts, lastRun] = await Promise.all([
       this.prisma.job.findMany({
         where: tabWhere(tab),
-        orderBy: [{ publishedAt: 'desc' }, { firstSeenAt: 'desc' }],
+        orderBy: [{ publishedAt: { sort: 'desc', nulls: 'last' } }, { firstSeenAt: 'desc' }],
       }),
       this.counts(),
       this.prisma.ingestionRun.findFirst({
@@ -79,13 +79,14 @@ export class JobsService {
   }
 
   /**
-   * "Not interested": excludes the offer from every tab. No undo in the UI yet.
+   * "Not interested": excludes the offer from every tab. No undo in the UI yet. The star goes too,
+   * or the stale purge, which spares favourites, would keep the invisible row forever.
    */
   public async hide(id: string): Promise<JobSummary> {
     await this.requireJob(id);
     const updated = await this.prisma.job.update({
       where: { id },
-      data: { isHidden: true },
+      data: { isHidden: true, isFavorite: false },
     });
     return toSummary(updated, this.profile.stackKeywords);
   }

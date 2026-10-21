@@ -3,7 +3,8 @@ import { XMLParser } from 'fast-xml-parser';
 import { permanentFromLabel } from '../../classifier/detect-permanent.js';
 import { htmlToText } from '../../html-to-text.js';
 import type { RawJob } from '../../raw-job.js';
-import { TIMEOUT_MS } from '../ats.constants.js';
+import { toDate } from '../../to-date.js';
+import { TALENTSOFT_FRENCH_LCID, TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
 import { companyFields } from '../company-fields.js';
 import type { TalentsoftFeed } from './talentsoft.types.js';
@@ -24,7 +25,7 @@ const parser = new XMLParser({
 export async function fetchTalentsoft(company: CompanyConfig): Promise<RawJob[]> {
   const filter = company.filter ? `&${company.filter}` : '';
   const response = await fetch(
-    `https://${company.board}/handlers/offerRss.ashx?LCID=1036${filter}`,
+    `https://${company.board}/handlers/offerRss.ashx?LCID=${TALENTSOFT_FRENCH_LCID}${filter}`,
     { signal: AbortSignal.timeout(TIMEOUT_MS) },
   );
   if (!response.ok) {
@@ -59,7 +60,7 @@ export async function fetchTalentsoft(company: CompanyConfig): Promise<RawJob[]>
         isRemote: false,
         isLocationApproximate: false,
         url: item.link!,
-        publishedAt: item.pubDate ? new Date(item.pubDate) : null,
+        publishedAt: toDate(item.pubDate),
       } satisfies RawJob;
     });
 }

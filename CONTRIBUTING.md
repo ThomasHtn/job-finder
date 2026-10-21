@@ -64,6 +64,7 @@ backend/            the API (NestJS, Prisma), which reads the job boards and kee
 frontend/           the app (Angular), served by nginx, which relays /api to the backend
 docs/deployment.md  what a server needs to run the images
 compose.yaml        the whole app on your machine, also started by every delivery
+tools/tour/         films the README tour and screens from the real app (tools/tour/README.md)
 ```
 
 The three folders are npm workspaces sharing one lockfile at the root, and one ESLint base (`eslint.base.js`) each extends. The backend and frontend READMEs hold the day-to-day commands of each side.

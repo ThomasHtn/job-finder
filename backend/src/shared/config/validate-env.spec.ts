@@ -41,6 +41,7 @@ describe('validateEnv', () => {
     const env = validateEnv(MINIMAL);
     expect(env.INGESTION_STALE_DAYS).toBe(30);
     expect(env.INGESTION_ON_STARTUP).toBe(false);
+    expect(env.INGESTION_CRON_ENABLED).toBe(true);
   });
 
   it('rejects a malformed cron expression', () => {

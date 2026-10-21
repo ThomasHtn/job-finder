@@ -217,9 +217,12 @@ describe('IngestionService.status', () => {
       jobCount: 4,
       runs: [
         {
-          ...run,
           startedAt: started.toISOString(),
           finishedAt: at.toISOString(),
+          fetched: 5,
+          kept: 2,
+          inserted: 1,
+          error: run.error,
         },
       ],
     });

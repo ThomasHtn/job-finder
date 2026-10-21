@@ -4,8 +4,8 @@ import { inject, Service, signal } from '@angular/core';
 import { COMPACT_QUERY } from './layout.constants';
 
 /**
- * Which shell the layout is in. The CSS owns the layout itself; this only decides which
- * navigation markup exists, so a bottom bar and a header strip never coexist in the a11y tree.
+ * Which shell the layout is in. The CSS owns the layout itself; this drives what CSS cannot: which
+ * navigation markup exists, the sheet's inertness and focus, and the gestures it allows.
  */
 @Service()
 export class Viewport {

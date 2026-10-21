@@ -1,5 +1,3 @@
-import type { JobSource } from './job-source.js';
-
 /**
  * What the list endpoint returns. The full description is left to the detail endpoint.
  */
@@ -38,11 +36,6 @@ export interface JobSummary {
    * True when only the department is known, so the commute cannot be guaranteed.
    */
   isLocationApproximate: boolean;
-
-  /**
-   * Source the offer was first ingested from.
-   */
-  source: JobSource;
 
   /**
    * Human readable origin, e.g. "France Travail" or "Doctolib (Greenhouse)".

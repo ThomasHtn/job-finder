@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../shared/config/env.schema.js';
 import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SECOND_MS } from '../../shared/helpers/time.constants.js';
+import { collectPages } from '../collect-pages.js';
 import type { JobSourceConnector } from '../job-source-connector.js';
 import type { RawJob } from '../raw-job.js';
 import type { SearchScope } from '../search-scope.js';
@@ -98,52 +100,53 @@ export class FranceTravailSource implements JobSourceConnector {
   }
 
   /**
-   * One search, paged until a short page or the cap. Fails when its first page does; a later
-   * page failing keeps what was collected.
+   * One search, paged until a short page or the cap.
    */
-  private async search(
+  private search(
     criteria: Record<string, string>,
     scope: SearchScope,
   ): Promise<FranceTravailOffer[]> {
-    const maxPages = scope === 'local' ? LOCAL_MAX_PAGES : REMOTE_MAX_PAGES;
-    const collected: FranceTravailOffer[] = [];
+    return collectPages(
+      {
+        label: JSON.stringify(criteria),
+        maxPages: scope === 'local' ? LOCAL_MAX_PAGES : REMOTE_MAX_PAGES,
+        pageSize: PAGE_SIZE,
+        logger: this.logger,
+      },
+      (page) => this.searchPage(criteria, scope, page),
+    );
+  }
 
-    for (let page = 0; page < maxPages; page += 1) {
-      const from = page * PAGE_SIZE;
-      const params = new URLSearchParams({
-        ...criteria,
-        typeContrat: 'CDI',
-        /* Newest first, so the page cap only ever drops the oldest offers. */
-        sort: '1',
-        range: `${from}-${from + PAGE_SIZE - 1}`,
-      });
-      if (scope === 'local') {
-        params.set('commune', this.profile.area.insee);
-        /* A straight line is never longer than the road: this radius holds the whole drive. */
-        params.set('distance', String(this.profile.area.driveKm));
-      }
-
-      const response = await this.searchRequest(params);
-
-      /* 204: no result for this query. 206, a partial page, is still ok. */
-      if (response.status === 204) break;
-      if (!response.ok) {
-        if (collected.length === 0) {
-          throw new Error(`France Travail search failed (${response.status})`);
-        }
-        this.logger.warn(
-          `Search ${JSON.stringify(criteria)} stopped at ${response.status}, keeping ${collected.length} offers`,
-        );
-        break;
-      }
-
-      const body = (await response.json()) as FranceTravailSearchResponse;
-      const results = body.resultats ?? [];
-      collected.push(...results);
-      if (results.length < PAGE_SIZE) break;
+  /**
+   * One page of a search, zero-based.
+   */
+  private async searchPage(
+    criteria: Record<string, string>,
+    scope: SearchScope,
+    page: number,
+  ): Promise<FranceTravailOffer[]> {
+    const from = page * PAGE_SIZE;
+    const params = new URLSearchParams({
+      ...criteria,
+      typeContrat: 'CDI',
+      /* Newest first, so the page cap only ever drops the oldest offers. */
+      sort: '1',
+      range: `${from}-${from + PAGE_SIZE - 1}`,
+    });
+    if (scope === 'local') {
+      params.set('commune', this.profile.area.insee);
+      /* A straight line is never longer than the road: this radius holds the whole drive. */
+      params.set('distance', String(this.profile.area.driveKm));
     }
 
-    return collected;
+    const response = await this.searchRequest(params);
+
+    /* 204: no result for this query. 206, a partial page, is still ok. */
+    if (response.status === 204) return [];
+    if (!response.ok) throw new Error(`France Travail search failed (${response.status})`);
+
+    const body = (await response.json()) as FranceTravailSearchResponse;
+    return body.resultats ?? [];
   }
 
   /**
@@ -162,7 +165,7 @@ export class FranceTravailSource implements JobSourceConnector {
 
       const retryAfter = Number(response.headers.get('Retry-After'));
       const wait =
-        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : RETRY_BACKOFF_MS;
+        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * SECOND_MS : RETRY_BACKOFF_MS;
       this.logger.warn(`Rate limited, waiting ${wait}ms (retry ${attempt + 1}/${MAX_RETRIES})`);
       await sleep(wait);
     }
@@ -193,7 +196,7 @@ export class FranceTravailSource implements JobSourceConnector {
     const token = (await response.json()) as TokenResponse;
     this.token = {
       value: token.access_token,
-      expiresAt: Date.now() + (token.expires_in - TOKEN_REFRESH_MARGIN_S) * 1000,
+      expiresAt: Date.now() + (token.expires_in - TOKEN_REFRESH_MARGIN_S) * SECOND_MS,
     };
     return this.token.value;
   }

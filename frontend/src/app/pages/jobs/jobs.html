@@ -1,5 +1,5 @@
 <!-- Header: who we are, the tabs, and the way to read the sources again with when it last happened. -->
-<header class="jobs__head">
+<header class="jobs__head" [attr.inert]="sheetOpen() ? '' : null">
   <div class="jobs__head-row flex items-center">
     <!-- The wordmark goes once the row has to hold two buttons: the mark alone still signs it. -->
     <app-brand [showName]="!compact()" />
@@ -34,7 +34,7 @@
     >
       <app-icon class="jobs__refresh-icon" name="refresh" />
       <!-- The sync time is the one fact the reader needs before trusting the list, on any screen. -->
-      <span id="jobs-sync" class="min-w-0 truncate tabular-nums" aria-live="polite">
+      <span id="jobs-sync" class="min-w-0 truncate tabular-nums">
         <span class="sr-only">{{ 'head.lastSync' | transloco }}</span>
         @if (refreshMessage(); as message) {
           <span class="jobs__stamp-fresh">{{ message }}</span>
@@ -45,6 +45,9 @@
         }
       </span>
     </button>
+
+    <!-- Announces the outcome of a refresh once, where the ageing sync time would every minute. -->
+    <span class="sr-only" aria-live="polite">{{ refreshMessage() }}</span>
   </div>
 
   <!-- Thin progress line under the bar while anything loads. -->
@@ -67,7 +70,11 @@
     </main>
   } @else {
     <!-- The feed itself. -->
-    <main class="jobs__feed" [attr.aria-busy]="loading() || refreshing()">
+    <main
+      class="jobs__feed"
+      [attr.aria-busy]="loading() || refreshing()"
+      [attr.inert]="sheetOpen() ? '' : null"
+    >
       <!-- What changed since last time: the first thing to read, and a way to see only that. -->
       @if (newCount() > 0) {
         <div class="jobs__intro flex flex-wrap items-end gap-x-5 gap-y-3">
@@ -91,8 +98,10 @@
         </div>
       }
 
-      <!-- A refresh, star or hide that failed: said above the list, which stays as it was. -->
+      <!-- A refresh, star, hide or reload that failed: said above the list, which stays as it was. -->
       @if (actionError(); as message) {
+        <app-notice class="jobs__notice" tone="alert">{{ message }}</app-notice>
+      } @else if (reloadError(); as message) {
         <app-notice class="jobs__notice" tone="alert">{{ message }}</app-notice>
       }
 
@@ -179,7 +188,7 @@
     <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
     <aside class="jobs__panel flex flex-col" [class.jobs__panel--open]="detailOpen()">
       <!-- The detail child route renders here; its activation is what opens the panel. -->
-      <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
+      <router-outlet (activate)="panelActivated()" (deactivate)="panelDeactivated()" />
 
       <!-- Placeholder for the empty column; hidden on a phone, where the panel stays closed. -->
       @if (!detailOpen()) {
@@ -193,6 +202,7 @@
 @if (compact()) {
   <app-job-tabs
     variant="bar"
+    [attr.inert]="sheetOpen() ? '' : null"
     [label]="'tabs.label' | transloco"
     [items]="tabItems()"
     [current]="currentView()"

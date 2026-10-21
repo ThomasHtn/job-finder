@@ -1,4 +1,4 @@
-import { DAY_MS } from '../shared/helpers/time.constants.js';
+import { DAY_MS, MINUTE_MS } from '../shared/helpers/time.constants.js';
 
 /**
  * How long a login stays valid.
@@ -13,4 +13,4 @@ export const MAX_ATTEMPTS = 5;
 /**
  * Sliding window over which the sign-in attempts are counted.
  */
-export const WINDOW_MS = 15 * 60 * 1000;
+export const WINDOW_MS = 15 * MINUTE_MS;

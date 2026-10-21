@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Service } from '@angular/core';
 
-import { storageOf } from '@core/storage/storage.utils';
+import { storageOf, writeStorage } from '@core/storage/storage.utils';
 
 import { LAST_VISIT_STORAGE_KEY } from './jobs.constants';
 
@@ -26,6 +26,6 @@ export class LastVisit {
    * Stamps the current visit right away, so a reload counts as a new visit.
    */
   constructor() {
-    this.storage?.setItem(LAST_VISIT_STORAGE_KEY, new Date().toISOString());
+    writeStorage(this.storage, LAST_VISIT_STORAGE_KEY, new Date().toISOString());
   }
 }

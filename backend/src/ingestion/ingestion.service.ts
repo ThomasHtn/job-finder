@@ -13,8 +13,7 @@ import { describeCrash, describeRun } from './describe-run.js';
 import { emptySummary } from './empty-summary.js';
 import { RECENT_RUNS } from './ingestion.constants.js';
 import { IngestionRepository } from './ingestion.repository.js';
-import type { SourceFailure } from './ingestion.types.js';
-import type { GeoPort } from './ingestion.types.js';
+import type { GeoPort, SourceFailure } from './ingestion.types.js';
 import { IngestionHeartbeat } from './ingestion-heartbeat.js';
 import { prepareJob } from './job-preparer.js';
 import { toSourceRun } from './to-source-run.js';
@@ -146,6 +145,7 @@ export class IngestionService {
       let kept = 0;
       let inserted = 0;
       let updated = 0;
+      let merged = 0;
 
       for (const raw of rawJobs) {
         const prepared = await prepareJob(raw, this.profile, this.geo);
@@ -155,13 +155,14 @@ export class IngestionService {
         const outcome = await this.repository.persistJob(prepared);
         if (outcome === 'inserted') inserted += 1;
         else if (outcome === 'updated') updated += 1;
-        else summary.merged += 1;
+        else merged += 1;
       }
 
       summary.fetched += rawJobs.length;
       summary.kept += kept;
       summary.inserted += inserted;
       summary.updated += updated;
+      summary.merged += merged;
 
       await this.repository.finishRun(runId, {
         fetched: rawJobs.length,
