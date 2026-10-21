@@ -114,4 +114,59 @@ describe('SettingsMenu', () => {
     expect(document.activeElement).toBe(trigger(host));
     host.remove();
   });
+
+  it('keeps the panel open on a press inside it, and ignores Escape while closed', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    document.body.append(host);
+    const focused = document.activeElement;
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(document.activeElement).toBe(focused);
+
+    trigger(host).click();
+    fixture.detectChanges();
+    host
+      .querySelector('.settings-menu__heading')!
+      .dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    fixture.detectChanges();
+    expect(host.querySelector('.settings-menu__panel')).not.toBeNull();
+    host.remove();
+  });
+
+  it('only closes when the language picked is already in use', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    const use = vi.spyOn(TestBed.inject(Language), 'use');
+
+    trigger(host).click();
+    fixture.detectChanges();
+    host.querySelector<HTMLButtonElement>('.settings-menu__item[lang="fr"]')!.click();
+    fixture.detectChanges();
+
+    expect(use).not.toHaveBeenCalled();
+    expect(host.querySelector('.settings-menu__panel')).toBeNull();
+  });
+
+  it('reloads the page when the other language left with a deployment', async () => {
+    sessionStorage.clear();
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    const assign = vi.fn();
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
+      assign,
+      href: 'http://localhost/?tab=remote',
+    } as unknown as Location);
+    vi.spyOn(TestBed.inject(Language), 'use').mockRejectedValue(
+      new TypeError('Failed to fetch dynamically imported module: en-ABC.js'),
+    );
+
+    trigger(host).click();
+    fixture.detectChanges();
+    host.querySelector<HTMLButtonElement>('.settings-menu__item[lang="en"]')!.click();
+    await fixture.whenStable();
+
+    expect(assign).toHaveBeenCalledWith('http://localhost/?tab=remote');
+    vi.restoreAllMocks();
+  });
 });

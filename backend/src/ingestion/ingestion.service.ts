@@ -141,7 +141,9 @@ export class IngestionService {
    * Why a source is not run, for the log line, or null when it runs.
    */
   private skipReason(connector: JobSourceConnector): string | null {
-    if (this.disabledSources.has(connector.name)) return 'is switched off (INGESTION_DISABLED_SOURCES)';
+    if (this.disabledSources.has(connector.name)) {
+      return 'is switched off (INGESTION_DISABLED_SOURCES)';
+    }
     if (!connector.isEnabled()) return 'is not configured';
     return null;
   }

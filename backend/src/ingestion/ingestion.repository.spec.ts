@@ -200,10 +200,7 @@ describe('IngestionRepository runs and purge', () => {
     expect(prisma.job.deleteMany).toHaveBeenCalledWith({
       where: {
         isFavorite: false,
-        OR: [
-          { publishedAt: { lt: cutoff } },
-          { publishedAt: null, firstSeenAt: { lt: cutoff } },
-        ],
+        OR: [{ publishedAt: { lt: cutoff } }, { publishedAt: null, firstSeenAt: { lt: cutoff } }],
       },
     });
   });

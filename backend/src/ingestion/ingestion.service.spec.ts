@@ -273,12 +273,9 @@ describe('IngestionService.status', () => {
   });
 
   it('reports a source switched off as disabled', async () => {
-    const [apec] = await service(
-      [connector('APEC', [])],
-      repository(),
-      heartbeat(),
-      ['APEC'],
-    ).status();
+    const [apec] = await service([connector('APEC', [])], repository(), heartbeat(), [
+      'APEC',
+    ]).status();
     expect(apec).toMatchObject({ source: 'APEC', enabled: false, ok: false });
   });
 });

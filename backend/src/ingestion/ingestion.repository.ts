@@ -171,10 +171,7 @@ export class IngestionRepository {
     const { count } = await this.prisma.job.deleteMany({
       where: {
         isFavorite: false,
-        OR: [
-          { publishedAt: { lt: cutoff } },
-          { publishedAt: null, firstSeenAt: { lt: cutoff } },
-        ],
+        OR: [{ publishedAt: { lt: cutoff } }, { publishedAt: null, firstSeenAt: { lt: cutoff } }],
       },
     });
     return count;
