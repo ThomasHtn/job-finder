@@ -1,0 +1,19 @@
+/* Screen frame: gutters, the sticky header and the phone's bottom tab bar. */
+
+@theme static {
+  /* Side padding of every column; tighter below the wide layout, see below. */
+  --layout-gutter: 1.5rem;
+
+  /* Height of the header's first row. */
+  --layout-header-height: 3.5rem;
+
+  /* Height of the phone's bottom tab bar, above the home indicator. */
+  --layout-tabbar-height: 3.75rem;
+}
+
+/* Phones and narrow windows: the same value as Tailwind's `max-lg:`. */
+@media (width < 64rem) {
+  :root {
+    --layout-gutter: 1.125rem;
+  }
+}

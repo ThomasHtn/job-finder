@@ -1,0 +1,110 @@
+@use 'tools' as *;
+
+/* A row of tabs. */
+:host {
+  display: flex;
+}
+
+/* One tab: the label weighs more and darkens once active. */
+.job-tabs__item {
+  border: 0;
+  background: none;
+  color: var(--color-ink-2);
+  font: 500 0.9375rem/1.2 var(--font-sans);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+
+  @include motion {
+    transition: color 0.16s ease;
+  }
+}
+
+/* Hovered tab. */
+.job-tabs__item:hover {
+  color: var(--color-ink);
+}
+
+/* Number of offers behind the tab. */
+.job-tabs__count {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* The tab on screen. */
+.job-tabs__item--active {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+/* Its count, in the accent. */
+.job-tabs__item--active .job-tabs__count {
+  color: var(--color-accent-ink);
+}
+
+/* Header strip: the selected tab is marked by weight and a short rule under it. */
+:host(.job-tabs--inline) {
+  gap: 1.5rem;
+}
+
+/* No glyphs in the header: the words are enough. */
+:host(.job-tabs--inline) .job-tabs__icon {
+  display: none;
+}
+
+/* Header tab, sitting on the header's bottom edge. */
+:host(.job-tabs--inline) .job-tabs__item {
+  position: relative;
+  padding: 0 0 0.8125rem;
+}
+
+/* The rule under the active header tab, over the header's hairline. */
+:host(.job-tabs--inline) .job-tabs__item--active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--color-accent);
+  content: '';
+}
+
+/* Bottom bar: fixed above the home indicator, each target an equal share of the width. */
+:host(.job-tabs--bar) {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* Bar tab: glyph over label. */
+:host(.job-tabs--bar) .job-tabs__item {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1875rem;
+  height: var(--layout-tabbar-height);
+  padding: 0 0.25rem;
+  font-size: 0.75rem;
+}
+
+/* Bar glyph. */
+:host(.job-tabs--bar) .job-tabs__icon {
+  --icon-size: 1.375rem;
+}
+
+/* Bar count. */
+:host(.job-tabs--bar) .job-tabs__count {
+  font-size: 0.75rem;
+}
+
+/* Active bar tab, in the accent. */
+:host(.job-tabs--bar) .job-tabs__item--active {
+  color: var(--color-accent-ink);
+}

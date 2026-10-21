@@ -1,0 +1,34 @@
+/* Element defaults, in Tailwind's base layer so any utility overrides them. */
+
+@layer base {
+  /* Both schemes are designed, so native controls follow the system one. */
+  html {
+    color-scheme: light dark;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Keyboard focus, drawn outside so it never shifts the layout. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+  }
+
+  /* Behind an open sheet: frozen, so the sheet is the only thing that scrolls. */
+  body.is-sheet-open {
+    overflow: hidden;
+  }
+}

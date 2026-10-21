@@ -1,0 +1,79 @@
+import { DOCUMENT } from '@angular/common';
+import { inject, Service, signal } from '@angular/core';
+
+import { TranslocoService } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
+
+import { storageOf } from '@core/storage/storage.utils';
+
+import { LOCALE_STORAGE_KEY } from './i18n.constants';
+import { AppLocale } from './i18n.model';
+import { pickLocale, toLocale } from './i18n.utils';
+
+/**
+ * Language the app speaks. The choice is browser-local, like the last visit: nothing about it reaches
+ * the API. Computed texts read `active()` so they follow a switch without a reload.
+ */
+@Service()
+export class Language {
+  /**
+   * Page document, whose `<html lang>` screen readers pronounce from.
+   */
+  private readonly document = inject(DOCUMENT);
+
+  /**
+   * Loads and activates the translations.
+   */
+  private readonly transloco = inject(TranslocoService);
+
+  /**
+   * Remembers an explicit choice, `null` when the browser blocks storage.
+   */
+  private readonly storage = storageOf(this.document);
+
+  /**
+   * Writable side of `active`.
+   */
+  private readonly current = signal<AppLocale>(this.initialLocale());
+
+  /**
+   * Language in use, set once its translations are loaded.
+   */
+  public readonly active = this.current.asReadonly();
+
+  /**
+   * Loads the starting language before the first screen, so no key ever shows.
+   */
+  public async start(): Promise<void> {
+    await this.apply(this.current());
+  }
+
+  /**
+   * Switches language and remembers it for the next visit.
+   */
+  public async use(locale: AppLocale): Promise<void> {
+    await this.apply(locale);
+    this.storage?.setItem(LOCALE_STORAGE_KEY, locale);
+  }
+
+  /**
+   * Loads a language, then makes it the active one everywhere at once.
+   */
+  private async apply(locale: AppLocale): Promise<void> {
+    await firstValueFrom(this.transloco.load(locale));
+    this.document.documentElement.lang = locale;
+    this.transloco.setActiveLang(locale);
+    this.current.set(locale);
+  }
+
+  /**
+   * An explicit choice wins; failing that, the browser decides.
+   */
+  private initialLocale(): AppLocale {
+    const navigator = this.document.defaultView?.navigator;
+    return (
+      toLocale(this.storage?.getItem(LOCALE_STORAGE_KEY)) ??
+      pickLocale(navigator?.languages ?? [navigator?.language ?? ''])
+    );
+  }
+}

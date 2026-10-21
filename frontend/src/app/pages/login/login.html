@@ -1,0 +1,54 @@
+<!-- Centred panel with the single password field. -->
+<main class="relative grid min-h-dvh place-items-center p-6">
+  <!-- Reachable before the password: the screen has to read in the visitor's language too. -->
+  <app-language-toggle class="absolute top-4 right-4" />
+
+  <!-- Brand, heading and form, kept together in one column. -->
+  <div class="w-full max-w-84">
+    <!-- Same mark as the header, with its wordmark. -->
+    <app-brand class="login__brand" />
+
+    <!-- What the screen guards, and what it expects from the visitor. -->
+    <h1 class="login__title">{{ 'login.title' | transloco }}</h1>
+    <p class="login__lead">{{ 'login.lead' | transloco }}</p>
+
+    <!-- Submit on Enter or on the button. -->
+    <form class="mt-7 flex flex-col" novalidate (submit)="submit($event)">
+      <!-- Password field. -->
+      <label class="block">
+        <span class="login__label">{{ 'login.password' | transloco }}</span>
+        <!-- The only field of the screen: focusing it on arrival is what the reader expects. -->
+        <!-- eslint-disable @angular-eslint/template/no-autofocus -->
+        <input
+          class="login__input"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          autofocus
+          [value]="password()"
+          (input)="onInput($event)"
+        />
+        <!-- eslint-enable @angular-eslint/template/no-autofocus -->
+      </label>
+
+      <!-- Failure message, announced to screen readers. -->
+      @if (error(); as message) {
+        <p class="login__error flex items-center gap-1.75" role="alert">
+          <app-icon class="login__error-icon" name="alert" />
+          <span>{{ message }}</span>
+        </p>
+      }
+
+      <!-- Disabled while empty or checking. -->
+      <button
+        app-button
+        variant="primary"
+        class="mt-5"
+        type="submit"
+        [disabled]="loading() || !password()"
+      >
+        {{ (loading() ? 'login.checking' : 'login.submit') | transloco }}
+      </button>
+    </form>
+  </div>
+</main>

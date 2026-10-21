@@ -1,0 +1,10 @@
+<!-- What is, or is not, there. -->
+<p class="empty-state__title">{{ title() }}</p>
+
+<!-- What to do about it. -->
+@if (hint(); as hint) {
+  <p class="empty-state__hint">{{ hint }}</p>
+}
+
+<!-- Actions given by the parent, collapsed when there are none. -->
+<div class="empty-state__actions"><ng-content /></div>

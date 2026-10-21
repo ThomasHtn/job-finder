@@ -1,0 +1,76 @@
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+
+import type { JobSummary } from '@job-finder/contract';
+
+import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
+import { jobSummary } from '@core/jobs/job.fixtures';
+import { LastVisit } from '@core/jobs/last-visit';
+
+import { JobRow } from './job-row';
+
+/**
+ * Renders one row as if the previous visit happened at the given time.
+ */
+function create(job: JobSummary, previousVisitAt: string | null) {
+  TestBed.configureTestingModule({
+    providers: [provideRouter([]), { provide: LastVisit, useValue: { previousVisitAt } }],
+  });
+  const fixture = TestBed.createComponent(JobRow);
+  fixture.componentRef.setInput('job', job);
+  fixture.detectChanges();
+  return fixture;
+}
+
+/**
+ * One feed row in isolation.
+ */
+describe('JobRow', () => {
+  useFrenchTexts();
+
+  it('flags an offer first seen after the previous visit as new', () => {
+    const fixture = create(
+      jobSummary({ firstSeenAt: '2026-09-06T10:00:00.000Z' }),
+      '2026-09-05T00:00:00.000Z',
+    );
+
+    expect(fixture.nativeElement.textContent).toContain('Nouveau');
+    expect(fixture.nativeElement.classList).toContain('job-row--new');
+  });
+
+  it('does not flag an offer already present at the previous visit', () => {
+    const fixture = create(
+      jobSummary({ firstSeenAt: '2026-09-01T10:00:00.000Z' }),
+      '2026-09-05T00:00:00.000Z',
+    );
+
+    expect(fixture.nativeElement.textContent).not.toContain('Nouveau');
+  });
+
+  it('does not flag anything on the very first visit', () => {
+    const fixture = create(jobSummary(), null);
+
+    expect(fixture.nativeElement.textContent).not.toContain('Nouveau');
+  });
+
+  it('shows only an unusual contract wording, and the salary', () => {
+    const fixture = create(jobSummary({ contractLabel: 'Full-time', salary: '45 k€' }), null);
+
+    expect(fixture.nativeElement.textContent).toContain('Full-time');
+    expect(fixture.nativeElement.textContent).toContain('45 k€');
+  });
+
+  it('emits the star and hide presses without opening the offer', () => {
+    const fixture = create(jobSummary(), null);
+    const starred: string[] = [];
+    const hidden: string[] = [];
+    fixture.componentInstance.favoriteToggled.subscribe((id) => starred.push(id));
+    fixture.componentInstance.hidden.subscribe((id) => hidden.push(id));
+
+    (fixture.nativeElement.querySelector('.job-row__star') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('.job-row__hide') as HTMLButtonElement).click();
+
+    expect(starred).toEqual(['job-1']);
+    expect(hidden).toEqual(['job-1']);
+  });
+});

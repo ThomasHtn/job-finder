@@ -1,0 +1,157 @@
+@use 'tools' as *;
+
+/* The sources, as one card like the feed. */
+:host {
+  display: block;
+}
+
+/* The card. */
+.source-board {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* One source. */
+.source-board__source {
+  --row-pad: 1.25rem;
+
+  position: relative;
+  padding: var(--row-pad);
+}
+
+/* Same inset hairlines as the feed rows. */
+.source-board__source:not(:first-child)::before {
+  position: absolute;
+  inset: 0 var(--row-pad) auto;
+  height: 1px;
+  background: var(--color-line);
+  content: '';
+}
+
+/* Its name. */
+.source-board__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Its health in a word. */
+.source-board__state {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* Offers it holds. */
+.source-board__count {
+  color: var(--color-ink-2);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Last success and last run. */
+.source-board__facts {
+  font-size: 0.8125rem;
+}
+
+/* A date's name: last success, last run. */
+.source-board__fact-term {
+  color: var(--color-ink-3);
+}
+
+/* Its date. */
+.source-board__fact-value {
+  margin: 0;
+  color: var(--color-ink-2);
+}
+
+/* Error of the last run, and the hint of a source without credentials. */
+.source-board__error,
+.source-board__hint {
+  margin: 0.625rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Runs recorded before errors were shortened hold a whole HTML page: two lines are enough. */
+.source-board__error,
+.source-board__run--failed .source-board__run-result {
+  @include line-clamp(2);
+}
+
+/* The error, tinted. */
+.source-board__error {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-alert-soft);
+  color: var(--color-alert);
+}
+
+/* The hint, quiet. */
+.source-board__hint {
+  color: var(--color-ink-3);
+}
+
+/* Folded run history. */
+.source-board__history {
+  margin-top: 0.625rem;
+  font-size: 0.8125rem;
+}
+
+/* The fold's handle, naming how many runs it holds. */
+.source-board__summary {
+  width: fit-content;
+  color: var(--color-ink-2);
+  cursor: pointer;
+}
+
+/* A failing source is the one thing on this tab worth a colour. */
+.source-board__source--failed .source-board__state {
+  color: var(--color-alert);
+  font-weight: 600;
+}
+
+/* A source without credentials, greyed. */
+.source-board__source--disabled .source-board__name {
+  color: var(--color-ink-3);
+}
+
+/* One run: date, then figures or error. */
+.source-board__run {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.3125rem 0;
+  color: var(--color-ink-2);
+}
+
+/* When it finished. */
+.source-board__run-date {
+  color: var(--color-ink-3);
+  white-space: nowrap;
+}
+
+/* What it found, or why it failed. */
+.source-board__run-result {
+  overflow-wrap: anywhere;
+}
+
+/* A failed run's error. */
+.source-board__run--failed .source-board__run-result {
+  color: var(--color-alert);
+}
+
+/* Edge to edge on a phone, like the feed. */
+@include below(sm) {
+  .source-board {
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .source-board__run {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}

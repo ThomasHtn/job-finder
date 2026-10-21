@@ -1,0 +1,182 @@
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import type { IngestionSummary, SourceStatus } from '@job-finder/contract';
+
+import { GeoService } from '../geo/geo.service.js';
+import type { Env } from '../shared/config/env.schema.js';
+import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
+import { DAY_MS } from '../shared/helpers/time.constants.js';
+import type { JobSourceConnector } from '../sources/job-source-connector.js';
+import { JOB_SOURCE_CONNECTORS } from '../sources/job-source-connectors.token.js';
+import { describeCrash, describeRun } from './describe-run.js';
+import { emptySummary } from './empty-summary.js';
+import { RECENT_RUNS } from './ingestion.constants.js';
+import { IngestionRepository } from './ingestion.repository.js';
+import type { SourceFailure } from './ingestion.types.js';
+import type { GeoPort } from './ingestion.types.js';
+import { IngestionHeartbeat } from './ingestion-heartbeat.js';
+import { prepareJob } from './job-preparer.js';
+import { toSourceRun } from './to-source-run.js';
+
+/**
+ * Orchestrates one ingestion: fetch, filter, persist, purge.
+ */
+@Injectable()
+export class IngestionService {
+  /**
+   * Scoped logger.
+   */
+  private readonly logger = new Logger(IngestionService.name);
+
+  /**
+   * Set while a run is in progress so overlapping triggers become no-ops.
+   */
+  private running = false;
+
+  /**
+   * Offers not seen for this long are dropped, unless they were favourited.
+   */
+  private readonly staleAfterDays: number;
+
+  /**
+   * Connectors are injected as a list so adding a source never touches this class.
+   * The heartbeat reports every run to the push monitor.
+   */
+  constructor(
+    @Inject(JOB_SOURCE_CONNECTORS)
+    private readonly connectors: JobSourceConnector[],
+    @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
+    @Inject(GeoService) private readonly geo: GeoPort,
+    private readonly repository: IngestionRepository,
+    config: ConfigService<Env, true>,
+    private readonly heartbeat: IngestionHeartbeat,
+  ) {
+    this.staleAfterDays = config.get('INGESTION_STALE_DAYS', { infer: true });
+  }
+
+  /**
+   * Runs every source in turn, or answers null when a run is already in progress.
+   * A failing source never stops the others; every run, even one that crashes, ends with a heartbeat.
+   */
+  public async run(): Promise<IngestionSummary | null> {
+    if (this.running) {
+      this.logger.warn('Ingestion already running, skipping this trigger');
+      return null;
+    }
+    this.running = true;
+
+    const startedAt = Date.now();
+    const summary = emptySummary();
+    const failures: SourceFailure[] = [];
+    let enabledSources = 0;
+    try {
+      for (const connector of this.connectors) {
+        if (!connector.isEnabled()) {
+          this.logger.warn(`Source ${connector.name} is not configured, skipping`);
+          summary.skippedSources.push(connector.name);
+          continue;
+        }
+        enabledSources += 1;
+        const failure = await this.runSource(connector, summary);
+        if (failure) failures.push(failure);
+      }
+      const threshold = new Date(Date.now() - this.staleAfterDays * DAY_MS);
+      summary.purged = await this.repository.purgeStaleJobs(threshold);
+    } catch (error) {
+      this.logger.error('Ingestion crashed', (error as Error).stack);
+      await this.heartbeat.send(describeCrash(error), Date.now() - startedAt);
+      throw error;
+    } finally {
+      this.running = false;
+    }
+
+    this.logger.log(
+      `Ingestion done: ${summary.fetched} fetched, ${summary.kept} kept, ` +
+        `${summary.inserted} new, ${summary.updated} updated, ${summary.merged} merged, ${summary.purged} purged`,
+    );
+    await this.heartbeat.send(
+      describeRun(summary, failures, enabledSources),
+      Date.now() - startedAt,
+    );
+    return summary;
+  }
+
+  /**
+   * Health and recent history per connector, for the degraded flag and the sources tab.
+   */
+  public async status(): Promise<SourceStatus[]> {
+    const jobCounts = await this.repository.countJobsBySource();
+
+    return Promise.all(
+      this.connectors.map(async (connector) => {
+        const enabled = connector.isEnabled();
+        const [runs, lastSuccessAt] = await Promise.all([
+          this.repository.recentRuns(connector.name, RECENT_RUNS),
+          this.repository.lastSuccessAt(connector.name),
+        ]);
+        const lastRun = runs.at(0);
+
+        return {
+          source: connector.name,
+          enabled,
+          lastRunAt: lastRun?.finishedAt?.toISOString() ?? null,
+          ok: enabled && !lastRun?.error,
+          error: lastRun?.error ?? null,
+          lastSuccessAt: lastSuccessAt?.toISOString() ?? null,
+          jobCount: jobCounts.get(connector.name) ?? 0,
+          runs: runs.map(toSourceRun),
+        };
+      }),
+    );
+  }
+
+  /**
+   * Fetches one source, persists what passes the filters, and records the run.
+   * Errors are captured on the run row and in the summary, never rethrown: the failure is returned.
+   */
+  private async runSource(
+    connector: JobSourceConnector,
+    summary: IngestionSummary,
+  ): Promise<SourceFailure | null> {
+    const runId = await this.repository.startRun(connector.name);
+
+    try {
+      const rawJobs = await connector.fetchJobs();
+      let kept = 0;
+      let inserted = 0;
+      let updated = 0;
+
+      for (const raw of rawJobs) {
+        const prepared = await prepareJob(raw, this.profile, this.geo);
+        if (!prepared) continue;
+        kept += 1;
+
+        const outcome = await this.repository.persistJob(prepared);
+        if (outcome === 'inserted') inserted += 1;
+        else if (outcome === 'updated') updated += 1;
+        else summary.merged += 1;
+      }
+
+      summary.fetched += rawJobs.length;
+      summary.kept += kept;
+      summary.inserted += inserted;
+      summary.updated += updated;
+
+      await this.repository.finishRun(runId, {
+        fetched: rawJobs.length,
+        kept,
+        inserted,
+        updated,
+      });
+      this.logger.log(`${connector.name}: ${rawJobs.length} fetched, ${kept} kept`);
+      return null;
+    } catch (error) {
+      const message = (error as Error).message;
+      summary.failedSources.push(connector.name);
+      await this.repository.failRun(runId, message);
+      this.logger.error(`${connector.name} failed: ${message}`);
+      return { source: connector.name, error: message };
+    }
+  }
+}

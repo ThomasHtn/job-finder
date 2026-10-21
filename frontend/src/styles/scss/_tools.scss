@@ -1,0 +1,40 @@
+/* Sass helpers for component stylesheets: `@use 'tools' as *;` at the top of the file. */
+
+@use 'sass:map';
+
+/* Tailwind's breakpoints, so a component switches layout at the same widths as the utilities. */
+$breakpoints: (
+  sm: 40rem,
+  md: 48rem,
+  lg: 64rem,
+  xl: 80rem,
+);
+
+/**
+ * Styles below breakpoint `$name`, like Tailwind's `max-sm:`/`max-lg:` prefixes.
+ */
+@mixin below($name) {
+  @media (width < map.get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+/**
+ * Animations and transitions only for users who did not ask for reduced motion.
+ */
+@mixin motion {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+/**
+ * Text clamped to `$lines` lines with an ellipsis, like Tailwind's `line-clamp-N`.
+ */
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+}

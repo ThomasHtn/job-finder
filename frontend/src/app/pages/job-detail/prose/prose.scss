@@ -1,0 +1,62 @@
+@use 'tools' as *;
+
+/* Reading text, not secondary information: full ink, generous leading, ~66-character measure. */
+:host {
+  display: block;
+  max-width: 36rem;
+  color: var(--color-ink);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+/* No trailing space under the last block. */
+:host > :last-child {
+  margin-bottom: 0;
+}
+
+/* One paragraph. */
+.prose__paragraph {
+  margin: 0 0 1.25rem;
+  text-wrap: pretty;
+}
+
+/* A lead-in line ("Your duties:") belongs to what comes next, not to what came before. */
+.prose__paragraph--lead {
+  margin-bottom: 0.5rem;
+}
+
+/* One bullet list. */
+.prose__list {
+  margin: 0 0 1.25rem;
+}
+
+/* One item, room on the left for its dash. */
+.prose__item {
+  position: relative;
+  padding-left: 1.375rem;
+  text-wrap: pretty;
+}
+
+/* Air between items. */
+.prose__item + .prose__item {
+  margin-top: 0.625rem;
+}
+
+/* A hairline dash rather than a bullet: same drawing language as the dividers. */
+.prose__item::before {
+  position: absolute;
+  top: 0.85em;
+  left: 0;
+  width: 0.5rem;
+  height: 1px;
+  background: var(--color-ink-3);
+  content: '';
+}
+
+/* Phones: a touch smaller, a touch tighter. */
+@include below(sm) {
+  :host {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}

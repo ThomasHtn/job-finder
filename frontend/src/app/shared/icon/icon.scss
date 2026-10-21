@@ -1,0 +1,16 @@
+/* Glyph box, sized by the parent through `--icon-size`. */
+:host {
+  display: inline-grid;
+  place-items: center;
+  width: var(--icon-size, 1.25rem);
+  height: var(--icon-size, 1.25rem);
+}
+
+/* The SVG is a mask, so a single file follows the surrounding text colour. */
+.icon {
+  width: 100%;
+  height: 100%;
+  background: currentcolor;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}

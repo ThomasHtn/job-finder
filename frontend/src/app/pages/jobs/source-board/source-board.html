@@ -1,0 +1,60 @@
+<!-- One block per source: its health, its stock, and its recent runs. -->
+<ul class="source-board">
+  @for (row of rows(); track row.status.source) {
+    <li class="source-board__source" [class]="'source-board__source--' + row.state">
+      <!-- Name, health, and how many offers it holds right now. -->
+      <div class="flex items-baseline gap-2.5">
+        <h2 class="source-board__name">{{ 'sources.names.' + row.status.source | transloco }}</h2>
+        <span class="source-board__state">{{ 'sources.states.' + row.state | transloco }}</span>
+        <span class="source-board__count ml-auto tabular-nums">{{ row.offers }}</span>
+      </div>
+
+      <!-- When it last answered, and when it was last asked: they differ while it fails. -->
+      @if (row.state !== 'disabled') {
+        <dl class="source-board__facts mt-2 flex flex-wrap gap-x-6 gap-y-1">
+          <div class="flex gap-1.5">
+            <dt class="source-board__fact-term">{{ 'sources.lastSuccess' | transloco }}</dt>
+            <dd class="source-board__fact-value">
+              {{ row.status.lastSuccessAt | syncLabel: language.active() : now() }}
+            </dd>
+          </div>
+          <div class="flex gap-1.5">
+            <dt class="source-board__fact-term">{{ 'sources.lastRun' | transloco }}</dt>
+            <dd class="source-board__fact-value tabular-nums">
+              @if (row.status.lastRunAt; as at) {
+                {{ at | date: ('date.dayTime' | transloco) }}
+              } @else {
+                {{ 'sources.never' | transloco }}
+              }
+            </dd>
+          </div>
+        </dl>
+      }
+
+      <!-- Why the last run failed, or why the source never runs. -->
+      @if (row.status.error; as error) {
+        <p class="source-board__error">{{ error }}</p>
+      } @else if (row.state === 'disabled') {
+        <p class="source-board__hint">{{ 'sources.disabledHint' | transloco }}</p>
+      }
+
+      <!-- Recent runs, folded: the head already says whether the last one went well. -->
+      @if (row.runs.length) {
+        <details class="source-board__history">
+          <summary class="source-board__summary">{{ row.history }}</summary>
+          <ol class="mt-2">
+            <!-- One line per run: when it finished, and its figures or its error. -->
+            @for (line of row.runs; track line.run.startedAt) {
+              <li class="source-board__run" [class.source-board__run--failed]="line.run.error">
+                <span class="source-board__run-date tabular-nums">
+                  {{ line.run.finishedAt | date: ('date.dayTime' | transloco) }}
+                </span>
+                <span class="source-board__run-result">{{ line.result }}</span>
+              </li>
+            }
+          </ol>
+        </details>
+      }
+    </li>
+  }
+</ul>

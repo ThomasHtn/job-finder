@@ -1,0 +1,48 @@
+@use 'tools' as *;
+
+/* Round, borderless; parent rules (colour, size) win over the states below, which carry no extra weight. */
+:host {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink-2);
+  cursor: pointer;
+
+  @include motion {
+    transition:
+      background-color 0.16s ease,
+      color 0.16s ease,
+      transform 0.16s var(--ease-standard);
+  }
+}
+
+/* Hover. */
+:host(:where(:hover)) {
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+}
+
+/* Pressed. */
+:host(:where(:active)) {
+  transform: scale(0.92);
+}
+
+/* Unavailable, while its action runs. */
+:host(:where(:disabled)) {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* A full 44px target under a finger. */
+@media (pointer: coarse) {
+  :host {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}

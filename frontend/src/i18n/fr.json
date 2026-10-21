@@ -1,0 +1,144 @@
+{
+  "date": {
+    "tag": "fr-FR",
+    "day": "dd/MM/yyyy",
+    "dayTime": "dd/MM/yyyy HH:mm"
+  },
+  "languages": {
+    "fr": "français",
+    "en": "anglais"
+  },
+  "language": {
+    "switchTo": "Passer en {{ name }}"
+  },
+  "head": {
+    "lastSync": "Dernière synchronisation :",
+    "searching": "Recherche en cours…",
+    "refresh": "Rechercher de nouvelles offres"
+  },
+  "sync": {
+    "never": "Jamais synchronisé",
+    "justNow": "À l'instant",
+    "minutesAgo": "Il y a {{ minutes }} min",
+    "hoursAgo": "Il y a {{ hours }} h",
+    "yesterday": "Hier",
+    "onDate": "Le {{ date }}"
+  },
+  "published": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{ days }} jours"
+  },
+  "tabs": {
+    "areaPlaceholder": "Sur site",
+    "remote": "Full remote",
+    "favorites": "Favoris",
+    "sources": "Sources",
+    "label": "Rubriques"
+  },
+  "sources": {
+    "names": {
+      "FRANCE_TRAVAIL": "France Travail",
+      "ADZUNA": "Adzuna",
+      "ATS": "Sites carrière (ATS)",
+      "EURES": "EURES",
+      "APEC": "APEC",
+      "FREE_WORK": "Free-Work",
+      "JOOBLE": "Jooble"
+    },
+    "states": {
+      "disabled": "Non configurée",
+      "never": "Jamais interrogée",
+      "ok": "OK",
+      "failed": "En échec"
+    },
+    "offersOne": "{{ count }} offre",
+    "offersOther": "{{ count }} offres",
+    "lastSuccess": "Dernier succès",
+    "lastRun": "Dernière exécution",
+    "never": "Jamais",
+    "disabledHint": "Identifiants absents du .env : la source est ignorée.",
+    "fetchedOne": "{{ count }} récupérée",
+    "fetchedOther": "{{ count }} récupérées",
+    "keptOne": "{{ count }} retenue",
+    "keptOther": "{{ count }} retenues",
+    "insertedOne": "{{ count }} nouvelle",
+    "insertedOther": "{{ count }} nouvelles",
+    "historyOne": "{{ count }} dernière exécution",
+    "historyOther": "{{ count }} dernières exécutions",
+    "unavailable": "L'état des sources n'a pas pu être chargé."
+  },
+  "feed": {
+    "newSinceOne": "offre depuis votre dernière visite",
+    "newSinceOther": "offres depuis votre dernière visite",
+    "showOnlyNew": "Voir",
+    "showAll": "Tout afficher",
+    "retry": "Réessayer",
+    "nothingNew": "Rien de nouveau depuis votre dernière visite.",
+    "nothingNewHint": "Les offres déjà vues sont toujours là.",
+    "showEveryOffer": "Voir toutes les offres",
+    "noFavorites": "Aucun favori.",
+    "noFavoritesHint": "Touchez l'étoile d'une offre pour la garder ici.",
+    "noRemote": "Aucune offre en full remote.",
+    "noOffers": "Aucune offre pour l'instant.",
+    "noOffersHint": "Interrogez les sources pour remplir la liste.",
+    "fetchOffers": "Rechercher des offres",
+    "idlePanel": "Choisissez une offre pour la lire ici.",
+    "newOffersNone": "Aucune nouvelle offre.",
+    "newOffersOne": "{{ count }} nouvelle offre.",
+    "newOffersOther": "{{ count }} nouvelles offres.",
+    "sourcesAvailable": "{{ ok }}/{{ total }} sources disponibles",
+    "sourcesFailed": "{{ summary }} - en échec : {{ sources }}",
+    "sourcesUnavailable": "Source(s) indisponible(s) : {{ sources }}.",
+    "refreshFailed": "Impossible de récupérer de nouvelles offres. {{ detail }}",
+    "loadFailed": "Impossible de charger les offres. {{ detail }}",
+    "favoriteFailed": "Impossible de modifier le favori. {{ detail }}",
+    "hideFailed": "Impossible de masquer l'offre. {{ detail }}"
+  },
+  "row": {
+    "unknownCompany": "Entreprise non précisée",
+    "approximateCity": "commune non précisée",
+    "new": "Nouveau",
+    "hide": "Pas intéressé, masquer cette offre",
+    "addFavorite": "Ajouter aux favoris",
+    "removeFavorite": "Retirer des favoris"
+  },
+  "place": {
+    "remote": "Full remote",
+    "unknown": "Lieu non précisé",
+    "approximate": "{{ city }} (commune non précisée)"
+  },
+  "detail": {
+    "close": "Fermer l'offre",
+    "backToList": "Revenir à la liste",
+    "contract": "Contrat",
+    "defaultContract": "CDI",
+    "salary": "Salaire",
+    "unknownSalary": "Non communiqué",
+    "publishedOn": "Publiée le",
+    "unknownDate": "Date inconnue",
+    "excerptOnly": "Cette source ne publie qu'un extrait. L'annonce complète est sur le site d'origine.",
+    "offerSection": "L'offre",
+    "companySection": "L'entreprise",
+    "alsoPublishedOn": "Également publiée sur",
+    "applyOn": "Voir l'offre sur {{ source }}",
+    "notFound": "Cette offre est introuvable.",
+    "loadFailed": "Impossible de charger cette offre, réessayez plus tard."
+  },
+  "login": {
+    "title": "Votre veille d'offres",
+    "lead": "Entrez le mot de passe pour l'ouvrir.",
+    "password": "Mot de passe",
+    "checking": "Vérification…",
+    "submit": "Entrer",
+    "wrongPassword": "Mot de passe incorrect.",
+    "throttled": "Trop de tentatives, réessayez dans quelques minutes."
+  },
+  "errors": {
+    "unreachable": "L'API est-elle démarrée ?",
+    "serverError": "Le serveur a rencontré une erreur, réessayez plus tard.",
+    "status": "Erreur {{ status }}.",
+    "conflict": "Une recherche est déjà en cours.",
+    "timeout": "Le serveur met du temps à répondre, l'opération continue peut-être."
+  }
+}

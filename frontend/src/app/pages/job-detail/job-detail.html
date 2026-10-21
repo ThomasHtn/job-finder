@@ -1,0 +1,154 @@
+<!-- Sheet bar: the handle to pull it away on a phone, the way back, and the star. -->
+<header
+  class="job-detail__bar"
+  (pointerdown)="startDrag($event)"
+  (pointermove)="moveDrag($event)"
+  (pointerup)="endDrag()"
+  (pointercancel)="endDrag()"
+>
+  <!-- Grab handle, the visual cue for pulling the sheet down on a phone. -->
+  <span class="job-detail__handle" aria-hidden="true"></span>
+
+  <!-- The way back, then the offer origin and its star. -->
+  <div class="job-detail__bar-row flex items-center gap-2">
+    <!-- A chevron on a phone, where the sheet slides down; a cross in the column. -->
+    <button
+      app-icon-button
+      type="button"
+      class="job-detail__close"
+      [attr.aria-label]="'detail.close' | transloco"
+      (click)="close()"
+    >
+      <app-icon [name]="compact() ? 'chevron-down' : 'dismiss'" />
+    </button>
+
+    <!-- Origin and star only once the offer has loaded. -->
+    @if (job(); as job) {
+      <p class="job-detail__origin min-w-0 flex-1 truncate">{{ job.sourceLabel }}</p>
+
+      <!-- Favourite toggle, mirrored back to the row through the patch bus. -->
+      <button
+        app-icon-button
+        type="button"
+        class="job-detail__star"
+        [class.job-detail__star--active]="job.isFavorite"
+        [attr.aria-label]="(job.isFavorite ? 'row.removeFavorite' : 'row.addFavorite') | transloco"
+        [attr.aria-pressed]="job.isFavorite"
+        (click)="toggleFavorite()"
+      >
+        <app-icon [name]="job.isFavorite ? 'star-filled' : 'star'" />
+      </button>
+    }
+  </div>
+
+  <!-- Thin progress line while the offer loads. -->
+  <app-scan-line [active]="loading()" />
+</header>
+
+<!-- The offer, or the error that replaced it. -->
+<div class="job-detail__scroll" #scroller [attr.aria-busy]="loading()">
+  @if (error(); as message) {
+    <app-empty-state [title]="message">
+      <button app-button type="button" (click)="close()">
+        {{ 'detail.backToList' | transloco }}
+      </button>
+    </app-empty-state>
+  } @else if (job(); as job) {
+    <article>
+      <!-- Title, company and place. -->
+      <h1 class="job-detail__title">{{ job.title }}</h1>
+      <p class="job-detail__meta mt-3 flex flex-wrap items-baseline gap-x-3.5 gap-y-0.5">
+        <span class="job-detail__company">
+          {{ job.company ?? ('row.unknownCompany' | transloco) }}
+        </span>
+        <span>{{ place() }}</span>
+      </p>
+
+      <!-- Key facts, on one band rather than in three boxes. -->
+      <dl class="job-detail__facts">
+        <div class="job-detail__fact">
+          <dt class="job-detail__fact-term">{{ 'detail.contract' | transloco }}</dt>
+          <dd class="job-detail__fact-value">
+            {{ job.contractLabel ?? ('detail.defaultContract' | transloco) }}
+          </dd>
+        </div>
+        <div class="job-detail__fact">
+          <dt class="job-detail__fact-term">{{ 'detail.salary' | transloco }}</dt>
+          <dd class="job-detail__fact-value">
+            {{ job.salary ?? ('detail.unknownSalary' | transloco) }}
+          </dd>
+        </div>
+        <div class="job-detail__fact">
+          <dt class="job-detail__fact-term">{{ 'detail.publishedOn' | transloco }}</dt>
+          <dd class="job-detail__fact-value tabular-nums">
+            @if (job.publishedAt; as publishedAt) {
+              {{ publishedAt | date: ('date.day' | transloco) }}
+            } @else {
+              {{ 'detail.unknownDate' | transloco }}
+            }
+          </dd>
+        </div>
+      </dl>
+
+      <!-- A star that did not go through: said here, the offer stays as it was. -->
+      @if (actionError(); as message) {
+        <app-notice tone="alert">{{ message }}</app-notice>
+      }
+
+      <!-- Snippet-only sources: say why the text below is short. -->
+      @if (!job.hasFullDescription) {
+        <app-notice icon="info">{{ 'detail.excerptOnly' | transloco }}</app-notice>
+      }
+
+      <!-- The ad itself. -->
+      @if (job.description) {
+        <section class="mt-9">
+          <h2 class="job-detail__section-title">{{ 'detail.offerSection' | transloco }}</h2>
+          <app-prose [text]="job.description" />
+        </section>
+      }
+
+      <!-- Company presentation, when the source separates it. -->
+      @if (job.companyDescription) {
+        <section class="mt-9">
+          <h2 class="job-detail__section-title">{{ 'detail.companySection' | transloco }}</h2>
+          <app-prose [text]="job.companyDescription" />
+        </section>
+      }
+
+      <!-- Same offer on other boards, listed by host. -->
+      @if (alternatives().length) {
+        <section class="mt-9">
+          <h2 class="job-detail__section-title">{{ 'detail.alsoPublishedOn' | transloco }}</h2>
+          <ul class="flex flex-col gap-2">
+            <!-- Each board opens in a new tab; the full URL shows on hover. -->
+            @for (alternative of alternatives(); track alternative.url) {
+              <li>
+                <a
+                  class="job-detail__alternative inline-flex items-center gap-1.75"
+                  [href]="alternative.url"
+                  target="_blank"
+                  rel="noopener"
+                  [title]="alternative.url"
+                >
+                  {{ alternative.label }}
+                  <app-icon class="job-detail__alternative-icon" name="external" />
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </article>
+  }
+</div>
+
+<!-- The one thing to do with an offer, kept under the thumb. -->
+@if (job(); as job) {
+  <footer class="job-detail__foot">
+    <a app-button variant="primary" class="w-full" [href]="job.url" target="_blank" rel="noopener">
+      {{ 'detail.applyOn' | transloco: { source: job.sourceLabel } }}
+      <app-icon class="job-detail__apply-icon" name="external" />
+    </a>
+  </footer>
+}

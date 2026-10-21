@@ -1,0 +1,70 @@
+@use 'tools' as *;
+
+/* Larger mark than in the header: the screen is nothing else. */
+.login__brand {
+  --brand-size: 1.75rem;
+  --brand-name-size: 1.25rem;
+}
+
+/* The tagline under the brand. */
+.login__title {
+  margin: 1.75rem 0 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+/* What the screen expects. */
+.login__lead {
+  margin: 0.25rem 0 0;
+  color: var(--color-ink-3);
+  font-size: 0.9375rem;
+}
+
+/* The password field's label. */
+.login__label {
+  display: block;
+  margin-bottom: 0.4375rem;
+  color: var(--color-ink-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* The password, slightly spaced so dots stay countable; the accent rings it on focus. */
+.login__input {
+  width: 100%;
+  padding: 0.8125rem 0.9375rem;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: 500 1rem/1.2 var(--font-sans);
+  letter-spacing: 0.08em;
+
+  @include motion {
+    transition:
+      border-color 0.16s ease,
+      box-shadow 0.16s ease;
+  }
+}
+
+/* Focused field. */
+.login__input:focus {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+/* Refusal message. */
+.login__error {
+  margin: 0.75rem 0 0;
+  color: var(--color-alert);
+  font-size: 0.875rem;
+}
+
+/* Its glyph, at text height. */
+.login__error-icon {
+  --icon-size: 0.9375rem;
+
+  flex: none;
+}

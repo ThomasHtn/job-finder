@@ -1,0 +1,7 @@
+# Generated or build output.
+node_modules/
+dist/
+coverage/
+src/generated/
+prisma/migrations/
+src/geo/isochrone.geojson

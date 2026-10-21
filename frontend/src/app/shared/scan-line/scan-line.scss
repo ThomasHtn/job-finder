@@ -1,0 +1,48 @@
+@use 'tools' as *;
+
+/* Two-pixel strip over the parent's bottom border, hidden while nothing loads. */
+:host {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  overflow: hidden;
+  opacity: 0;
+
+  @include motion {
+    transition: opacity 0.25s ease;
+  }
+}
+
+/* Something loads. */
+:host(.scan-line--active) {
+  opacity: 1;
+}
+
+/* The light: a still half-tone bar for those who asked for less motion. */
+.scan-line__sweep {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  opacity: 0.5;
+
+  @include motion {
+    inset: 0 auto 0 0;
+    width: 34%;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    opacity: 1;
+    animation: scan-line-sweep 1.3s var(--ease-standard) infinite;
+  }
+}
+
+/* From off the left edge to off the right one. */
+@keyframes scan-line-sweep {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(400%);
+  }
+}

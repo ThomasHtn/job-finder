@@ -1,0 +1,19 @@
+# Per-Dockerfile ignore (BuildKit): the context is the repository root, so only what the backend
+# image is built from gets in. Everything else, .env files and node_modules first, stays out.
+*
+!package.json
+!package-lock.json
+!contract/package.json
+!contract/tsconfig.json
+!contract/src/
+!frontend/package.json
+!backend/package.json
+!backend/nest-cli.json
+!backend/tsconfig.json
+!backend/tsconfig.build.json
+!backend/prisma.config.ts
+!backend/prisma/
+!backend/src/
+backend/src/generated/
+**/*.spec.ts
+**/*.fixtures.ts

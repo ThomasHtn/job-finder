@@ -1,0 +1,35 @@
+import type { JobTab } from '@job-finder/contract';
+
+import { IconName } from '@shared/icon/icon.model';
+
+import { SOURCES_TAB } from './jobs.constants';
+
+/**
+ * Every tab of the shell: the three offer lists, then the sources.
+ */
+export type ShellTab = JobTab | typeof SOURCES_TAB;
+
+/**
+ * One entry of the tab strip: where it leads, how it reads, and how many offers are behind it.
+ */
+export interface JobTabItem {
+  /**
+   * Tab this entry selects.
+   */
+  tab: ShellTab;
+
+  /**
+   * Wording shown to the reader.
+   */
+  label: string;
+
+  /**
+   * Offers currently in that tab, `null` for a tab that does not list offers.
+   */
+  count: number | null;
+
+  /**
+   * Glyph, only drawn in the bottom bar.
+   */
+  icon: IconName;
+}

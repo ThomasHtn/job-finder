@@ -1,0 +1,6 @@
+/* Motion curve shared by every transition. */
+
+@theme static {
+  /* Quick start, long soft landing: sheets, presses, the progress sweep. */
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+}

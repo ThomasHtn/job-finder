@@ -1,0 +1,36 @@
+/* Centred column of text, with room around it. */
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 4.5rem 1.5rem;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* What is, or is not, there. */
+.empty-state__title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* What to do about it. */
+.empty-state__hint {
+  max-width: 26rem;
+  margin: 0;
+  color: var(--color-ink-3);
+  font-size: 0.9375rem;
+}
+
+/* Actions, set apart from the text. */
+.empty-state__actions {
+  margin-top: 1rem;
+}
+
+/* No action given. */
+.empty-state__actions:empty {
+  display: none;
+}

@@ -1,0 +1,194 @@
+@use 'tools' as *;
+
+/* One row of the feed card; `--row-pad` also places the separators and the "new" bar. */
+:host {
+  --row-pad: 1.25rem;
+
+  position: relative;
+  display: block;
+  padding: var(--row-pad);
+
+  @include motion {
+    transition: background-color 0.14s ease;
+  }
+}
+
+/* Separators start at the text, iOS-list style, and never cross the rounded ends. */
+:host(:not(:first-child))::before {
+  position: absolute;
+  inset: 0 var(--row-pad) auto;
+  height: 1px;
+  background: var(--color-line);
+  content: '';
+}
+
+/* First row: the card's top corners. */
+:host(:first-child) {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Last row: the card's bottom corners. */
+:host(:last-child) {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* Hovered row. */
+:host(:hover) {
+  background: var(--color-surface-hover);
+}
+
+/* The offer currently open in the panel, so the two halves of the screen stay tied together. */
+:host(.job-row--selected) {
+  background: var(--color-surface-2);
+}
+
+/* The one loud mark in the feed: an offer that appeared since the last visit. */
+:host(.job-row--new)::after {
+  position: absolute;
+  top: var(--row-pad);
+  bottom: var(--row-pad);
+  left: 0;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--color-accent);
+  content: '';
+}
+
+/* Already opened: de-emphasised by weight and one step of ink, never below AA. */
+:host(.job-row--viewed) .job-row__title {
+  color: var(--color-ink-2);
+  font-weight: 500;
+}
+
+/* Title, the link to the offer. */
+.job-row__title {
+  color: var(--color-ink);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  text-wrap: balance;
+}
+
+/* Stretches the click target to the whole row without nesting interactive content. */
+.job-row__title::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+/* Free text from the sources, sometimes a full sentence: capped so the title keeps most of the line. */
+.job-row__salary {
+  flex: 0 1 auto;
+  max-width: 40%;
+  color: var(--color-ink-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: end;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Employer, place and caveat separated by space and ink alone: no punctuation to wrap badly. */
+.job-row__meta {
+  color: var(--color-ink-2);
+  font-size: 0.875rem;
+}
+
+/* The employer, weighted. */
+.job-row__company {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+/* The note on a region-only offer: town not given. */
+.job-row__note {
+  color: var(--color-ink-3);
+}
+
+/* First lines of the description, clamped. */
+.job-row__excerpt {
+  @include line-clamp(2);
+
+  max-width: 60ch;
+  color: var(--color-ink-2);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* Provenance strip. */
+.job-row__footer {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* The source, weighted. */
+.job-row__source {
+  color: var(--color-ink-2);
+  font-weight: 500;
+}
+
+/* The left bar already carries the state: the word is here for anyone not seeing colour. */
+.job-row__new {
+  color: var(--color-accent-ink);
+  font-weight: 600;
+}
+
+/* Above the stretched title link; taller than the strip, so they overhang instead of padding it. */
+.job-row__actions {
+  position: relative;
+  z-index: 1;
+  margin: -0.5rem -0.5rem -0.5rem 0;
+  opacity: 0;
+
+  @include motion {
+    transition: opacity 0.14s ease;
+  }
+}
+
+/* Glyph size of both actions. */
+.job-row__star,
+.job-row__hide {
+  --icon-size: 1.0625rem;
+}
+
+/* The actions show on hover, on keyboard focus, and stay on a starred offer. */
+:host(:hover) .job-row__actions,
+:host(:focus-within) .job-row__actions,
+:host(.job-row--starred) .job-row__actions {
+  opacity: 1;
+}
+
+/* A starred offer's star. */
+:host(.job-row--starred) .job-row__star {
+  color: var(--color-accent);
+}
+
+/* Nothing to hover on a touch screen: the actions stay out. */
+@media (hover: none) {
+  .job-row__actions {
+    opacity: 1;
+  }
+}
+
+/* No room for a money column: the head dissolves so the salary can drop below the excerpt. */
+@include below(sm) {
+  :host {
+    --row-pad: 1rem;
+  }
+
+  .job-row__salary {
+    order: 1;
+    align-self: flex-start;
+    max-width: none;
+    margin-top: 0.5rem;
+    text-align: start;
+  }
+
+  .job-row__excerpt {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}

@@ -1,0 +1,64 @@
+@use 'tools' as *;
+
+/* Neutral text button; parent rules win over the states below, which carry no extra weight. */
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.125rem;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: 500 0.9375rem/1.2 var(--font-sans);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+
+  @include motion {
+    transition:
+      transform 0.16s var(--ease-standard),
+      background-color 0.16s ease,
+      border-color 0.16s ease;
+  }
+}
+
+/* Hover. */
+:host(:where(:hover)) {
+  border-color: var(--color-ink-3);
+  background: var(--color-surface-hover);
+}
+
+/* Pressed. */
+:host(:where(:active)) {
+  transform: scale(0.98);
+}
+
+/* Unavailable. */
+:host(:where(:disabled)) {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* The main action: filled with ink. */
+:host(.button--primary) {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+/* Main action, hovered. */
+:host(.button--primary:where(:hover)) {
+  border-color: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
+  background: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
+}
+
+/* A dimmed ink fill turns to mud: an unavailable main action reads as a flat tile instead. */
+:host(.button--primary:where(:disabled)) {
+  border-color: transparent;
+  background: var(--color-surface-2);
+  color: var(--color-ink-3);
+  opacity: 1;
+}

@@ -1,0 +1,218 @@
+@use 'tools' as *;
+
+/* The panel's content: bar, scrolling offer, footer. Springs back from a drag. */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-surface);
+
+  @include motion {
+    transition: transform 0.28s var(--ease-standard);
+  }
+}
+
+/* During a drag it tracks the finger with no easing. */
+:host(.job-detail--dragging) {
+  transition: none;
+}
+
+/* The bar: handle, way back, origin, star. */
+.job-detail__bar {
+  position: relative;
+  flex: none;
+  border-bottom: 1px solid var(--color-line);
+  touch-action: none;
+}
+
+/* Its row. */
+.job-detail__bar-row {
+  height: 3.25rem;
+  padding: 0 0.75rem;
+}
+
+/* Where the offer was found. */
+.job-detail__origin {
+  margin: 0;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* Close glyph size. */
+.job-detail__close {
+  --icon-size: 1.125rem;
+}
+
+/* Star glyph size. */
+.job-detail__star {
+  --icon-size: 1.1875rem;
+}
+
+/* A starred offer's star. */
+.job-detail__star--active {
+  color: var(--color-accent);
+}
+
+/* Only a phone sheet gets a handle: on a wide screen the panel is not going anywhere. */
+.job-detail__handle {
+  display: none;
+}
+
+/* The offer, scrolling on its own; its width decides how the facts lay out. */
+.job-detail__scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 1.75rem 1.5rem 2.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  container-type: inline-size;
+}
+
+/* Footer holding the way to the original ad. */
+.job-detail__foot {
+  flex: none;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+/* Its external glyph. */
+.job-detail__apply-icon {
+  --icon-size: 1rem;
+}
+
+/* The offer's title. */
+.job-detail__title {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Company and place. */
+.job-detail__meta {
+  color: var(--color-ink-2);
+  font-size: 0.9375rem;
+}
+
+/* The company, weighted. */
+.job-detail__company {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+/* Contract, salary and date: one band split by hairlines, not three cards. */
+.job-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 1.75rem 0;
+  padding: 0;
+  border-block: 1px solid var(--color-line);
+  background: var(--color-line);
+}
+
+/* One fact. */
+.job-detail__fact {
+  padding: 0.875rem 1rem 0.875rem 0;
+  background: var(--color-surface);
+}
+
+/* Facts after the first, inset from the hairline. */
+.job-detail__fact:not(:first-child) {
+  padding-left: 1rem;
+}
+
+/* A fact's name: contract, salary, date. */
+.job-detail__fact-term {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* A fact's value. */
+.job-detail__fact-value {
+  margin: 0.1875rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Section heading inside the offer: small, weighted, in sentence case. */
+.job-detail__section-title {
+  margin: 0 0 0.875rem;
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Link to a twin listing, underlined by a hairline. */
+.job-detail__alternative {
+  padding-bottom: 0.0625rem;
+  border-bottom: 1px solid var(--color-line-2);
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+/* Hovered twin link. */
+.job-detail__alternative:hover {
+  border-bottom-color: currentcolor;
+  color: var(--color-accent-ink);
+}
+
+/* Its external glyph. */
+.job-detail__alternative-icon {
+  --icon-size: 0.875rem;
+
+  color: var(--color-ink-3);
+}
+
+/* A narrow panel is not a narrow window: the band stacks on its own width, not the screen's. */
+@container (max-width: 30rem) {
+  .job-detail__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .job-detail__fact {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6875rem 0;
+  }
+
+  .job-detail__fact:not(:first-child) {
+    padding-left: 0;
+  }
+
+  .job-detail__fact-value {
+    margin: 0;
+  }
+}
+
+/* Phones and narrow windows: the panel is a sheet with a handle. */
+@include below(lg) {
+  .job-detail__handle {
+    display: block;
+    width: 2.25rem;
+    height: 0.25rem;
+    margin: 0.5rem auto -0.25rem;
+    border-radius: 999px;
+    background: var(--color-line-2);
+  }
+
+  .job-detail__bar-row {
+    padding-top: 0.25rem;
+  }
+
+  .job-detail__scroll {
+    padding: 1.5rem var(--layout-gutter) 2rem;
+  }
+
+  .job-detail__foot {
+    padding: 0.75rem var(--layout-gutter) calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}

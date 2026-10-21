@@ -1,0 +1,76 @@
+<!-- Title and salary, company and place, excerpt, then provenance and actions. -->
+<div class="job-row__body min-w-0 max-sm:flex max-sm:flex-col">
+  <!-- Title links to the detail; salary sits on the same line when known. -->
+  <div class="flex items-baseline gap-4 max-sm:contents">
+    <a
+      class="job-row__title min-w-0 flex-1"
+      [routerLink]="detailLink()"
+      queryParamsHandling="preserve"
+    >
+      {{ job().title }}
+    </a>
+    @if (job().salary; as salary) {
+      <span class="job-row__salary tabular-nums">{{ salary }}</span>
+    }
+  </div>
+
+  <!-- Company and place; region-only offers say so. -->
+  <p class="job-row__meta mt-1 flex flex-wrap items-baseline gap-x-3.5 gap-y-0.5 max-sm:gap-x-3">
+    <span class="job-row__company">
+      {{ job().company ?? ('row.unknownCompany' | transloco) }}
+    </span>
+    <span>{{ place() }}</span>
+    @if (job().isLocationApproximate && !job().isRemote) {
+      <span class="job-row__note">{{ 'row.approximateCity' | transloco }}</span>
+    }
+  </p>
+
+  <!-- First lines of the description. -->
+  @if (job().excerpt; as excerpt) {
+    <p class="job-row__excerpt mt-2.5">{{ excerpt }}</p>
+  }
+
+  <!-- Bottom line: provenance on the left, actions on the right, so the head keeps the full width. -->
+  <div class="mt-3 flex items-center gap-3 max-sm:order-2">
+    <!-- Provenance strip: source, unusual contract wording, date, "new" badge. -->
+    <p
+      class="job-row__footer flex min-w-0 flex-1 flex-wrap items-center gap-x-3.5 gap-y-1 max-sm:gap-x-3"
+    >
+      <span class="job-row__source">{{ job().sourceLabel }}</span>
+      @if (contract(); as contract) {
+        <span>{{ contract }}</span>
+      }
+      <span>{{ job().publishedAt | publishedLabel: language.active() : now() }}</span>
+      @if (isNew()) {
+        <span class="job-row__new">{{ 'row.new' | transloco }}</span>
+      }
+    </p>
+
+    <!-- Actions: hide, then star. -->
+    <div class="job-row__actions flex flex-none gap-0.5">
+      <!-- "Not interested". -->
+      <button
+        app-icon-button
+        type="button"
+        class="job-row__hide"
+        [attr.aria-label]="'row.hide' | transloco"
+        (click)="hide($event)"
+      >
+        <app-icon name="dismiss" />
+      </button>
+      <!-- Favourite toggle, filled when starred. -->
+      <button
+        app-icon-button
+        type="button"
+        class="job-row__star"
+        [attr.aria-label]="
+          (job().isFavorite ? 'row.removeFavorite' : 'row.addFavorite') | transloco
+        "
+        [attr.aria-pressed]="job().isFavorite"
+        (click)="toggleFavorite($event)"
+      >
+        <app-icon [name]="job().isFavorite ? 'star-filled' : 'star'" />
+      </button>
+    </div>
+  </div>
+</div>

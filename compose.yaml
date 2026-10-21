@@ -1,0 +1,90 @@
+# Whole app from its images on http://localhost:8001: try it, or check the images before a delivery (CI does).
+# Local only: no TLS, no backups. Day-to-day development runs natively (CONTRIBUTING.md), on the postgres below.
+# Usage: `docker compose up --build` (or `make up`), nothing to configure; sign in with job-finder-demo-password.
+# Ports sit one above littlewords' (8000, 5433), so both demos run side by side.
+# A server writes its own compose from the contract in docs/deployment.md.
+name: job-finder
+
+services:
+  # Also the development database (`make db`): published on 127.0.0.1:5434, never on the network.
+  postgres:
+    image: postgres:17.11-alpine3.24@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    environment:
+      POSTGRES_DB: jobfinder
+      POSTGRES_USER: jobfinder
+      POSTGRES_PASSWORD: jobfinder
+    ports:
+      - '127.0.0.1:5434:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U jobfinder -d jobfinder']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Build context is the repository root: the npm workspaces share one lockfile and the contract.
+  backend:
+    image: job-finder-backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    # Demo search profile first, then your backend/.env if any.
+    env_file:
+      - path: backend/.env.example
+      - path: backend/.env
+        required: false
+    # Replaces the localhost database of the env files with the one above. No crawl at boot: the
+    # demo shows seeded offers, and CI never calls the real job boards.
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://jobfinder:jobfinder@postgres:5432/jobfinder
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:8001
+      INGESTION_ON_STARTUP: 'false'
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # One-shot: sets the demo password and, on an empty database, a handful of fictitious offers.
+  # Same image as the backend, built once above.
+  demo:
+    image: job-finder-backend
+    pull_policy: never
+    command: ['node', 'dist/cli/seed-demo.js', '--demo']
+    entrypoint: []
+    env_file:
+      - path: backend/.env.example
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://jobfinder:jobfinder@postgres:5432/jobfinder
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: 'no'
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # The app's single entry point: serves the bundle and relays /api and /readyz to the backend.
+  frontend:
+    image: job-finder-frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - '127.0.0.1:8001:8080'
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      backend:
+        condition: service_healthy
+      demo:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:

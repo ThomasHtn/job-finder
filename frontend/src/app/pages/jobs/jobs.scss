@@ -1,0 +1,253 @@
+@use 'tools' as *;
+
+/* The header is two rows on a wide screen, one on a phone; everything sticky measures from here. */
+:host {
+  --head-total: calc(var(--layout-header-height) + 2.75rem);
+  --shell-width: 74rem;
+  --panel-gap: 1.5rem;
+
+  display: block;
+  min-height: 100dvh;
+}
+
+/* Sticky frosted header, a hairline under it. */
+.jobs__head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-paper) 84%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* One header row, as wide as the content below. */
+.jobs__head-row {
+  max-width: var(--shell-width);
+  height: var(--layout-header-height);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter);
+}
+
+/* The tab row, shorter, the tabs resting on its bottom edge. */
+.jobs__head-row--tabs {
+  height: 2.75rem;
+}
+
+/* Sync time: truncates rather than pushing the buttons off a narrow screen. */
+.jobs__stamp {
+  margin: 0;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+/* What a manual refresh just brought. */
+.jobs__stamp-fresh {
+  color: var(--color-accent-ink);
+  font-weight: 600;
+}
+
+/* Refresh button, flush with the gutter. */
+.jobs__refresh {
+  --icon-size: 1.1875rem;
+
+  margin-right: -0.5rem;
+}
+
+/* A source is down. */
+.jobs__refresh--degraded {
+  color: var(--color-alert);
+}
+
+/* A refresh is running. */
+.jobs__refresh--spinning app-icon {
+  @include motion {
+    animation: jobs-spin 0.9s linear infinite;
+  }
+}
+
+/* One turn of the refresh glyph. */
+@keyframes jobs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reading and choosing get the same room: neither column is the leftover of the other. */
+.jobs__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(21rem, 1fr);
+  align-items: start;
+  gap: 2rem;
+  max-width: var(--shell-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter);
+}
+
+/* The sources tab: one column, no panel. */
+.jobs__layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The feed column. */
+.jobs__feed {
+  min-width: 0;
+  padding: var(--panel-gap) 0 4rem;
+}
+
+/* The rows, as one card. */
+.jobs__list {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* The page's one memorable control: what landed since the last visit, and a way to see only that. */
+.jobs__fresh {
+  margin: 0 0 1rem;
+  padding: 0.8125rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+  font: 500 0.9375rem/1.35 var(--font-sans);
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+
+  @include motion {
+    transition:
+      background-color 0.16s ease,
+      border-color 0.16s ease,
+      color 0.16s ease;
+  }
+}
+
+/* The accent dot. */
+.jobs__fresh-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* The filter's action: show only the new offers, or all of them again. */
+.jobs__fresh-action {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Filter on: the banner drops its colour, since the rows it left are the coloured ones. */
+.jobs__fresh--active {
+  border-color: var(--color-line-2);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Its dot, greyed. */
+.jobs__fresh--active .jobs__fresh-dot {
+  background: var(--color-ink-3);
+}
+
+/* The panel: keeps the same air under the header as the feed does, scrolled or not. */
+.jobs__panel {
+  position: sticky;
+  top: calc(var(--head-total) + var(--panel-gap));
+  height: calc(100dvh - var(--head-total) - var(--panel-gap) * 2);
+  margin-top: var(--panel-gap);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* Nothing open, nothing to frame: the invitation floats on the page itself. */
+.jobs__panel:not(.jobs__panel--open) {
+  border-color: transparent;
+  background: none;
+}
+
+/* The invitation of the empty panel. */
+.jobs__idle {
+  max-width: 20rem;
+  margin: auto;
+  padding: 2rem;
+  color: var(--color-ink-3);
+  font-size: 0.9375rem;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Phones and narrow windows: one column, the offer as a sheet over it. */
+@include below(lg) {
+  :host {
+    --head-total: var(--layout-header-height);
+  }
+
+  .jobs__layout {
+    display: block;
+    padding: 0;
+  }
+
+  .jobs__feed {
+    padding: 1rem var(--layout-gutter)
+      calc(var(--layout-tabbar-height) + env(safe-area-inset-bottom) + 2rem);
+  }
+
+  /* The offer takes the whole screen, rising from the bottom the way a sheet does. */
+  .jobs__panel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    visibility: hidden;
+    overscroll-behavior: contain;
+    transform: translateY(100%);
+
+    @include motion {
+      transition:
+        transform 0.3s var(--ease-standard),
+        visibility 0.3s;
+    }
+  }
+
+  .jobs__panel--open {
+    visibility: visible;
+    transform: none;
+  }
+
+  .jobs__idle {
+    display: none;
+  }
+}
+
+/* On a phone the list runs edge to edge: the frame was costing reading width. */
+@include below(sm) {
+  .jobs__feed {
+    padding-inline: 0;
+  }
+
+  .jobs__fresh,
+  .jobs__notice {
+    width: auto;
+    margin-inline: var(--layout-gutter);
+  }
+
+  .jobs__list {
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+/* The narrowest phones: a tighter banner. */
+@media (width <= 26rem) {
+  .jobs__fresh {
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+}

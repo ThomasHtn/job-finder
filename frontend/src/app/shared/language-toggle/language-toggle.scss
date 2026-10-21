@@ -1,0 +1,11 @@
+/* Wraps the round button tightly, so the host can be placed like any other item. */
+:host {
+  display: inline-flex;
+}
+
+/* "FR", "EN": small capitals, spaced. */
+.language-toggle__code {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}

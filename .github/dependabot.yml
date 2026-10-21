@@ -1,18 +1,48 @@
 version: 2
 
-# One grouped pull request per ecosystem and run; security updates still arrive on their own.
+# The three npm workspaces share one lockfile at the root and pull a large transitive tree (NestJS and
+# Prisma on one side, the Angular toolchain on the other). The delivery scans the built images and blocks
+# on an advisory; these updates are what clears it.
+#
+# Each ecosystem is grouped into a single pull request per run: seven separate bumps a week on a
+# personal project get ignored, one grouped bump gets reviewed. Security updates are deliberately
+# left ungrouped by GitHub, so an advisory still arrives as its own pull request.
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Major versions are migrations (NestJS, Prisma, Angular and its TypeScript, Node, Postgres),
+    # done on purpose, not merged from a weekly bump.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
     groups:
       npm-dependencies:
         patterns:
           - '*'
 
-  # Actions are pinned by major tag, which stops receiving fixes once a new major exists.
+  # Base images are pinned by version and digest: without these entries a Node or nginx advisory
+  # would never surface, since a pinned image no longer moves on its own.
+  - package-ecosystem: docker
+    directories:
+      - /backend
+      - /frontend
+    schedule:
+      interval: weekly
+    # Major versions are migrations, done on purpose, not merged from a weekly bump.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+    groups:
+      docker-images:
+        patterns:
+          - '*'
+
+  # The workflows pin actions by commit SHA (version in a comment); these updates move both.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -22,9 +52,17 @@ updates:
         patterns:
           - '*'
 
-  - package-ecosystem: docker
-    directories:
-      - /apps/api
-      - /apps/web
+  # The database image of compose.yaml, pinned by version and digest like the base images.
+  - package-ecosystem: docker-compose
+    directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+    # Major versions are migrations, done on purpose, not merged from a weekly bump.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+    groups:
+      compose-images:
+        patterns:
+          - '*'

@@ -1,0 +1,9 @@
+# Generated or build output.
+node_modules/
+dist/
+coverage/
+.angular/
+out-tsc/
+test-results/
+playwright-report/
+e2e/.auth/

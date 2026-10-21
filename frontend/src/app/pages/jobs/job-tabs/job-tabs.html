@@ -1,0 +1,19 @@
+<!-- One button per tab; the count is part of the label, not a decoration. -->
+@for (item of items(); track item.tab) {
+  <button
+    type="button"
+    class="job-tabs__item flex min-w-0 items-center"
+    [class.job-tabs__item--active]="item.tab === current()"
+    [attr.aria-current]="item.tab === current() ? 'page' : null"
+    (click)="selected.emit(item.tab)"
+  >
+    <app-icon class="job-tabs__icon" [name]="item.icon" />
+    <span class="flex min-w-0 items-baseline gap-1.5">
+      <span class="truncate">{{ item.label }}</span>
+      <!-- The sources tab has no offers to count. -->
+      @if (item.count !== null) {
+        <span class="job-tabs__count flex-none tabular-nums">{{ item.count }}</span>
+      }
+    </span>
+  </button>
+}

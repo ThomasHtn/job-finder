@@ -1,0 +1,144 @@
+{
+  "date": {
+    "tag": "en-GB",
+    "day": "d MMM yyyy",
+    "dayTime": "dd/MM/yyyy HH:mm"
+  },
+  "languages": {
+    "fr": "French",
+    "en": "English"
+  },
+  "language": {
+    "switchTo": "Switch to {{ name }}"
+  },
+  "head": {
+    "lastSync": "Last sync:",
+    "searching": "Searching…",
+    "refresh": "Search for new offers"
+  },
+  "sync": {
+    "never": "Never synced",
+    "justNow": "Just now",
+    "minutesAgo": "{{ minutes }} min ago",
+    "hoursAgo": "{{ hours }} h ago",
+    "yesterday": "Yesterday",
+    "onDate": "On {{ date }}"
+  },
+  "published": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{ days }} days ago"
+  },
+  "tabs": {
+    "areaPlaceholder": "On site",
+    "remote": "Full remote",
+    "favorites": "Favorites",
+    "sources": "Sources",
+    "label": "Sections"
+  },
+  "sources": {
+    "names": {
+      "FRANCE_TRAVAIL": "France Travail",
+      "ADZUNA": "Adzuna",
+      "ATS": "Career sites (ATS)",
+      "EURES": "EURES",
+      "APEC": "APEC",
+      "FREE_WORK": "Free-Work",
+      "JOOBLE": "Jooble"
+    },
+    "states": {
+      "disabled": "Not configured",
+      "never": "Never queried",
+      "ok": "OK",
+      "failed": "Failing"
+    },
+    "offersOne": "{{ count }} offer",
+    "offersOther": "{{ count }} offers",
+    "lastSuccess": "Last success",
+    "lastRun": "Last run",
+    "never": "Never",
+    "disabledHint": "No credentials in .env: the source is skipped.",
+    "fetchedOne": "{{ count }} fetched",
+    "fetchedOther": "{{ count }} fetched",
+    "keptOne": "{{ count }} kept",
+    "keptOther": "{{ count }} kept",
+    "insertedOne": "{{ count }} new",
+    "insertedOther": "{{ count }} new",
+    "historyOne": "Last {{ count }} run",
+    "historyOther": "Last {{ count }} runs",
+    "unavailable": "The source status could not be loaded."
+  },
+  "feed": {
+    "newSinceOne": "offer since your last visit",
+    "newSinceOther": "offers since your last visit",
+    "showOnlyNew": "Show",
+    "showAll": "Show all",
+    "retry": "Try again",
+    "nothingNew": "Nothing new since your last visit.",
+    "nothingNewHint": "The offers you have already seen are still there.",
+    "showEveryOffer": "Show every offer",
+    "noFavorites": "No favorites.",
+    "noFavoritesHint": "Tap an offer's star to keep it here.",
+    "noRemote": "No full remote offer.",
+    "noOffers": "No offers yet.",
+    "noOffersHint": "Query the sources to fill the list.",
+    "fetchOffers": "Search for offers",
+    "idlePanel": "Pick an offer to read it here.",
+    "newOffersNone": "No new offer.",
+    "newOffersOne": "{{ count }} new offer.",
+    "newOffersOther": "{{ count }} new offers.",
+    "sourcesAvailable": "{{ ok }}/{{ total }} sources available",
+    "sourcesFailed": "{{ summary }} - failing: {{ sources }}",
+    "sourcesUnavailable": "Unavailable source(s): {{ sources }}.",
+    "refreshFailed": "Could not fetch new offers. {{ detail }}",
+    "loadFailed": "Could not load the offers. {{ detail }}",
+    "favoriteFailed": "Could not update the favorite. {{ detail }}",
+    "hideFailed": "Could not hide the offer. {{ detail }}"
+  },
+  "row": {
+    "unknownCompany": "Company not stated",
+    "approximateCity": "town not stated",
+    "new": "New",
+    "hide": "Not interested, hide this offer",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites"
+  },
+  "place": {
+    "remote": "Full remote",
+    "unknown": "Location not stated",
+    "approximate": "{{ city }} (town not stated)"
+  },
+  "detail": {
+    "close": "Close the offer",
+    "backToList": "Back to the list",
+    "contract": "Contract",
+    "defaultContract": "Permanent",
+    "salary": "Salary",
+    "unknownSalary": "Not stated",
+    "publishedOn": "Published on",
+    "unknownDate": "Unknown date",
+    "excerptOnly": "This source only publishes an excerpt. The full listing is on the original site.",
+    "offerSection": "The role",
+    "companySection": "The company",
+    "alsoPublishedOn": "Also published on",
+    "applyOn": "View the offer on {{ source }}",
+    "notFound": "This offer cannot be found.",
+    "loadFailed": "Could not load this offer, try again later."
+  },
+  "login": {
+    "title": "Your job watch",
+    "lead": "Enter the password to open it.",
+    "password": "Password",
+    "checking": "Checking…",
+    "submit": "Enter",
+    "wrongPassword": "Wrong password.",
+    "throttled": "Too many attempts, try again in a few minutes."
+  },
+  "errors": {
+    "unreachable": "Is the API running?",
+    "serverError": "The server hit an error, try again later.",
+    "status": "Error {{ status }}.",
+    "conflict": "A search is already running.",
+    "timeout": "The server is taking long, the operation may still be running."
+  }
+}
