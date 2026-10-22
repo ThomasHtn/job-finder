@@ -54,7 +54,8 @@ An hour a day, for three genuinely new offers.
 
 Morning and evening, Job Finder reads fifty-five sources and throws away everything that is not for
 you. An offer posted on three boards shows up once, in its most complete version, with a link to
-each board. An offer taken down disappears from the list. Your favorites stay.
+each board. An offer leaves the list a month after its publication, and never comes back. Your
+favorites stay.
 
 ## A commute area, not a radius
 
@@ -117,12 +118,12 @@ light or dark, following the phone.
 
 ## A typical morning
 
-|          |                                                                 |
-| -------- | --------------------------------------------------------------- |
-| **8:02** | You open the app from the icon on your home screen.             |
-| **8:03** | Four offers flagged New. Two do not speak to you: cross, cross. |
-| **8:05** | A third one interests you: star. You apply to the fourth.       |
-| **8:06** | Done. The day's watch is over. Coffee is still hot.             |
+|          |                                                              |
+| -------- | ------------------------------------------------------------ |
+| **8:02** | You open the app from the icon on your home screen.          |
+| **8:03** | Four offers flagged New. Two do not speak to you: scroll on. |
+| **8:05** | A third one interests you: star. You apply to the fourth.    |
+| **8:06** | Done. The day's watch is over. Coffee is still hot.          |
 
 ## Where the offers come from
 
