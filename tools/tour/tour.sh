@@ -17,7 +17,10 @@ PASSWORD='job-finder-tour-password'
 # A throwaway database next to the development one, dropped on exit.
 DEV_URL="$(grep -E '^DATABASE_URL=' "$ROOT/backend/.env" | cut -d= -f2-)"
 TOUR_DB=jobfinder_tour
-TOUR_URL="${DEV_URL%/*}/$TOUR_DB"
+# Same server and options, other database name: the query string, if any, is re-appended.
+TOUR_BASE="${DEV_URL%%\?*}"
+TOUR_QUERY="${DEV_URL#"$TOUR_BASE"}"
+TOUR_URL="${TOUR_BASE%/*}/$TOUR_DB$TOUR_QUERY"
 
 WORK="$(mktemp -d)"
 GROUPS_TO_STOP=()

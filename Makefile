@@ -6,7 +6,7 @@ SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
 .PHONY: help setup db migrate contract backend frontend dev ingest password fix lint test verify e2e up down reset logs version
 
-# npm 11, the version engines and packageManager ask for: npm 10.9 trips on jsdom.
+# npm 11, the version packageManager asks for (CI fails when a pin here or in a Dockerfile differs): npm 10.9 trips on jsdom.
 NPM := npx --yes npm@11.21.1
 
 ##@ Setup
@@ -55,10 +55,10 @@ fix: ## Every auto-fix: ESLint, Stylelint, Prettier
 	cd contract && npm run fix
 	cd backend && npm run fix
 	cd frontend && npm run fix
-	npx prettier --write .
+	npx prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude
 
 lint: ## Linters and format checks, without the tests
-	npx prettier --check .
+	npx prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude
 	cd contract && npm run format:check && npm run lint && npm run typecheck
 	cd backend && npm run format:check && npm run lint && npm run typecheck
 	cd frontend && npm run format:check && npm run lint && npm run typecheck
@@ -67,7 +67,7 @@ test: ## Unit tests of both halves
 	cd backend && npm test
 	cd frontend && npm test -- --watch=false
 
-verify: ## Every CI gate: format, lint, types, tests with coverage floors, production builds
+verify: ## CI's code gates: format, lint, types, tests with coverage floors, builds (images: make up && make e2e)
 	npm run build -w @job-finder/contract
 	npm run db:generate -w backend
 	$(MAKE) --no-print-directory lint

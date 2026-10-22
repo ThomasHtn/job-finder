@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1210 520" width="1210" height="520" role="img" aria-label="Architecture: sources, NestJS api, PostgreSQL, Angular frontend and shared contract">
   <style>
     text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    .bg { fill: #fbfcfd }
+    .bg { fill: #f3f9f8 }
     .card { fill: #ffffff }
     .ink { fill: #101822 }
     .ink2 { fill: #545f6d }

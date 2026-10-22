@@ -47,14 +47,14 @@ make down
 
 1. Write a test that fails.
 2. Make it pass.
-3. Tidy up, then run every check the CI runs:
+3. Tidy up, then run the code checks of the CI:
 
 ```bash
 make fix
 make verify
 ```
 
-Green here means green on GitHub. Coverage floors only ever go up: they sit just below today's figures in `backend/vitest.config.ts` and `frontend/angular.json`.
+Green here means the code checks are green on GitHub; the image build, scan and browser tests only run there, or locally with `make up && make e2e`. Coverage floors only ever go up: they sit just below today's figures in `backend/vitest.config.ts` and `frontend/angular.json`.
 
 ## What lives where
 
@@ -73,11 +73,11 @@ The three folders are npm workspaces sharing one lockfile at the root, and one E
 
 **The whole domain lives in the `.env`**: job title, keywords, stack, commute area. It is validated by zod (`backend/src/shared/config/env.schema.ts`) and exposed as an injectable `SearchProfile`. Changing job needs no code.
 
-**The job boards** (`backend/src/sources/`) share one contract, `JobSourceConnector`: `name`, `isEnabled()`, `fetchJobs()`, everything normalised into `RawJob`. Missing keys mean skipped, not failed, and so does a source listed in `INGESTION_DISABLED_SOURCES`. The 49 company career sites go through one connector iterating `sources/ats/companies.config.ts`.
+**The job boards** (`backend/src/sources/`) share one contract, `JobSourceConnector`: `name`, `isEnabled()`, `fetchJobs()`, everything normalised into `RawJob`. Missing keys mean skipped, not failed, and so does a source listed in `INGESTION_DISABLED_SOURCES`. The 49 company career sites go through one connector iterating `sources/ats/companies.constants.ts`.
 
 **An ingestion** runs on a cron and on `POST /api/ingestion/run`: hard filters (title, stack, permanent contract, remote, commute area), an upsert on `(source, sourceId)` that merges the same offer published by two boards, then a purge of what was published more than thirty days ago (first seen, when the board gives no date), favourites spared; an offer already past that age is not ingested again. Each board's run is recorded on its own, and the run reports to `INGESTION_HEARTBEAT_URL` when set.
 
-**The commute area** is a driving-time polygon generated once by OpenRouteService and committed (`backend/src/geo/isochrone.geojson`): a point-in-polygon test at ingestion, no network call. Geocoding is cached in the database, failures included.
+**The commute area** is a driving-time polygon generated once by OpenRouteService and committed (`backend/src/geo/isochrone.geojson`): a point-in-polygon test at ingestion, no network call. Geocoding is cached in the database, addresses that were not found included; an outage of the geocoder is never cached.
 
 **The app** keeps the feed mounted: an offer opens in a child route, a column on a wide screen, a sheet on a phone. What changes in the panel travels back to the feed through `JobPatchBus` instead of a reload.
 
@@ -87,7 +87,7 @@ The three folders are npm workspaces sharing one lockfile at the root, and one E
 - Small functions, names that explain themselves, no dead code, no magic numbers.
 - Something moves to shared only when a second place needs it.
 - One concern per file: constants, types, mappers and helpers each get their own, named after what they hold.
-- Glyphs, icons and fonts are files in `frontend/public`, never drawn in a template.
+- Glyphs, icons and fonts are files in `frontend/public`, never drawn in a template (the brand mark, `shared/brand`, is the one inline exception).
 - Never log a password, a session token or a sign-in request.
 
 ## Comments

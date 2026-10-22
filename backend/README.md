@@ -42,7 +42,7 @@ npm run test:ci
 ```
 
 The first one fixes lint and formatting, the second runs the tests once with the coverage floors of
-`vitest.config.ts`. `make -C .. verify` runs every check the CI runs, on both halves.
+`vitest.config.ts`. `make -C .. verify` runs the code checks of the CI on both halves (images and browser tests: `make up && make e2e`).
 
 ## Run a single test
 

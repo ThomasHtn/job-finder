@@ -16,6 +16,8 @@ on:
       - '*.md'
       - 'docs/**'
       - 'compose.yaml'
+      - 'Makefile'
+      - 'tools/**'
       - '.github/**'
       - '.prettierrc.json'
       - '.prettierignore'
@@ -74,10 +76,23 @@ jobs:
         working-directory: contract
         run: npm run format:check && npm run lint
 
-      # Docs, workflows and compose.yaml at the root.
+      # npm is pinned in several files; they must all match packageManager.
+      - name: Check npm pins
+        working-directory: .
+        run: |
+          pin="npm@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          mismatches=$(grep -rnoE 'npm@[0-9]+\.[0-9]+\.[0-9]+' Makefile backend/Dockerfile frontend/Dockerfile .github/workflows | grep -v ":$pin$" || true)
+          if [ -n "$mismatches" ]; then
+            echo "These npm pins differ from $pin:"
+            echo "$mismatches"
+            exit 1
+          fi
+
+      # Docs, workflows and compose.yaml at the root. Prettier ignores what git ignores, plus the
+      # local excludes of the clone.
       - name: Check root formatting
         working-directory: .
-        run: npx prettier --check .
+        run: npx prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude
 
       - name: Check formatting
         run: npm run format:check

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/icon.svg" alt="The Job Finder icon: an orange dot over three lines" width="96">
+  <img src="frontend/public/icon.svg" alt="The Job Finder icon: a teal dot over three lines" width="96">
 </p>
 
 <h1 align="center">Job Finder</h1>
@@ -11,10 +11,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/self--hosted-yours-B84D00" alt="Self-hosted">
-  <img src="https://img.shields.io/badge/tracking-none-FB923C" alt="No tracking">
-  <img src="https://img.shields.io/badge/contracts-permanent_only-B84D00" alt="Permanent contracts only">
-  <img src="https://img.shields.io/badge/auto--apply-never-FB923C" alt="Never applies for you">
+  <img src="https://img.shields.io/badge/self--hosted-yours-0E6E63" alt="Self-hosted">
+  <img src="https://img.shields.io/badge/tracking-none-3FB8A6" alt="No tracking">
+  <img src="https://img.shields.io/badge/contracts-permanent_only-0E6E63" alt="Permanent contracts only">
+  <img src="https://img.shields.io/badge/auto--apply-never-3FB8A6" alt="Never applies for you">
 </p>
 
 <p align="center">

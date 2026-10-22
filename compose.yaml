@@ -58,6 +58,9 @@ services:
     pull_policy: never
     command: ['node', 'dist/cli/seed-demo.js', '--demo']
     entrypoint: []
+    # The image's HEALTHCHECK probes an API this one-shot never starts.
+    healthcheck:
+      disable: true
     env_file:
       - path: backend/.env.example
     environment:

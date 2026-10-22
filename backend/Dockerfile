@@ -4,7 +4,9 @@
 # Build context is the repository root: the workspaces share one lockfile, and the API needs the
 # contract. Dockerfile.dockerignore, next to this file, lets in only what the image is built from.
 
-# ---- Dependencies stage -----------------------------------------------------
+# =============================================================================
+# Dependencies stage
+# =============================================================================
 # npm 11, as packageManager says: unlike the npm 10 of the base image, it only runs the install
 # scripts the root allowScripts approves. Every workspace manifest is copied because npm ci checks
 # them all against the lockfile, before the sources, so this layer only changes with the dependencies.
@@ -16,7 +18,9 @@ COPY backend/package.json backend/
 COPY frontend/package.json frontend/
 RUN npx --yes npm@11.21.1 ci --workspace contract --workspace backend
 
-# ---- Build stage ------------------------------------------------------------
+# =============================================================================
+# Build stage
+# =============================================================================
 # Quality gates (lint, tests, coverage) run in CI before an image is built, so this stage only builds:
 # the contract, the Prisma client into src/generated, then the API and its command-line tools.
 FROM deps AS build
@@ -26,7 +30,9 @@ RUN npm run build --workspace contract \
   && npm run db:generate --workspace backend \
   && npm run build --workspace backend
 
-# ---- Production dependencies stage -----------------------------------------
+# =============================================================================
+# Production dependencies stage
+# =============================================================================
 # Same install without the dev tools. The Prisma CLI stays: it applies the migrations at startup.
 FROM deps AS prod-deps
 # A dependency whose range the hoisted copy does not satisfy (another workspace pins an older one) is
@@ -34,7 +40,9 @@ FROM deps AS prod-deps
 RUN npx --yes npm@11.21.1 ci --workspace contract --workspace backend --omit=dev \
   && mkdir -p backend/node_modules
 
-# ---- Runtime stage ----------------------------------------------------------
+# =============================================================================
+# Runtime stage
+# =============================================================================
 FROM node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS runtime
 
 # Alpine security fixes land days before a rebuilt base image: applied at build time, so the image

@@ -4,7 +4,9 @@
 # Build context: the repository root, since the app compiles the shared contract (`contract/`) and the
 # workspaces share one lockfile. `docker build -f frontend/Dockerfile .`; what it skips: Dockerfile.dockerignore.
 
-# ---- Build stage ------------------------------------------------------------
+# =============================================================================
+# Build stage
+# =============================================================================
 # Quality gates (format, lint, test) run in CI before an image is built, so this stage only builds.
 FROM node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS build
 WORKDIR /workspace
@@ -22,7 +24,9 @@ COPY contract contract
 COPY frontend frontend
 RUN npm run build --workspace contract && npm run build --workspace frontend
 
-# ---- Runtime stage ------------------------------------------------------------
+# =============================================================================
+# Runtime stage
+# =============================================================================
 # nginx serves the bundle and relays /api/* and /readyz to the backend: the app's single entry point.
 # The unprivileged image runs every nginx process as the `nginx` user, never root.
 FROM nginxinc/nginx-unprivileged:1.31.7-alpine3.24@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e AS runtime

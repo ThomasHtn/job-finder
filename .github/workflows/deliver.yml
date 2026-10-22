@@ -3,7 +3,9 @@ name: Deliver
 # Every push to main: both test suites, then both images started from compose.yaml, scanned and
 # driven by the browser tests, and only then pushed to GHCR, tagged with the commit.
 # A tag v<x.y.z> does the same, adds the version tags and publishes a GitHub release.
-# A pull request touching the images or compose.yaml runs it all without pushing anything.
+# A pull request touching what an image is built from (dependencies, sources, Dockerfiles, nginx
+# template) or compose.yaml runs it all without pushing anything.
+# A release tag must sit on a commit of main.
 # The server only pulls what this pushed, so a commit whose checks failed has no image and cannot be deployed.
 on:
   push:
@@ -21,7 +23,19 @@ on:
       - 'frontend/nginx.conf.template'
       - 'frontend/e2e/**'
       - 'frontend/playwright.config.ts'
-      - 'backend/src/cli/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '*/package.json'
+      - 'contract/**'
+      - 'backend/prisma/**'
+      - 'backend/prisma.config.ts'
+      - 'backend/nest-cli.json'
+      - 'backend/tsconfig*.json'
+      - 'backend/src/**'
+      - 'frontend/src/**'
+      - 'frontend/public/**'
+      - 'frontend/angular.json'
+      - 'frontend/tsconfig*.json'
       - 'compose.yaml'
       - '.github/workflows/deliver.yml'
 
@@ -30,10 +44,12 @@ on:
 permissions:
   contents: read
 
-# A newer push supersedes a running delivery: only the latest commit of main gets deployed.
+# A newer pull-request push supersedes the running check. A delivery of main or of a tag is never
+# cancelled, so it cannot stop between the backend and the frontend push; a newer push waits its turn
+# (GitHub keeps only the latest waiting run), so the latest commit of main is still the one deployed.
 concurrency:
   group: deliver-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   backend:
@@ -63,13 +79,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # Nothing pushes back: no token left on disk for later steps.
+        # Nothing pushes back: no token left on disk for later steps. A release tag needs the whole
+        # history to prove it sits on main.
         with:
           persist-credentials: false
+          fetch-depth: ${{ startsWith(github.ref, 'refs/tags/v') && 0 || 1 }}
 
       # Registry paths must be lowercase; the owner name is not.
       - name: Compute registry
         run: echo "IMAGE_REGISTRY=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_ENV"
+
+      # A release tag on a side branch would publish images that main never tested.
+      - name: Check release commit is on main
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
 
       # A release tag must name the version every workspace carries (`make version`), or the images would lie.
       - name: Check release version

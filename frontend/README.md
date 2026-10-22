@@ -14,7 +14,7 @@ npm run build --workspace contract
 Then every day, with the backend running on port 3001:
 
 ```bash
-npm start
+npm start --workspace frontend
 ```
 
 The app opens on http://localhost:4201 and relays `/api` to the API (`proxy.conf.json`).

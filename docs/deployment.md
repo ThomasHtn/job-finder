@@ -64,6 +64,8 @@ INGESTION_HEARTBEAT_URL=
 
 The search profile (`SEARCH_*`: job title, keywords, stack, commute area) is the whole domain of the app. Copy it from [backend/.env.example](../backend/.env.example), where every key is explained, and change it without touching the images. A new commute area also needs a new isochrone, generated in the repository (backend README).
 
+Do not copy the rest of that file: its development defaults are wrong on a server. `LOGIN_THROTTLE_ENABLED=false` must stay unset (or `true`) so sign-in attempts stay rate-limited, and `INGESTION_DISABLED_SOURCES` is set above on purpose.
+
 These already have the right default. Leave them alone unless you know why:
 
 ```properties
