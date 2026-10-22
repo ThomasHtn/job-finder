@@ -11,7 +11,6 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { config } from 'dotenv';
-import type { FeatureCollection, Polygon } from 'geojson';
 
 import { ISOCHRONE_FILENAME } from '../geo/geo.constants.js';
 import { validateEnv } from '../shared/config/validate-env.js';
@@ -20,6 +19,7 @@ import {
   ISOCHRONE_URL,
   METERS_PER_KM,
 } from './generate-isochrone.constants.js';
+import { parseIsochroneResponse } from './parse-isochrone-response.js';
 
 config({ path: '.env', quiet: true });
 
@@ -61,19 +61,19 @@ if (!response.ok) {
 }
 
 /**
- * One polygon feature: the reachable area.
+ * The reachable area, validated and stripped of everything but its rings.
  */
-const geojson = (await response.json()) as FeatureCollection<Polygon>;
+const area = parseIsochroneResponse(await response.json());
 
 /**
  * Committed next to the geo module, which loads it at startup.
  */
 const target = fileURLToPath(new URL(`../geo/${ISOCHRONE_FILENAME}`, import.meta.url));
-writeFileSync(target, `${JSON.stringify(geojson)}\n`);
+writeFileSync(target, `${JSON.stringify(area)}\n`);
 
 /**
  * Vertex count of the outer ring, printed as a sanity check.
  */
-const points = geojson.features[0]?.geometry.coordinates[0]?.length ?? 0;
+const points = area.geometry.coordinates[0]?.length ?? 0;
 console.log(`Wrote ${ISOCHRONE_FILENAME} (${driveKm} km, ${points} points) to ${target}`);
 console.log('Commit this file: the API now filters offers locally, with no network call.');
