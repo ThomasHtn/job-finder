@@ -30,10 +30,11 @@ on:
 permissions:
   contents: read
 
-# Superseded pull-request runs are cancelled. Fixed group name: inside deliver.yml, github.workflow is
-# the caller's name, and sharing its group would deadlock the call.
+# Superseded pull-request runs are cancelled. The prefix keeps clear of deliver.yml's own group, which
+# would deadlock the call; github.workflow (the caller's name there) keeps this run and the one
+# deliver.yml calls on the same pull request from cancelling each other.
 concurrency:
-  group: backend-ci-${{ github.ref }}
+  group: backend-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
