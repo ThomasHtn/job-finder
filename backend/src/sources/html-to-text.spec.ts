@@ -44,6 +44,10 @@ describe('htmlToText', () => {
     expect(htmlToText('<p>a&nbsp;  b</p><br><br><br><p>c</p>')).toBe('a b\n\nc');
   });
 
+  it('leaves no tag behind nested markup', () => {
+    expect(htmlToText('<scr<b>ipt>alert(1)</script>')).toBe('ipt>alert(1)');
+  });
+
   it('answers null for an empty or tag-only description', () => {
     expect(htmlToText(null)).toBeNull();
     expect(htmlToText('')).toBeNull();

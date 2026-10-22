@@ -16,6 +16,19 @@ function decodeEntities(text: string): string {
 }
 
 /**
+ * Removes tags until none is left, so a nested `<scr<b>ipt>` cannot leave a tag behind.
+ */
+function stripTags(markup: string): string {
+  let previous: string;
+  let current = markup;
+  do {
+    previous = current;
+    current = current.replace(/<[^>]*>/g, '');
+  } while (current !== previous);
+  return current;
+}
+
+/**
  * Turns an HTML description into readable plain text. Some boards (Greenhouse) return HTML that is
  * itself entity-escaped, so it is unescaped once before the tags go. Text entities are decoded only
  * after, or an escaped "&lt;" would read as the start of a tag and swallow the text behind it.
@@ -24,10 +37,11 @@ export function htmlToText(html: string | null | undefined): string | null {
   if (!html) return null;
 
   const markup = REAL_TAG.test(html) ? html : decodeEntities(html);
-  const stripped = markup
-    .replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/gi, '\n')
-    .replace(/<\s*li[^>]*>/gi, '- ')
-    .replace(/<[^>]+>/g, '');
+  const stripped = stripTags(
+    markup
+      .replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/gi, '\n')
+      .replace(/<\s*li[^>]*>/gi, '- '),
+  );
   /* A decoded `&#0;` leaves a NUL, which PostgreSQL refuses. */
   const text = stripNul(decodeEntities(stripped))
     .replace(/[ \t\u00a0]+/g, ' ')
