@@ -35,6 +35,11 @@ describe('htmlToText', () => {
     expect(htmlToText('a &#abc; b &#99999999; c')).toBe('a &#abc; b &#99999999; c');
   });
 
+  it('drops the NUL character a numeric entity decodes to', () => {
+    expect(htmlToText('<p>Java&#0; &#x0;Spring</p>')).toBe('Java Spring');
+    expect(htmlToText('&#0;')).toBeNull();
+  });
+
   it('collapses spaces, including non-breaking ones, and blank lines', () => {
     expect(htmlToText('<p>a&nbsp;  b</p><br><br><br><p>c</p>')).toBe('a b\n\nc');
   });

@@ -1,11 +1,8 @@
-import { permanentFromLabel } from '../../classifier/detect-permanent.js';
-import { htmlToText } from '../../html-to-text.js';
+import { getJson } from '../../get-json.js';
 import type { RawJob } from '../../raw-job.js';
-import { toDate } from '../../to-date.js';
-import { ATS_PAGE_SIZE, TIMEOUT_MS } from '../ats.constants.js';
+import { ATS_PAGE_SIZE, CAPGEMINI_COUNTRY_CODE, FIRST_PAGE, TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
-import { companyFields } from '../company-fields.js';
-import { getJson } from '../get-json.js';
+import { toRawJob } from './capgemini.mapper.js';
 import type { CapgeminiJob } from './capgemini.types.js';
 
 /**
@@ -15,41 +12,17 @@ import type { CapgeminiJob } from './capgemini.types.js';
  */
 export async function fetchCapgemini(company: CompanyConfig): Promise<RawJob[]> {
   const params = new URLSearchParams({
-    page: '1',
+    page: FIRST_PAGE,
     size: String(ATS_PAGE_SIZE),
-    country_code: 'fr-fr',
+    country_code: CAPGEMINI_COUNTRY_CODE,
     search: company.board,
   });
   const body = await getJson<{ data?: CapgeminiJob[] }>(
     `https://cg-jobstream-api.azurewebsites.net/api/job-search?${params}`,
-    TIMEOUT_MS,
+    { label: `Capgemini ${company.board}`, timeoutMs: TIMEOUT_MS },
   );
 
   return (body.data ?? [])
     .filter((job) => job.location?.includes(company.board))
-    .map((job) => {
-      const description = htmlToText(job.description);
-      return {
-        ...companyFields(company, 'Capgemini'),
-        /* One search per town: the board keeps an offer listed in two towns apart. */
-        sourceId: `capgemini:${company.board}:${job.id}`,
-        title: job.title,
-        company: job.brand ?? company.name,
-        companyDescription: null,
-        description,
-        hasFullDescription: Boolean(description),
-        contractLabel: job.contract_type ?? null,
-        isPermanent: permanentFromLabel(job.contract_type),
-        salary: null,
-        locationText: company.board,
-        city: company.board,
-        postalCode: null,
-        latitude: null,
-        longitude: null,
-        isRemote: false,
-        isLocationApproximate: false,
-        url: job.apply_job_url,
-        publishedAt: toDate(job.updated_at),
-      } satisfies RawJob;
-    });
+    .map((job) => toRawJob(company, job));
 }

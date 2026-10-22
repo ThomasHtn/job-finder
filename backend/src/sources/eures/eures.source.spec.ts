@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PROFILE } from '../../shared/config/search-profile.fixtures.js';
-import type { SearchProfile } from '../../shared/config/search-profile.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { DIRECT_HIRE, RESULTS_PER_PAGE } from './eures.constants.js';
 import { EuresSource } from './eures.source.js';
 import type { EuresJob } from './eures.types.js';

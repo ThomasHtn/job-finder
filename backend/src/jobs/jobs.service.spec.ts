@@ -60,7 +60,7 @@ describe('JobsService not found', () => {
   it('rejects unknown ids', async () => {
     const { service } = build([]);
     await expect(service.detail('nope')).rejects.toBeInstanceOf(NotFoundException);
-    await expect(service.toggleFavorite('nope')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.setFavorite('nope', true)).rejects.toBeInstanceOf(NotFoundException);
   });
 });
 
@@ -127,11 +127,12 @@ describe('JobsService flags', () => {
     expect(prisma.job.update).not.toHaveBeenCalled();
   });
 
-  it('flips the favourite flag both ways', async () => {
+  it('sets the favourite flag to the asked state, whatever it was', async () => {
     const off = build([], jobRow({ isFavorite: false }));
-    expect((await off.service.toggleFavorite('job-1')).isFavorite).toBe(true);
+    expect((await off.service.setFavorite('job-1', true)).isFavorite).toBe(true);
 
     const on = build([], jobRow({ isFavorite: true }));
-    expect((await on.service.toggleFavorite('job-1')).isFavorite).toBe(false);
+    expect((await on.service.setFavorite('job-1', true)).isFavorite).toBe(true);
+    expect((await on.service.setFavorite('job-1', false)).isFavorite).toBe(false);
   });
 });

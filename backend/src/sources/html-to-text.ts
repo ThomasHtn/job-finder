@@ -1,36 +1,5 @@
-/**
- * Named entities met in source descriptions; numeric ones are decoded generically.
- */
-const ENTITIES: Record<string, string> = {
-  amp: '&',
-  lt: '<',
-  gt: '>',
-  quot: '"',
-  apos: "'",
-  nbsp: ' ',
-  eacute: 'é',
-  egrave: 'è',
-  ecirc: 'ê',
-  agrave: 'à',
-  ccedil: 'ç',
-  ugrave: 'ù',
-  ocirc: 'ô',
-  icirc: 'î',
-  rsquo: '’',
-  hellip: '…',
-  mdash: '—',
-  ndash: '–',
-};
-
-/**
- * Highest Unicode code point: a numeric entity above it is not a character.
- */
-const MAX_CODE_POINT = 0x10ffff;
-
-/**
- * Markup that is real HTML rather than entity-escaped HTML.
- */
-const REAL_TAG = /<[a-z/!]/i;
+import { stripNul } from '../shared/helpers/strip-nul.js';
+import { ENTITIES, MAX_CODE_POINT, REAL_TAG } from './html-to-text.constants.js';
 
 /**
  * Replaces named, decimal and hexadecimal entities; unknown or invalid ones are left as is.
@@ -59,7 +28,8 @@ export function htmlToText(html: string | null | undefined): string | null {
     .replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/gi, '\n')
     .replace(/<\s*li[^>]*>/gi, '- ')
     .replace(/<[^>]+>/g, '');
-  const text = decodeEntities(stripped)
+  /* A decoded `&#0;` leaves a NUL, which PostgreSQL refuses. */
+  const text = stripNul(decodeEntities(stripped))
     .replace(/[ \t\u00a0]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();

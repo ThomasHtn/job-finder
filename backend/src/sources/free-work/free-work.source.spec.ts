@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PROFILE } from '../../shared/config/search-profile.fixtures.js';
-import { FULL_REMOTE, PAGE_SIZE } from './free-work.constants.js';
+import { FULL_REMOTE_MODE, PAGE_SIZE } from './free-work.constants.js';
 import { FreeWorkSource } from './free-work.source.js';
 import type { FreeWorkJob } from './free-work.types.js';
 
@@ -46,7 +46,7 @@ function params(url: string | URL | Request): URLSearchParams {
  * True for the nationwide remote sweep.
  */
 function isRemoteSearch(url: string | URL | Request): boolean {
-  return params(url).get('remoteMode') === FULL_REMOTE;
+  return params(url).get('remoteMode') === FULL_REMOTE_MODE;
 }
 
 /**

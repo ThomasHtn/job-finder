@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SearchProfile } from '../shared/config/search-profile.js';
+import type { SearchProfile } from '../shared/config/search-profile.types.js';
 import type { PrismaService } from '../shared/prisma/prisma.service.js';
 import { GeoService } from './geo.service.js';
 
@@ -23,7 +23,7 @@ function build(cached: unknown = null, resolved = HIT) {
   const prisma = {
     geocodeCache: {
       findUnique: vi.fn(async () => cached),
-      create: vi.fn(async () => ({})),
+      upsert: vi.fn(async () => ({})),
     },
   };
   const geocoder = { resolve: vi.fn(async () => resolved) };
@@ -59,22 +59,21 @@ describe('GeoService.geocode', () => {
   it('caches a fresh hit', async () => {
     const { service, prisma } = build();
     expect(await service.geocode('Le Havre')).toEqual(HIT);
-    expect(prisma.geocodeCache.create).toHaveBeenCalledWith({
-      data: { query: 'le havre', ...HIT },
+    expect(prisma.geocodeCache.upsert).toHaveBeenCalledWith({
+      where: { query: 'le havre' },
+      create: { query: 'le havre', ...HIT },
+      update: HIT,
     });
   });
 
   it('caches a fresh miss with null coordinates', async () => {
     const { service, prisma } = build(null, null as never);
     expect(await service.geocode('Nulle part')).toBeNull();
-    expect(prisma.geocodeCache.create).toHaveBeenCalledWith({
-      data: {
-        query: 'nulle part',
-        latitude: null,
-        longitude: null,
-        city: null,
-        postalCode: null,
-      },
+    const miss = { latitude: null, longitude: null, city: null, postalCode: null };
+    expect(prisma.geocodeCache.upsert).toHaveBeenCalledWith({
+      where: { query: 'nulle part' },
+      create: { query: 'nulle part', ...miss },
+      update: miss,
     });
   });
 
@@ -82,6 +81,6 @@ describe('GeoService.geocode', () => {
     const { service, prisma, geocoder } = build();
     geocoder.resolve.mockRejectedValueOnce(new Error('Geocoder returned 503'));
     expect(await service.geocode('Rouen')).toBeNull();
-    expect(prisma.geocodeCache.create).not.toHaveBeenCalled();
+    expect(prisma.geocodeCache.upsert).not.toHaveBeenCalled();
   });
 });

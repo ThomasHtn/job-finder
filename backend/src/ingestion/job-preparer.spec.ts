@@ -28,6 +28,23 @@ describe('prepareJob', () => {
     expect(prepared).not.toHaveProperty('latitude');
   });
 
+  it('strips the NUL characters PostgreSQL rejects from every field', async () => {
+    const prepared = await prepareJob(
+      rawJob({ description: 'Angular\u0000 et Java', company: 'Ac\u0000me' }),
+      PROFILE,
+      geo(),
+    );
+
+    expect(prepared).toMatchObject({ description: 'Angular et Java', company: 'Acme' });
+  });
+
+  it('hashes every remote offer on the same place', async () => {
+    const remote = await prepareJob(rawJob({ isRemote: true, city: 'Paris' }), PROFILE, geo());
+    const elsewhere = await prepareJob(rawJob({ isRemote: true, city: 'Lyon' }), PROFILE, geo());
+
+    expect(remote?.dedupeHash).toBe(elsewhere?.dedupeHash);
+  });
+
   it('drops offers that do not match the profile', async () => {
     const out = await prepareJob(
       rawJob({ title: 'Comptable', description: 'Excel' }),

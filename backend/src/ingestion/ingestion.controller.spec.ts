@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, HttpStatus } from '@nestjs/common';
 
 import { describe, expect, it } from 'vitest';
 
@@ -19,6 +19,12 @@ function controller(result: ReturnType<typeof emptySummary> | null): IngestionCo
 describe('IngestionController.run', () => {
   it('returns the summary of the run', async () => {
     expect(await controller(emptySummary()).run()).toEqual(emptySummary());
+  });
+
+  it('answers 200 rather than 201, as nothing is created', () => {
+    const status = Reflect.getMetadata('__httpCode__', IngestionController.prototype.run);
+
+    expect(status).toBe(HttpStatus.OK);
   });
 
   it('answers 409 while another run is in progress', async () => {

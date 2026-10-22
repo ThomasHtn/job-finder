@@ -5,18 +5,18 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 
 import type { Env } from '../shared/config/env.schema.js';
-import { CRON_JOB_NAME } from './ingestion.constants.js';
+import { CRON_JOB_NAME, CRON_TIME_ZONE } from './ingestion.constants.js';
 import { IngestionService } from './ingestion.service.js';
 
 /**
  * Wires the cron and the optional startup run; the service itself knows nothing about time.
  */
 @Injectable()
-export class IngestionScheduler implements OnApplicationBootstrap {
+export class IngestionSchedulerService implements OnApplicationBootstrap {
   /**
    * Scoped logger.
    */
-  private readonly logger = new Logger(IngestionScheduler.name);
+  private readonly logger = new Logger(IngestionSchedulerService.name);
 
   /**
    * The service to trigger, the schedule to read, the registry to attach to.
@@ -34,7 +34,7 @@ export class IngestionScheduler implements OnApplicationBootstrap {
   public onApplicationBootstrap(): void {
     if (this.config.get('INGESTION_CRON_ENABLED', { infer: true })) {
       const expression = this.config.get('INGESTION_CRON', { infer: true });
-      const job = new CronJob(expression, () => this.trigger());
+      const job = new CronJob(expression, () => this.trigger(), null, false, CRON_TIME_ZONE);
       this.scheduler.addCronJob(CRON_JOB_NAME, job);
       job.start();
       this.logger.log(`Ingestion scheduled with cron "${expression}"`);

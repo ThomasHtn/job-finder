@@ -1,4 +1,4 @@
-import { ConflictException, Controller, Get, Post } from '@nestjs/common';
+import { ConflictException, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
 import type { IngestionSummary, SourceStatus } from '@job-finder/contract';
 
@@ -15,9 +15,10 @@ export class IngestionController {
   constructor(private readonly ingestion: IngestionService) {}
 
   /**
-   * Manual trigger, mostly useful right after a deployment; 409 while another run is in progress.
+   * Manual trigger, mostly useful right after a deployment; 200 as nothing is created, 409 while another run is in progress.
    */
   @Post('run')
+  @HttpCode(HttpStatus.OK)
   public async run(): Promise<IngestionSummary> {
     const summary = await this.ingestion.run();
     if (!summary) throw new ConflictException('An ingestion is already running');

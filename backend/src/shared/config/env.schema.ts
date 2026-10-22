@@ -11,7 +11,7 @@ import {
   optionalUrl,
   requiredCsvList,
 } from './env.fields.js';
-import type { SearchProfile } from './search-profile.js';
+import type { SearchProfile } from './search-profile.types.js';
 
 /**
  * Every variable read from the environment, before derivation.

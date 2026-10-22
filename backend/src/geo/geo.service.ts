@@ -1,8 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../shared/config/search-profile.types.js';
 import { PrismaService } from '../shared/prisma/prisma.service.js';
-import { BanGeocoder } from './ban-geocoder.js';
+import { BanGeocoderService } from './ban-geocoder.service.js';
 import type { ResolvedLocation } from './ban-geocoder.types.js';
 import type { Area, Coordinates } from './geo.types.js';
 import { isWithinArea } from './is-within-area.js';
@@ -28,7 +29,7 @@ export class GeoService {
    */
   constructor(
     private readonly prisma: PrismaService,
-    private readonly geocoder: BanGeocoder,
+    private readonly geocoder: BanGeocoderService,
     @Inject(SEARCH_PROFILE) private readonly profile: SearchProfile,
   ) {
     if (!this.area) {
@@ -76,14 +77,17 @@ export class GeoService {
       this.logger.warn(`Geocoding failed for "${query}", not cached: ${(error as Error).message}`);
       return null;
     }
-    await this.prisma.geocodeCache.create({
-      data: {
-        query,
-        latitude: resolved?.latitude ?? null,
-        longitude: resolved?.longitude ?? null,
-        city: resolved?.city ?? null,
-        postalCode: resolved?.postalCode ?? null,
-      },
+    const entry = {
+      latitude: resolved?.latitude ?? null,
+      longitude: resolved?.longitude ?? null,
+      city: resolved?.city ?? null,
+      postalCode: resolved?.postalCode ?? null,
+    };
+    /* Two runs may resolve the same place at once: the second write simply refreshes the entry. */
+    await this.prisma.geocodeCache.upsert({
+      where: { query },
+      create: { query, ...entry },
+      update: entry,
     });
     return resolved;
   }

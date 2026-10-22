@@ -2,10 +2,12 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../shared/config/env.schema.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { SECOND_MS } from '../../shared/helpers/time.constants.js';
 import { collectPages } from '../collect-pages.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
+import { postForm } from '../post-form.js';
 import type { RawJob } from '../raw-job.js';
 import type { SearchScope } from '../search-scope.js';
 import { SearchTally } from '../search-tally.js';
@@ -15,11 +17,13 @@ import {
   LOCAL_MAX_PAGES,
   MAX_RETRIES,
   PAGE_SIZE,
+  PERMANENT_CONTRACT,
   REMOTE_MAX_PAGES,
   RETRY_BACKOFF_MS,
   SCOPE,
   SEARCH_TIMEOUT_MS,
   SEARCH_URL,
+  SORT_NEWEST_FIRST,
   TOKEN_REFRESH_MARGIN_S,
   TOKEN_TIMEOUT_MS,
   TOKEN_URL,
@@ -31,6 +35,7 @@ import type {
   FranceTravailSearchResponse,
   TokenResponse,
 } from './france-travail.types.js';
+import { tokenLifetimeSeconds } from './token-lifetime.js';
 
 /**
  * France Travail connector: the richest source, full text and coordinates included.
@@ -128,9 +133,9 @@ export class FranceTravailSource implements JobSourceConnector {
     const from = page * PAGE_SIZE;
     const params = new URLSearchParams({
       ...criteria,
-      typeContrat: 'CDI',
+      typeContrat: PERMANENT_CONTRACT,
       /* Newest first, so the page cap only ever drops the oldest offers. */
-      sort: '1',
+      sort: SORT_NEWEST_FIRST,
       range: `${from}-${from + PAGE_SIZE - 1}`,
     });
     if (scope === 'local') {
@@ -177,26 +182,19 @@ export class FranceTravailSource implements JobSourceConnector {
   private async getToken(): Promise<string> {
     if (this.token && this.token.expiresAt > Date.now()) return this.token.value;
 
-    const response = await fetch(TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
+    const token = await postForm<TokenResponse>(
+      TOKEN_URL,
+      new URLSearchParams({
         grant_type: 'client_credentials',
         client_id: this.clientId!,
         client_secret: this.clientSecret!,
         scope: SCOPE,
       }),
-      signal: AbortSignal.timeout(TOKEN_TIMEOUT_MS),
-    });
-
-    if (!response.ok) {
-      throw new Error(`France Travail auth failed (${response.status}): ${await response.text()}`);
-    }
-
-    const token = (await response.json()) as TokenResponse;
+      { label: 'France Travail auth', timeoutMs: TOKEN_TIMEOUT_MS },
+    );
     this.token = {
       value: token.access_token,
-      expiresAt: Date.now() + (token.expires_in - TOKEN_REFRESH_MARGIN_S) * SECOND_MS,
+      expiresAt: Date.now() + (tokenLifetimeSeconds(token) - TOKEN_REFRESH_MARGIN_S) * SECOND_MS,
     };
     return this.token.value;
   }

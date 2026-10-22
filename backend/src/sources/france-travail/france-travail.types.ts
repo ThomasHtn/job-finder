@@ -10,7 +10,7 @@ export interface TokenResponse {
   /**
    * Lifetime of the token, in seconds.
    */
-  expires_in: number;
+  expires_in?: number;
 }
 
 /**

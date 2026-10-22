@@ -1,3 +1,5 @@
+import type { JobSource } from './job-source.js';
+
 /**
  * Result of one ingestion run, returned by the manual trigger endpoint.
  */
@@ -33,12 +35,12 @@ export interface IngestionSummary {
   purged: number;
 
   /**
-   * Sources without credentials, never called.
+   * Sources without credentials or listed in INGESTION_DISABLED_SOURCES, never called.
    */
-  skippedSources: string[];
+  skippedSources: JobSource[];
 
   /**
    * Sources whose fetch failed during this run.
    */
-  failedSources: string[];
+  failedSources: JobSource[];
 }

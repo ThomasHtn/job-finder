@@ -6,6 +6,7 @@
 export * from './api-error.js';
 export * from './app-config.js';
 export * from './app-token-header.js';
+export * from './favorite-update.js';
 export * from './ingestion-summary.js';
 export * from './job-counts.js';
 export * from './job-detail.js';

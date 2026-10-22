@@ -9,9 +9,9 @@ export const BASE_URL = 'https://api.adzuna.com/v1/api/jobs/fr/search';
 export const RESULTS_PER_PAGE = 50;
 
 /**
- * The free tier is 2500 requests/month. With a 2h cron (~360 runs/month), one page for
- * each of the first MAX_KEYWORDS queries plus two nationwide remote sweeps stays
- * around 1800/month, leaving headroom for manual `/api/ingestion/run` triggers.
+ * The free tier is 2500 requests/month. With the default cron (twice a day, ~60 runs/month), one
+ * page for each of the first MAX_KEYWORDS queries plus two nationwide remote sweeps stays around
+ * 300/month, leaving ample headroom for manual `/api/ingestion/run` triggers and retries.
  */
 export const MAX_PAGES = 1;
 
@@ -39,11 +39,6 @@ export const RETRY_BACKOFF_MS = 10_000;
  * Longest error body kept on the run row.
  */
 export const MAX_ERROR_LENGTH = 200;
-
-/**
- * Adzuna keeps ads alive for years; anything older is a zombie.
- */
-export const MAX_DAYS_OLD = 60;
 
 /**
  * Exact phrases matched in the full ad, which the API sees even though it only

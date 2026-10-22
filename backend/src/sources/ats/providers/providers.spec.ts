@@ -1,3 +1,5 @@
+import { Logger } from '@nestjs/common';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CompanyConfig } from '../ats.types.js';
@@ -29,7 +31,7 @@ function json(body: unknown): Response {
 }
 
 /**
- * Specs of the ATS providers: France filtering and mapping.
+ * Specs of the ATS providers: requests and France filtering; the mapping has its own specs.
  */
 describe('ATS providers', () => {
   const fetchMock = vi.fn<typeof fetch>();
@@ -92,21 +94,6 @@ describe('ATS providers', () => {
         'https://boards-api.greenhouse.io/v1/boards/acme/jobs?content=true',
       );
       expect(jobs.map((job) => job.sourceId)).toEqual(['greenhouse:acme:1', 'greenhouse:acme:4']);
-      expect(jobs[0]).toMatchObject({
-        source: 'ATS',
-        sourceLabel: 'Acme (Greenhouse)',
-        description: 'Stack Java',
-        hasFullDescription: true,
-        contractLabel: 'Full-time',
-        isPermanent: true,
-        publishedAt: new Date('2026-10-01T10:00:00Z'),
-      });
-      expect(jobs[1]).toMatchObject({
-        description: null,
-        hasFullDescription: false,
-        isRemote: true,
-        publishedAt: new Date('2026-10-02T10:00:00Z'),
-      });
     });
   });
 
@@ -141,15 +128,14 @@ describe('ATS providers', () => {
       const jobs = await fetchLever(company('lever'));
 
       expect(jobs.map((job) => job.sourceId)).toEqual(['lever:acme:a', 'lever:acme:b']);
-      expect(jobs[0]).toMatchObject({
-        description: 'Stack Angular\n\nMutuelle',
-        hasFullDescription: true,
-        isPermanent: true,
-        isRemote: true,
-        city: 'Paris',
-        publishedAt: new Date('2026-10-01T00:00:00Z'),
-      });
-      expect(jobs[1]).toMatchObject({ description: null, isPermanent: null, publishedAt: null });
+    });
+
+    it('fails when the board answers something else than a list', async () => {
+      fetchMock.mockResolvedValue(json({ error: 'maintenance' }));
+
+      await expect(fetchLever(company('lever'))).rejects.toThrow(
+        'Lever acme answered something else than a list',
+      );
     });
   });
 
@@ -197,13 +183,6 @@ describe('ATS providers', () => {
       const jobs = await fetchAshby(company('ashby'));
 
       expect(jobs.map((job) => job.sourceId)).toEqual(['ashby:acme:a', 'ashby:acme:c']);
-      expect(jobs[0]).toMatchObject({
-        city: 'Caen',
-        postalCode: '14000',
-        hasFullDescription: true,
-        isRemote: false,
-      });
-      expect(jobs[1]).toMatchObject({ city: 'France', isRemote: true, publishedAt: null });
     });
   });
 
@@ -239,14 +218,7 @@ describe('ATS providers', () => {
       const url = new URL(href(fetchMock.mock.calls[0][0]));
       expect(url.searchParams.get('search')).toBe('Rouen');
       expect(url.searchParams.get('size')).toBe('100');
-      expect(jobs).toHaveLength(1);
-      expect(jobs[0]).toMatchObject({
-        sourceId: 'capgemini:Rouen:1',
-        company: 'Capgemini Engineering',
-        city: 'Rouen',
-        description: 'Stack Java',
-        isPermanent: true,
-      });
+      expect(jobs.map((job) => job.sourceId)).toEqual(['capgemini:Rouen:1']);
     });
   });
 
@@ -294,14 +266,22 @@ describe('ATS providers', () => {
         'smartrecruiters:acme:p1',
         'smartrecruiters:acme:p2',
       ]);
-      expect(jobs[0]).toMatchObject({
-        description: 'Acme\n\nStack Java',
-        hasFullDescription: true,
-        isPermanent: true,
-        city: 'Le Havre',
-        url: 'https://jobs.smartrecruiters.com/acme/p1',
-      });
-      expect(jobs[1]).toMatchObject({ description: null, isPermanent: null });
+      expect(jobs[0].description).toBe('Acme\n\nStack Java');
+      expect(jobs[1].description).toBeNull();
+    });
+
+    it('logs the posting whose description could not be read', async () => {
+      const warn = vi.spyOn(Logger, 'warn').mockImplementation(() => undefined);
+      fetchMock.mockImplementation(async (url) =>
+        new URL(href(url)).pathname.endsWith('/postings')
+          ? json({ content: [{ id: 'p2', name: 'Developer', location: { country: 'fr' } }] })
+          : new Response('', { status: 500 }),
+      );
+
+      await fetchSmartRecruiters(company('smartrecruiters'));
+
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('posting p2'), 'SmartRecruiters');
+      warn.mockRestore();
     });
   });
 });

@@ -10,6 +10,16 @@ export const TOKEN_URL =
 export const SEARCH_URL = 'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
 
 /**
+ * `typeContrat` value of a permanent contract, the only one searched.
+ */
+export const PERMANENT_CONTRACT = 'CDI';
+
+/**
+ * `sort` value listing the newest offers first.
+ */
+export const SORT_NEWEST_FIRST = '1';
+
+/**
  * Scopes granted to the application.
  */
 export const SCOPE = 'api_offresdemploiv2 o2dsoffre';
@@ -58,6 +68,11 @@ export const TOKEN_TIMEOUT_MS = 15_000;
  * Tokens are refreshed this early so one never expires mid-run.
  */
 export const TOKEN_REFRESH_MARGIN_S = 60;
+
+/**
+ * Lifetime assumed when the token answer gives none (the API grants about 25 minutes).
+ */
+export const TOKEN_DEFAULT_TTL_S = 1_500;
 
 /**
  * Ad page an offer id resolves to, when the source gives no direct link.

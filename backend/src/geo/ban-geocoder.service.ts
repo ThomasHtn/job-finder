@@ -8,7 +8,7 @@ import { parseBanResponse } from './parse-ban-response.js';
  * HTTP client for the French national address base.
  */
 @Injectable()
-export class BanGeocoder {
+export class BanGeocoderService {
   /**
    * Resolves a free-form French location to its best match, null when nothing matches.
    * Throws when the address base cannot answer, so a passing outage is never mistaken for a miss.

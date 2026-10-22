@@ -46,7 +46,7 @@ model Job {
   /// Links to the same offer found on other sources during deduplication.
   alternativeUrls String[] @default([])
 
-  /// With firstSeenAt as fallback, the age that drives the purge.
+  /// Null when the board gives no date; firstSeenAt then drives the purge.
   publishedAt DateTime?
   firstSeenAt DateTime  @default(now())
 
@@ -69,6 +69,16 @@ model GeocodeCache {
   city       String?
   postalCode String?
   createdAt  DateTime @default(now())
+}
+
+/// Undated offers the purge deleted: the board still lists them, and without this record the next
+/// run would bring them back as new, for ever. Dated ones are skipped on their publication date.
+model PurgedJob {
+  source   JobSourceType
+  sourceId String
+  purgedAt DateTime      @default(now())
+
+  @@id([source, sourceId])
 }
 
 model IngestionRun {

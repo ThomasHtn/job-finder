@@ -2,14 +2,17 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../shared/config/env.schema.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
+import { postJson } from '../post-json.js';
 import type { RawJob } from '../raw-job.js';
 import { SearchTally } from '../search-tally.js';
 import { sleep } from '../sleep.js';
 import {
   BASE_URL,
   DELAY_BETWEEN_REQUESTS_MS,
+  FIRST_PAGE,
   MAX_KEYWORDS,
   MAX_RADIUS_KM,
   RESULTS_PER_PAGE,
@@ -72,25 +75,19 @@ export class JoobleSource implements JobSourceConnector {
    * One search, first page only.
    */
   private async search(keywords: string): Promise<JoobleJob[]> {
-    const response = await fetch(`${BASE_URL}/${this.apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    /* The key sits in the URL: the label is all an error message may name. */
+    const body = await postJson<JoobleSearchResponse>(
+      `${BASE_URL}/${this.apiKey}`,
+      {
         keywords,
         location: this.profile.area.city,
         /* The API takes its numbers as strings. */
         radius: String(Math.min(this.profile.area.driveKm, MAX_RADIUS_KM)),
-        page: '1',
+        page: FIRST_PAGE,
         ResultOnPage: String(RESULTS_PER_PAGE),
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-    if (!response.ok) {
-      /* The body may be a whole HTML page (Cloudflare challenge): the status says enough. */
-      throw new Error(`Jooble search failed (${response.status})`);
-    }
-
-    const body = (await response.json()) as JoobleSearchResponse;
+      },
+      { label: 'Jooble search', timeoutMs: TIMEOUT_MS },
+    );
     return body.jobs ?? [];
   }
 

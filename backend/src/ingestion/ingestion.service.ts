@@ -5,16 +5,19 @@ import type { IngestionSummary, JobSource, SourceStatus } from '@job-finder/cont
 
 import { GeoService } from '../geo/geo.service.js';
 import type { Env } from '../shared/config/env.schema.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../shared/config/search-profile.types.js';
 import { DAY_MS } from '../shared/helpers/time.constants.js';
-import type { JobSourceConnector } from '../sources/job-source-connector.js';
+import type { JobSourceConnector } from '../sources/job-source-connector.types.js';
 import { JOB_SOURCE_CONNECTORS } from '../sources/job-source-connectors.token.js';
+import type { RawJob } from '../sources/raw-job.js';
 import { describeCrash, describeRun } from './describe-run.js';
+import { emptyOutcomes } from './empty-outcomes.js';
 import { emptySummary } from './empty-summary.js';
 import { RECENT_RUNS } from './ingestion.constants.js';
 import { IngestionRepository } from './ingestion.repository.js';
-import type { GeoPort, SourceFailure } from './ingestion.types.js';
-import { IngestionHeartbeat } from './ingestion-heartbeat.js';
+import type { GeoPort, OfferOutcome, SourceFailure } from './ingestion.types.js';
+import { IngestionHeartbeatService } from './ingestion-heartbeat.service.js';
 import { prepareJob } from './job-preparer.js';
 import { toSourceRun } from './to-source-run.js';
 
@@ -54,7 +57,7 @@ export class IngestionService {
     @Inject(GeoService) private readonly geo: GeoPort,
     private readonly repository: IngestionRepository,
     config: ConfigService<Env, true>,
-    private readonly heartbeat: IngestionHeartbeat,
+    private readonly heartbeat: IngestionHeartbeatService,
   ) {
     this.maxAgeDays = config.get('INGESTION_MAX_AGE_DAYS', { infer: true });
     this.disabledSources = new Set(config.get('INGESTION_DISABLED_SOURCES', { infer: true }));
@@ -151,6 +154,7 @@ export class IngestionService {
   /**
    * Fetches one source, persists what passes the filters and is not past the cutoff, and records the run.
    * Errors are captured on the run row and in the summary, never rethrown: the failure is returned.
+   * Only a failing fetch fails the board; one offer that cannot be written is logged and left behind.
    */
   private async runSource(
     connector: JobSourceConnector,
@@ -161,37 +165,29 @@ export class IngestionService {
 
     try {
       const rawJobs = await connector.fetchJobs();
-      let kept = 0;
-      let inserted = 0;
-      let updated = 0;
-      let merged = 0;
+      const purged = await this.repository.purgedSourceIds(connector.name);
+      const outcomes = emptyOutcomes();
 
       for (const raw of rawJobs) {
-        /* The purge would delete it at the end of this run, and the next run would bring it back. */
-        if (raw.publishedAt && raw.publishedAt < cutoff) continue;
-        const prepared = await prepareJob(raw, this.profile, this.geo);
-        if (!prepared) continue;
-        kept += 1;
-
-        const outcome = await this.repository.persistJob(prepared);
-        if (outcome === 'inserted') inserted += 1;
-        else if (outcome === 'updated') updated += 1;
-        else merged += 1;
+        outcomes[await this.ingestOffer(raw, cutoff, purged)] += 1;
       }
+      const kept = rawJobs.length - outcomes.skipped;
 
       summary.fetched += rawJobs.length;
       summary.kept += kept;
-      summary.inserted += inserted;
-      summary.updated += updated;
-      summary.merged += merged;
+      summary.inserted += outcomes.inserted;
+      summary.updated += outcomes.updated;
+      summary.merged += outcomes.merged;
 
       await this.repository.finishRun(runId, {
         fetched: rawJobs.length,
         kept,
-        inserted,
-        updated,
+        inserted: outcomes.inserted,
+        updated: outcomes.updated,
       });
-      this.logger.log(`${connector.name}: ${rawJobs.length} fetched, ${kept} kept`);
+      this.logger.log(
+        `${connector.name}: ${rawJobs.length} fetched, ${kept} kept, ${outcomes.failed} failed`,
+      );
       return null;
     } catch (error) {
       const message = (error as Error).message;
@@ -199,6 +195,29 @@ export class IngestionService {
       await this.repository.failRun(runId, message);
       this.logger.error(`${connector.name} failed: ${message}`);
       return { source: connector.name, error: message };
+    }
+  }
+
+  /**
+   * Filters and writes one offer. A failure is logged and answered, never thrown, so the offers
+   * after it still get their turn.
+   */
+  private async ingestOffer(
+    raw: RawJob,
+    cutoff: Date,
+    purged: ReadonlySet<string>,
+  ): Promise<OfferOutcome> {
+    /* The purge would delete it at the end of this run, and the next run would bring it back. */
+    if (raw.publishedAt && raw.publishedAt < cutoff) return 'skipped';
+    /* Undated, the purge already deleted it once: the board keeps listing it. */
+    if (!raw.publishedAt && purged.has(raw.sourceId)) return 'skipped';
+
+    try {
+      const prepared = await prepareJob(raw, this.profile, this.geo);
+      return prepared ? await this.repository.persistJob(prepared) : 'skipped';
+    } catch (error) {
+      this.logger.warn(`${raw.source} offer ${raw.sourceId} skipped: ${(error as Error).message}`);
+      return 'failed';
     }
   }
 }

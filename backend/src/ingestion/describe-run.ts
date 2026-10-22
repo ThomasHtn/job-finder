@@ -1,13 +1,15 @@
 import type { IngestionSummary } from '@job-finder/contract';
 
-import { HEARTBEAT_ERROR_MAX, HEARTBEAT_MSG_MAX } from './ingestion.constants.js';
+import { HEARTBEAT_ERROR_MAX, HEARTBEAT_MSG_MAX, TRUNCATION_MARK } from './ingestion.constants.js';
 import type { HeartbeatReport, SourceFailure } from './ingestion.types.js';
 
 /**
  * Cuts a text to a length, marking the cut.
  */
 function truncate(text: string, max: number): string {
-  return text.length > max ? `${text.slice(0, max - 3)}...` : text;
+  return text.length > max
+    ? `${text.slice(0, max - TRUNCATION_MARK.length)}${TRUNCATION_MARK}`
+    : text;
 }
 
 /**

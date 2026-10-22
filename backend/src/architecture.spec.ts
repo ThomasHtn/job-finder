@@ -35,6 +35,12 @@ const PRISMA_SERVICE = join(SRC, 'shared', 'prisma', 'prisma.service.ts');
 const DATA_ACCESS = /\.(service|repository|spec)\.ts$/;
 
 /**
+ * Folders allowed to read `process.env`: the validated config, and the command-line tools that run
+ * before or without the Nest container.
+ */
+const ENV_READERS = [join(SRC, 'shared', 'config'), join(SRC, 'cli')];
+
+/**
  * Every TypeScript file of a folder, recursively, generated code excluded.
  */
 function sources(folder: string): string[] {
@@ -96,6 +102,16 @@ describe('architecture', () => {
     const violations = FILES.filter(({ file }) => relativeImports(file).includes(PRISMA_SERVICE))
       .filter(({ file, folder }) => folder !== 'shared' && !DATA_ACCESS.test(file))
       .map(({ file }) => relative(SRC, file));
+
+    expect(violations).toEqual([]);
+  });
+
+  it('reads process.env only in the config and the command-line tools', () => {
+    const violations = sources(SRC)
+      .filter((file) => file !== import.meta.filename)
+      .filter((file) => !ENV_READERS.some((folder) => file.startsWith(`${folder}/`)))
+      .filter((file) => readFileSync(file, 'utf8').includes('process.env'))
+      .map((file) => relative(SRC, file));
 
     expect(violations).toEqual([]);
   });

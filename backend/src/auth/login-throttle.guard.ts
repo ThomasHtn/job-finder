@@ -11,11 +11,7 @@ import type { Request } from 'express';
 
 import type { Env } from '../shared/config/env.schema.js';
 import { MAX_ATTEMPTS, WINDOW_MS } from './auth.constants.js';
-
-/**
- * Timestamps of the recent attempts of one client, oldest first.
- */
-type Attempts = number[];
+import type { Attempts } from './login-throttle.types.js';
 
 /**
  * In-memory brute-force protection for the login route: a client that made

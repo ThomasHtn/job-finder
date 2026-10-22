@@ -27,7 +27,7 @@ export class AuthService {
    */
   public async login(password: unknown): Promise<string | null> {
     const stored = await this.prisma.appPassword.findUnique({ where: { id: 1 } });
-    if (!stored || !verifyPassword(password, stored.hash)) return null;
+    if (!stored || !(await verifyPassword(password, stored.hash))) return null;
 
     const token = generateToken();
     await this.prisma.session.create({

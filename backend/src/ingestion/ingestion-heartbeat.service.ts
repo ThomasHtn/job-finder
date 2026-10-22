@@ -10,11 +10,11 @@ import type { HeartbeatReport } from './ingestion.types.js';
  * to a chat. A missing ping turns the monitor red too, so a cron that stopped firing is caught.
  */
 @Injectable()
-export class IngestionHeartbeat {
+export class IngestionHeartbeatService {
   /**
    * Scoped logger.
    */
-  private readonly logger = new Logger(IngestionHeartbeat.name);
+  private readonly logger = new Logger(IngestionHeartbeatService.name);
 
   /**
    * Push URL, undefined when no monitor is configured.

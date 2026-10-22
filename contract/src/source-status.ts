@@ -11,7 +11,7 @@ export interface SourceStatus {
   source: JobSource;
 
   /**
-   * False when the source has no credentials configured: it never runs.
+   * False when the source has no credentials configured or is listed in INGESTION_DISABLED_SOURCES: it never runs.
    */
   enabled: boolean;
 
@@ -36,7 +36,7 @@ export interface SourceStatus {
   lastSuccessAt: string | null;
 
   /**
-   * Visible offers currently stored under this source.
+   * Offers currently stored under this source.
    */
   jobCount: number;
 

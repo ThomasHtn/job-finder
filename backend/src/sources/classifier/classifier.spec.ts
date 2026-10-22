@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { SearchProfile } from '../../shared/config/search-profile.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import type { RawJob } from '../raw-job.js';
 import { detectPermanent, permanentFromLabel } from './detect-permanent.js';
 import { detectRemote } from './detect-remote.js';

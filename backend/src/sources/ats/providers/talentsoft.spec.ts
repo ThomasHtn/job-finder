@@ -43,12 +43,28 @@ describe('fetchTalentsoft', () => {
     );
     expect(job).toMatchObject({
       sourceId: 'talentsoft:recrutement.matmut.fr:10639',
-      sourceLabel: 'Matmut (Talentsoft)',
       title: 'Ingénieur DevOps F/H',
-      isPermanent: true,
-      locationText: '66 rue de Sotteville',
       description: 'Contrat : DUREE INDETERMINEE\nStack Java & Kubernetes',
-      publishedAt: new Date('2026-09-30T15:04:39Z'),
     });
+  });
+
+  it('reads a relative link from the career site and skips a malformed one', async () => {
+    const feed = `<rss><channel>
+<item><link>/Pages/Offre.aspx?idOffre=1</link><title>Dev A</title></item>
+<item><link>http://</link><title>Dev B</title></item>
+<item><link>/Pages/Offre.aspx?idOffre=3</link><title>Dev C</title></item>
+</channel></rss>`;
+    vi.stubGlobal('fetch', async () => new Response(feed));
+
+    const jobs = await fetchTalentsoft({
+      name: 'Matmut',
+      provider: 'talentsoft',
+      board: 'jobs.test',
+    });
+
+    expect(jobs.map((job) => job.url)).toEqual([
+      'https://jobs.test/Pages/Offre.aspx?idOffre=1',
+      'https://jobs.test/Pages/Offre.aspx?idOffre=3',
+    ]);
   });
 });

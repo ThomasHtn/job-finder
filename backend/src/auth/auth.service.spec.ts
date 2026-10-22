@@ -12,11 +12,16 @@ import { hashToken } from './session-token.js';
 const PASSWORD = 's3cret-long';
 
 /**
+ * Hash of that password, computed once: scrypt is slow on purpose.
+ */
+const HASH = await hashPassword(PASSWORD);
+
+/**
  * Service over a Prisma stand-in: `password` decides whether a hash is stored, `session` what the
  * session lookup answers.
  */
 function build(options: { password: boolean; session?: { expiresAt: Date } | null }) {
-  const stored = options.password ? { id: 1, hash: hashPassword(PASSWORD) } : null;
+  const stored = options.password ? { id: 1, hash: HASH } : null;
   const prisma = {
     appPassword: {
       count: vi.fn(async () => (stored ? 1 : 0)),

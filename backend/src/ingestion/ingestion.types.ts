@@ -10,6 +10,18 @@ import type { RawJob } from '../sources/raw-job.js';
 export type PersistOutcome = 'inserted' | 'updated' | 'merged';
 
 /**
+ * What happened to one fetched offer: written, left out by the filters or the age limit, or
+ * failed alone without stopping its board.
+ */
+export type OfferOutcome = PersistOutcome | 'skipped' | 'failed';
+
+/**
+ * How an incoming offer meets a row it duplicates: `refresh` is its own row seen again, `merge` a
+ * twin published by another board.
+ */
+export type MergeMode = 'refresh' | 'merge';
+
+/**
  * Figures recorded on a finished IngestionRun.
  */
 export interface RunCounters {
@@ -59,14 +71,24 @@ export interface FinishedRun extends RunCounters {
  */
 export interface Twin {
   /**
-   * Database identifier of the twin.
+   * Database identifier of the row.
    */
   id: string;
 
   /**
-   * Current main link of the twin.
+   * Current main link of the row.
    */
   url: string;
+
+  /**
+   * Origin label the row currently shows.
+   */
+  sourceLabel: string;
+
+  /**
+   * Publication date the row holds, null when no board gave one.
+   */
+  publishedAt: Date | null;
 
   /**
    * Whether the twin already holds a full description.

@@ -9,7 +9,8 @@ import type {
 } from '@job-finder/contract';
 
 import type { JobModel } from '../generated/prisma/models.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../shared/config/search-profile.types.js';
 import { PrismaService } from '../shared/prisma/prisma.service.js';
 import { toDetail, toSummary } from './job.mapper.js';
 import { tabWhere } from './tab-where.js';
@@ -67,14 +68,11 @@ export class JobsService {
   }
 
   /**
-   * Flips the favourite flag.
+   * Sets the favourite flag to the asked state, so repeating a call changes nothing.
    */
-  public async toggleFavorite(id: string): Promise<JobSummary> {
-    const job = await this.requireJob(id);
-    const updated = await this.prisma.job.update({
-      where: { id },
-      data: { isFavorite: !job.isFavorite },
-    });
+  public async setFavorite(id: string, isFavorite: boolean): Promise<JobSummary> {
+    await this.requireJob(id);
+    const updated = await this.prisma.job.update({ where: { id }, data: { isFavorite } });
     return toSummary(updated, this.profile.stackKeywords);
   }
 

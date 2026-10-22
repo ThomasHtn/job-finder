@@ -51,7 +51,7 @@ try {
   if (arg === '--clear') {
     await prisma.appPassword.deleteMany();
   } else {
-    const hash = hashPassword(arg);
+    const hash = await hashPassword(arg);
     await prisma.appPassword.upsert({
       where: { id: 1 },
       create: { id: 1, hash },

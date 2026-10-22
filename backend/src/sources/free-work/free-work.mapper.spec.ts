@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_JOB_SLUG, DETAIL_URL, FULL_REMOTE, PERMANENT } from './free-work.constants.js';
+import {
+  DEFAULT_JOB_SLUG,
+  DETAIL_URL,
+  FULL_REMOTE_MODE,
+  PERMANENT_CONTRACT,
+} from './free-work.constants.js';
 import { toRawJob } from './free-work.mapper.js';
 
 /**
@@ -12,7 +17,7 @@ describe('toRawJob (Free-Work)', () => {
       id: 42,
       title: 'Développeur Symfony',
       slug: 'developpeur-symfony',
-      contracts: [PERMANENT],
+      contracts: [PERMANENT_CONTRACT],
       job: { slug: 'developpeur' },
       location: { locality: 'Dieppe', postalCode: '76200', latitude: '49.92', longitude: '1.08' },
     });
@@ -32,7 +37,7 @@ describe('toRawJob (Free-Work)', () => {
       id: 1,
       title: 'Dev',
       slug: 'dev',
-      remoteMode: FULL_REMOTE,
+      remoteMode: FULL_REMOTE_MODE,
       location: { adminLevel1: 'Normandie' },
     });
 

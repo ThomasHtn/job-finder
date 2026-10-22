@@ -1,22 +1,11 @@
-import { XMLParser } from 'fast-xml-parser';
-
-import { permanentFromLabel } from '../../classifier/detect-permanent.js';
-import { htmlToText } from '../../html-to-text.js';
+import { getText } from '../../get-text.js';
 import type { RawJob } from '../../raw-job.js';
-import { toDate } from '../../to-date.js';
 import { TALENTSOFT_FRENCH_LCID, TIMEOUT_MS } from '../ats.constants.js';
 import type { CompanyConfig } from '../ats.types.js';
-import { companyFields } from '../company-fields.js';
+import { FEED_PARSER } from './talentsoft.constants.js';
+import { toRawJob } from './talentsoft.mapper.js';
 import type { TalentsoftFeed } from './talentsoft.types.js';
-import { stripReference, talentsoftReference } from './talentsoft-reference.js';
-
-/**
- * Keeps every value a string and always yields lists for repeated tags.
- */
-const parser = new XMLParser({
-  parseTagValue: false,
-  isArray: (tagName) => tagName === 'item' || tagName === 'category',
-});
+import { resolveLink } from './talentsoft-link.js';
 
 /**
  * Talentsoft RSS feed; the board is the career site host, the filter its feed criteria.
@@ -24,43 +13,16 @@ const parser = new XMLParser({
  */
 export async function fetchTalentsoft(company: CompanyConfig): Promise<RawJob[]> {
   const filter = company.filter ? `&${company.filter}` : '';
-  const response = await fetch(
+  const xml = await getText(
     `https://${company.board}/handlers/offerRss.ashx?LCID=${TALENTSOFT_FRENCH_LCID}${filter}`,
-    { signal: AbortSignal.timeout(TIMEOUT_MS) },
+    { label: `Talentsoft ${company.board}`, timeoutMs: TIMEOUT_MS },
   );
-  if (!response.ok) {
-    throw new Error(`${company.board} returned ${response.status}`);
-  }
 
-  const feed = parser.parse(await response.text()) as TalentsoftFeed;
+  const feed = FEED_PARSER.parse(xml) as TalentsoftFeed;
   const items = feed.rss?.channel?.item ?? [];
 
-  return items
-    .filter((item) => item.title && item.link)
-    .map((item) => {
-      const [, contract, address] = item.category ?? [];
-      const description = htmlToText(item.description);
-      return {
-        ...companyFields(company, 'Talentsoft'),
-        sourceId: `talentsoft:${company.board}:${talentsoftReference(item.link!)}`,
-        title: stripReference(item.title!),
-        company: company.name,
-        companyDescription: null,
-        description,
-        hasFullDescription: Boolean(description),
-        contractLabel: contract ?? null,
-        isPermanent: permanentFromLabel(contract),
-        salary: null,
-        /* Sometimes a bare street with no town: the geocoder still resolves it. */
-        locationText: address?.trim() || null,
-        city: null,
-        postalCode: null,
-        latitude: null,
-        longitude: null,
-        isRemote: false,
-        isLocationApproximate: false,
-        url: item.link!,
-        publishedAt: toDate(item.pubDate),
-      } satisfies RawJob;
-    });
+  return items.flatMap((item) => {
+    const link = resolveLink(item.link, company.board);
+    return item.title && link ? [toRawJob(company, { ...item, title: item.title }, link)] : [];
+  });
 }

@@ -181,7 +181,7 @@ describe('FranceTravailSource', () => {
     fetchMock.mockImplementation(async () => new Response('invalid_client', { status: 401 }));
 
     await expect(new FranceTravailSource(config(), PROFILE).fetchJobs()).rejects.toThrow(
-      'France Travail auth failed (401): invalid_client',
+      'France Travail auth failed (401)',
     );
   });
 

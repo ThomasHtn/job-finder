@@ -10,6 +10,16 @@ export const TIMEOUT_MS = 30_000;
 export const ATS_PAGE_SIZE = 100;
 
 /**
+ * First page of a paged board, as the query string spells it.
+ */
+export const FIRST_PAGE = '1';
+
+/**
+ * Country filter of Capgemini's search API: French offers only.
+ */
+export const CAPGEMINI_COUNTRY_CODE = 'fr-fr';
+
+/**
  * Talentsoft locale id of French, the language the feeds are read in.
  */
 export const TALENTSOFT_FRENCH_LCID = 1036;

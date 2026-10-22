@@ -10,7 +10,8 @@ import {
 
 import { describe, expect, it } from 'vitest';
 
-import { INTERNAL_DETAIL, toApiError } from './to-api-error.js';
+import { INTERNAL_DETAIL } from './to-api-error.constants.js';
+import { toApiError } from './to-api-error.js';
 
 /**
  * Error body of every thrown value.

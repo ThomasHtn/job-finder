@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 
 import {
   type JobDetail,
@@ -36,10 +36,16 @@ export class JobsController {
   }
 
   /**
-   * Stars or un-stars the offer.
+   * Stars or un-stars the offer, as the body says; 400 unless `isFavorite` is a boolean.
    */
   @Patch(':id/favorite')
-  public toggleFavorite(@Param('id') id: string): Promise<JobSummary> {
-    return this.jobs.toggleFavorite(id);
+  public setFavorite(
+    @Param('id') id: string,
+    @Body('isFavorite') isFavorite: unknown,
+  ): Promise<JobSummary> {
+    if (typeof isFavorite !== 'boolean') {
+      throw new BadRequestException('isFavorite must be a boolean');
+    }
+    return this.jobs.setFavorite(id, isFavorite);
   }
 }

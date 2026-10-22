@@ -3,7 +3,7 @@ import { type ArgumentsHost, Logger, NotFoundException } from '@nestjs/common';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiExceptionFilter } from './api-exception.filter.js';
-import { INTERNAL_DETAIL } from './to-api-error.js';
+import { INTERNAL_DETAIL } from './to-api-error.constants.js';
 
 /**
  * Host whose response records the status and body the filter writes.

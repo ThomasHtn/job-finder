@@ -9,10 +9,10 @@ import { AdzunaSource } from './adzuna.source.js';
 vi.mock('../sleep.js', () => ({ sleep: async () => {} }));
 
 /**
- * Config stub answering both credentials.
+ * Config stub answering both credentials and the maximum age.
  */
 const config = {
-  get: () => 'key',
+  get: (key: keyof Env) => (key === 'INGESTION_MAX_AGE_DAYS' ? 30 : 'key'),
 } as unknown as ConfigService<Env, true>;
 
 /**
@@ -47,6 +47,15 @@ describe('AdzunaSource', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('asks only for the offers the purge would keep', async () => {
+    fetchMock.mockResolvedValue(page());
+
+    await new AdzunaSource(config, PROFILE).fetchJobs().catch(() => undefined);
+
+    const url = new URL(fetchMock.mock.calls[0][0] as string);
+    expect(url.searchParams.get('max_days_old')).toBe('30');
   });
 
   it('retries a transient 503 and keeps the results', async () => {

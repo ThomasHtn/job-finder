@@ -4,7 +4,7 @@ import { rawJob } from '../raw-job.fixtures.js';
 import { AtsSource } from './ats.source.js';
 import { ATS_FETCHERS } from './providers/ats-fetchers.js';
 
-vi.mock('./companies.config.js', () => ({
+vi.mock('./companies.constants.js', () => ({
   COMPANIES: [
     { name: 'Acme', provider: 'greenhouse', board: 'acme' },
     { name: 'Globex', provider: 'lever', board: 'globex' },

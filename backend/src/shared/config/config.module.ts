@@ -2,7 +2,8 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import type { Env } from './env.schema.js';
-import { SEARCH_PROFILE, type SearchProfile } from './search-profile.js';
+import { SEARCH_PROFILE } from './search-profile.token.js';
+import type { SearchProfile } from './search-profile.types.js';
 import { validateEnv } from './validate-env.js';
 
 /**

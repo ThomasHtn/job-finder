@@ -3,19 +3,19 @@ import type { ConfigService } from '@nestjs/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Env } from '../shared/config/env.schema.js';
-import { IngestionHeartbeat } from './ingestion-heartbeat.js';
+import { IngestionHeartbeatService } from './ingestion-heartbeat.service.js';
 
 /**
  * Heartbeat configured with the given push URL.
  */
 function heartbeat(url: string | undefined) {
-  return new IngestionHeartbeat({ get: () => url } as unknown as ConfigService<Env, true>);
+  return new IngestionHeartbeatService({ get: () => url } as unknown as ConfigService<Env, true>);
 }
 
 /**
  * Push of each run to the uptime-kuma monitor.
  */
-describe('IngestionHeartbeat', () => {
+describe('IngestionHeartbeatService', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('stays silent without a monitor', async () => {

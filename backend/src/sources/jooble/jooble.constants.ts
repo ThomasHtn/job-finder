@@ -14,6 +14,11 @@ export const MAX_KEYWORDS = 3;
 export const MAX_RADIUS_KM = 80;
 
 /**
+ * Page asked for, as the API takes its numbers: a string.
+ */
+export const FIRST_PAGE = '1';
+
+/**
  * Results asked for per query.
  */
 export const RESULTS_PER_PAGE = 50;

@@ -3,7 +3,8 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import type { AppConfig } from '@job-finder/contract';
 
 import { AuthService } from '../auth/auth.service.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../shared/config/search-profile.types.js';
 import { Public } from '../shared/security/public.decorator.js';
 
 /**

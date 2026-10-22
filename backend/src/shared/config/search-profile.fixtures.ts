@@ -1,4 +1,4 @@
-import type { SearchProfile } from './search-profile.js';
+import type { SearchProfile } from './search-profile.types.js';
 
 /**
  * Profile used by the specs. Not shipped: only imported by *.spec.ts.

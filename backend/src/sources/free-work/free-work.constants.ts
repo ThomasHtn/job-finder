@@ -16,12 +16,12 @@ export const DEFAULT_JOB_SLUG = 'autre';
 /**
  * The board mixes freelance missions and salaried roles; only the latter are in scope.
  */
-export const PERMANENT = 'permanent';
+export const PERMANENT_CONTRACT = 'permanent';
 
 /**
  * Value of `remoteMode` on a fully remote offer.
  */
-export const FULL_REMOTE = 'full';
+export const FULL_REMOTE_MODE = 'full';
 
 /**
  * Location key matching the whole country: the board also lists UK and Canadian

@@ -16,7 +16,7 @@ export const CDI_CONTRACT = '101888';
 /**
  * Fully remote tier of the `typesTeletravail` facet; the other two are partial.
  */
-export const FULL_REMOTE = '20767';
+export const FULL_REMOTE_TIER = '20767';
 
 /**
  * Largest page the endpoint serves.

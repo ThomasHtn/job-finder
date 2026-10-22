@@ -1,15 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { collectPages } from '../collect-pages.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
+import { postJson } from '../post-json.js';
 import type { RawJob } from '../raw-job.js';
 import { SearchTally } from '../search-tally.js';
 import { sleep } from '../sleep.js';
 import {
   CDI_CONTRACT,
   DELAY_BETWEEN_REQUESTS_MS,
-  FULL_REMOTE,
+  FULL_REMOTE_TIER,
   LOCAL_MAX_PAGES,
   PAGE_SIZE,
   REMOTE_MAX_PAGES,
@@ -64,7 +66,7 @@ export class ApecSource implements JobSourceConnector {
         offers.set(offer.numeroOffre, offer);
       }
       /* Nationwide, restricted to the full-remote tier. */
-      const remote = { motsCles: query, typesTeletravail: [FULL_REMOTE] };
+      const remote = { motsCles: query, typesTeletravail: [FULL_REMOTE_TIER] };
       for (const offer of await tally.run(JSON.stringify(remote), () =>
         this.search(remote, REMOTE_MAX_PAGES),
       )) {
@@ -93,10 +95,9 @@ export class ApecSource implements JobSourceConnector {
   private async searchPage(criteria: Record<string, unknown>, page: number): Promise<ApecOffer[]> {
     await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
-    const response = await fetch(SEARCH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const body = await postJson<ApecSearchResponse>(
+      SEARCH_URL,
+      {
         ...criteria,
         typeClient: 'CADRE',
         typesContrat: [CDI_CONTRACT],
@@ -104,12 +105,9 @@ export class ApecSource implements JobSourceConnector {
         sorts: [{ type: 'DATE', direction: 'DESCENDING' }],
         pagination: { range: PAGE_SIZE, startIndex: page * PAGE_SIZE },
         activeFiltre: true,
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-    if (!response.ok) throw new Error(`APEC search failed (${response.status})`);
-
-    const body = (await response.json()) as ApecSearchResponse;
+      },
+      { label: 'APEC search', timeoutMs: TIMEOUT_MS },
+    );
     return body.resultats ?? [];
   }
 }

@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
+import type { JobSourceType } from '../generated/prisma/enums.js';
 import { PrismaService } from '../shared/prisma/prisma.service.js';
+import { MERGE_COLUMNS } from './ingestion.constants.js';
 import type { FinishedRun, PersistOutcome, PreparedJob, RunCounters } from './ingestion.types.js';
+import { ownFacts } from './own-facts.js';
 import { planMerge } from './plan-merge.js';
 
 /**
@@ -89,72 +92,42 @@ export class IngestionRepository {
    * Upserts by (source, sourceId); a twin from another source is enriched, not duplicated.
    */
   public async persistJob(job: PreparedJob): Promise<PersistOutcome> {
-    const data = {
-      sourceLabel: job.sourceLabel,
-      title: job.title,
-      company: job.company,
-      companyDescription: job.companyDescription,
-      description: job.description,
-      hasFullDescription: job.hasFullDescription,
-      contractLabel: job.contractLabel,
-      salary: job.salary,
-      city: job.city,
-      postalCode: job.postalCode,
-      isRemote: job.isRemote,
-      isLocationApproximate: job.isLocationApproximate,
-      url: job.url,
-      publishedAt: job.publishedAt,
-      dedupeHash: job.dedupeHash,
-    };
-
     const own = await this.prisma.job.findUnique({
       where: {
         source_sourceId: { source: job.source, sourceId: job.sourceId },
       },
-      select: {
-        id: true,
-        url: true,
-        sourceLabel: true,
-        hasFullDescription: true,
-        alternativeUrls: true,
-      },
+      select: MERGE_COLUMNS,
     });
     if (own) {
-      /* A richer text merged in from another source must survive its own source's next pass. */
-      const keepsRicher = own.hasFullDescription && !job.hasFullDescription;
-      /* A merge promotion is the only way the row shows another source's label and link. */
-      const promoted = own.sourceLabel !== job.sourceLabel;
-      const { url, description, hasFullDescription, sourceLabel, ...facts } = data;
-      const links = new Set([...own.alternativeUrls, ...(job.alternativeUrls ?? []), job.url]);
-      if (promoted) links.add(own.url);
-      links.delete(keepsRicher ? own.url : job.url);
       await this.prisma.job.update({
         where: { id: own.id },
-        data: {
-          ...(keepsRicher
-            ? facts
-            : { ...facts, url, description, hasFullDescription, sourceLabel }),
-          alternativeUrls: [...links],
-        },
+        data: { ...ownFacts(job), ...planMerge(own, job, 'refresh') },
       });
       return 'updated';
     }
 
     const twin = await this.prisma.job.findFirst({
-      where: { dedupeHash: job.dedupeHash },
-      select: { id: true, url: true, hasFullDescription: true, alternativeUrls: true },
+      where: { dedupeHash: job.dedupeHash, source: { not: job.source } },
+      /* Oldest first, so the same row wins on every run when several boards list the offer. */
+      orderBy: { firstSeenAt: 'asc' },
+      select: MERGE_COLUMNS,
     });
     if (twin) {
       await this.prisma.job.update({
         where: { id: twin.id },
-        data: planMerge(twin, job),
+        data: planMerge(twin, job, 'merge'),
       });
       return 'merged';
     }
 
     await this.prisma.job.create({
       data: {
-        ...data,
+        ...ownFacts(job),
+        url: job.url,
+        description: job.description,
+        hasFullDescription: job.hasFullDescription,
+        sourceLabel: job.sourceLabel,
+        publishedAt: job.publishedAt,
         source: job.source,
         sourceId: job.sourceId,
         alternativeUrls: job.alternativeUrls ?? [],
@@ -164,16 +137,39 @@ export class IngestionRepository {
   }
 
   /**
+   * Source ids of the undated offers the purge already deleted for one source.
+   */
+  public async purgedSourceIds(source: JobSourceType): Promise<Set<string>> {
+    const purged = await this.prisma.purgedJob.findMany({
+      where: { source },
+      select: { sourceId: true },
+    });
+    return new Set(purged.map((entry) => entry.sourceId));
+  }
+
+  /**
    * Deletes offers published before the cutoff, or first seen before it when the date is unknown,
-   * keeping favourites.
+   * keeping favourites. The undated ones are remembered, or the next run would bring them back.
    */
   public async purgeOldJobs(cutoff: Date): Promise<number> {
-    const { count } = await this.prisma.job.deleteMany({
+    const stale = await this.prisma.job.findMany({
       where: {
         isFavorite: false,
         OR: [{ publishedAt: { lt: cutoff } }, { publishedAt: null, firstSeenAt: { lt: cutoff } }],
       },
+      select: { id: true, source: true, sourceId: true, publishedAt: true },
     });
-    return count;
+    if (stale.length === 0) return 0;
+
+    const undated = stale.filter((job) => job.publishedAt === null);
+
+    await this.prisma.$transaction([
+      this.prisma.purgedJob.createMany({
+        data: undated.map(({ source, sourceId }) => ({ source, sourceId })),
+        skipDuplicates: true,
+      }),
+      this.prisma.job.deleteMany({ where: { id: { in: stale.map((job) => job.id) } } }),
+    ]);
+    return stale.length;
   }
 }

@@ -1,4 +1,4 @@
-import type { SearchProfile } from '../../shared/config/search-profile.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { matchesAny } from '../../shared/helpers/keyword-match.js';
 import { normalize } from '../../shared/helpers/normalize-text.js';
 import type { RawJob } from '../raw-job.js';

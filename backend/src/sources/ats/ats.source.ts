@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import type { JobSourceConnector } from '../job-source-connector.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
 import type { RawJob } from '../raw-job.js';
-import { COMPANIES } from './companies.config.js';
+import { COMPANIES } from './companies.constants.js';
 import { ATS_FETCHERS } from './providers/ats-fetchers.js';
 
 /**

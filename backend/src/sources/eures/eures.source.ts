@@ -1,8 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { collectPages } from '../collect-pages.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
+import { postJson } from '../post-json.js';
 import type { RawJob } from '../raw-job.js';
 import { SearchTally } from '../search-tally.js';
 import { sleep } from '../sleep.js';
@@ -81,10 +83,9 @@ export class EuresSource implements JobSourceConnector {
   private async searchPage(keyword: string, page: number): Promise<EuresJob[]> {
     await sleep(DELAY_BETWEEN_REQUESTS_MS);
 
-    const response = await fetch(SEARCH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const body = await postJson<EuresSearchResponse>(
+      SEARCH_URL,
+      {
         resultsPerPage: RESULTS_PER_PAGE,
         page,
         sortSearch: 'MOST_RECENT',
@@ -105,12 +106,9 @@ export class EuresSource implements JobSourceConnector {
         minNumberPost: null,
         sessionId: 'job-finder',
         requestLanguage: 'fr',
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-    if (!response.ok) throw new Error(`EURES search failed (${response.status})`);
-
-    const body = (await response.json()) as EuresSearchResponse;
+      },
+      { label: 'EURES search', timeoutMs: TIMEOUT_MS },
+    );
     return body.jvs ?? [];
   }
 }

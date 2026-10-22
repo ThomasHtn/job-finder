@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Env } from '../../shared/config/env.schema.js';
 import { PROFILE } from '../../shared/config/search-profile.fixtures.js';
-import type { SearchProfile } from '../../shared/config/search-profile.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { MAX_KEYWORDS } from './jooble.constants.js';
 import { JoobleSource } from './jooble.source.js';
 import type { JoobleJob } from './jooble.types.js';

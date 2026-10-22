@@ -8,7 +8,12 @@ import { emptySummary } from './empty-summary.js';
  */
 describe('describeRun', () => {
   it('sums up a healthy run with the sources left unconfigured', () => {
-    const summary = { ...emptySummary(), skippedSources: ['ADZUNA'], kept: 132, inserted: 4 };
+    const summary = {
+      ...emptySummary(),
+      skippedSources: ['ADZUNA' as const],
+      kept: 132,
+      inserted: 4,
+    };
 
     expect(describeRun(summary, [], 6)).toEqual({
       status: 'up',

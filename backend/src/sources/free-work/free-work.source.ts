@@ -1,18 +1,20 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { collectPages } from '../collect-pages.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import { getJson } from '../get-json.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
 import type { RawJob } from '../raw-job.js';
 import { SearchTally } from '../search-tally.js';
 import { sleep } from '../sleep.js';
 import {
   DELAY_BETWEEN_REQUESTS_MS,
   FRANCE,
-  FULL_REMOTE,
+  FULL_REMOTE_MODE,
   MAX_PAGES,
   PAGE_SIZE,
-  PERMANENT,
+  PERMANENT_CONTRACT,
   SEARCH_URL,
   TIMEOUT_MS,
 } from './free-work.constants.js';
@@ -54,7 +56,7 @@ export class FreeWorkSource implements JobSourceConnector {
     const tally = new SearchTally(this.logger);
     const searches: Record<string, string>[] = [
       { locationKeys: this.profile.area.freeWorkLocations.join(',') },
-      { remoteMode: FULL_REMOTE, locationKeys: FRANCE },
+      { remoteMode: FULL_REMOTE_MODE, locationKeys: FRANCE },
     ];
 
     for (const criteria of searches) {
@@ -90,16 +92,19 @@ export class FreeWorkSource implements JobSourceConnector {
 
     const params = new URLSearchParams({
       ...criteria,
-      contracts: PERMANENT,
+      contracts: PERMANENT_CONTRACT,
       itemsPerPage: String(PAGE_SIZE),
       page: String(page),
     });
-    const response = await fetch(`${SEARCH_URL}?${params}`, {
+    const body = await getJson<unknown>(`${SEARCH_URL}?${params}`, {
+      label: 'Free-Work search',
+      timeoutMs: TIMEOUT_MS,
       headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    if (!response.ok) throw new Error(`Free-Work search failed (${response.status})`);
+    if (!Array.isArray(body)) {
+      throw new Error('Free-Work search answered something else than a list');
+    }
 
-    return (await response.json()) as FreeWorkJob[];
+    return body as FreeWorkJob[];
   }
 }

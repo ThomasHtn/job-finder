@@ -7,14 +7,14 @@ import type { JobSource } from '@job-finder/contract';
 import type { Env } from '../shared/config/env.schema.js';
 import { PROFILE } from '../shared/config/search-profile.fixtures.js';
 import { DAY_MS } from '../shared/helpers/time.constants.js';
-import type { JobSourceConnector } from '../sources/job-source-connector.js';
+import type { JobSourceConnector } from '../sources/job-source-connector.types.js';
 import { rawJob } from '../sources/raw-job.fixtures.js';
 import type { RawJob } from '../sources/raw-job.js';
 import type { IngestionRepository } from './ingestion.repository.js';
 import { IngestionService } from './ingestion.service.js';
 import type { FinishedRun, PersistOutcome } from './ingestion.types.js';
 import type { GeoPort } from './ingestion.types.js';
-import type { IngestionHeartbeat } from './ingestion-heartbeat.js';
+import type { IngestionHeartbeatService } from './ingestion-heartbeat.service.js';
 
 /**
  * Connector stub answering a fixed list, or failing with the given error.
@@ -40,6 +40,7 @@ function repository(outcome: PersistOutcome = 'inserted') {
     countJobsBySource: vi.fn(async () => new Map([['FRANCE_TRAVAIL', 4]])),
     persistJob: vi.fn(async () => outcome),
     purgeOldJobs: vi.fn(async () => 2),
+    purgedSourceIds: vi.fn(async () => new Set<string>()),
   };
 }
 
@@ -78,7 +79,7 @@ function service(
     geo,
     repo as unknown as IngestionRepository,
     config(disabled),
-    beat as unknown as IngestionHeartbeat,
+    beat as unknown as IngestionHeartbeatService,
   );
 }
 
@@ -130,6 +131,78 @@ describe('IngestionService.run', () => {
     const [cutoff] = repo.purgeOldJobs.mock.calls[0] as unknown as [Date];
     expect(cutoff.getTime()).toBeGreaterThan(old.getTime());
     expect(cutoff.getTime()).toBeLessThan(recent.getTime());
+  });
+
+  it('keeps the board when one offer cannot be written, and writes the others', async () => {
+    const repo = repository();
+    repo.persistJob
+      .mockResolvedValueOnce('inserted')
+      .mockRejectedValueOnce(new Error('invalid byte sequence'))
+      .mockResolvedValueOnce('inserted');
+    const summary = await service(
+      [
+        connector('FRANCE_TRAVAIL', [
+          rawJob({ sourceId: '1' }),
+          rawJob({ sourceId: '2' }),
+          rawJob({ sourceId: '3' }),
+        ]),
+      ],
+      repo,
+    ).run();
+
+    expect(summary).toMatchObject({ fetched: 3, kept: 3, inserted: 2, failedSources: [] });
+    expect(repo.failRun).not.toHaveBeenCalled();
+    expect(repo.finishRun).toHaveBeenCalledWith('run-1', {
+      fetched: 3,
+      kept: 3,
+      inserted: 2,
+      updated: 0,
+    });
+  });
+
+  it('keeps the board when preparing one offer throws', async () => {
+    const repo = repository();
+    const failingGeo: GeoPort = {
+      geocode: async () => {
+        throw new Error('database gone');
+      },
+      isWithinArea: () => true,
+    };
+    const svc = new IngestionService(
+      [
+        connector('FRANCE_TRAVAIL', [
+          rawJob({ sourceId: '1', latitude: null, longitude: null, locationText: 'Rouen' }),
+          rawJob({ sourceId: '2' }),
+        ]),
+      ],
+      PROFILE,
+      failingGeo,
+      repo as unknown as IngestionRepository,
+      config(),
+      heartbeat() as unknown as IngestionHeartbeatService,
+    );
+
+    const summary = await svc.run();
+
+    expect(summary).toMatchObject({ kept: 2, inserted: 1, failedSources: [] });
+  });
+
+  it('does not ingest again an undated offer the purge already deleted', async () => {
+    const repo = repository();
+    repo.purgedSourceIds.mockResolvedValue(new Set(['gone']));
+    const summary = await service(
+      [
+        connector('FRANCE_TRAVAIL', [
+          rawJob({ sourceId: 'gone', publishedAt: null }),
+          rawJob({ sourceId: 'fresh', publishedAt: null }),
+        ]),
+      ],
+      repo,
+    ).run();
+
+    expect(repo.purgedSourceIds).toHaveBeenCalledWith('FRANCE_TRAVAIL');
+    expect(summary).toMatchObject({ fetched: 2, kept: 1, inserted: 1 });
+    expect(repo.persistJob).toHaveBeenCalledTimes(1);
   });
 
   it('skips disabled sources without opening a run', async () => {

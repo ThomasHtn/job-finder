@@ -2,16 +2,16 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../shared/config/env.schema.js';
-import { SEARCH_PROFILE, type SearchProfile } from '../../shared/config/search-profile.js';
+import { SEARCH_PROFILE } from '../../shared/config/search-profile.token.js';
+import type { SearchProfile } from '../../shared/config/search-profile.types.js';
 import { collectPages } from '../collect-pages.js';
-import type { JobSourceConnector } from '../job-source-connector.js';
+import type { JobSourceConnector } from '../job-source-connector.types.js';
 import type { RawJob } from '../raw-job.js';
 import type { SearchScope } from '../search-scope.js';
 import { SearchTally } from '../search-tally.js';
 import { sleep } from '../sleep.js';
 import {
   BASE_URL,
-  MAX_DAYS_OLD,
   MAX_KEYWORDS,
   MAX_PAGES,
   MAX_RETRIES,
@@ -118,7 +118,8 @@ export class AdzunaSource implements JobSourceConnector {
       permanent: '1',
       /* Newest first, so the first page holds what changed since the last run. */
       sort_by: 'date',
-      max_days_old: String(MAX_DAYS_OLD),
+      /* Adzuna keeps ads alive for years: ask only for what the purge would keep. */
+      max_days_old: String(this.config.get('INGESTION_MAX_AGE_DAYS', { infer: true })),
       'content-type': 'application/json',
     });
     if (scope === 'local') {
