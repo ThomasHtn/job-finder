@@ -12,3 +12,8 @@ export const LOGIN_ROUTE = '/login';
  * The feed, where a signed-in reader lands.
  */
 export const HOME_ROUTE = '/';
+
+/**
+ * Query parameter of the login screen holding the page to open once signed in.
+ */
+export const RETURN_URL_PARAM = 'returnUrl';

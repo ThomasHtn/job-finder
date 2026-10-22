@@ -14,7 +14,6 @@ export const ICON_NAMES = [
   'remote',
   'pulse',
   'building',
-  'clock',
   'code',
   'source',
   'salary',

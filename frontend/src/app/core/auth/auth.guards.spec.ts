@@ -29,9 +29,10 @@ describe('authGuard', () => {
   /**
    * Runs the guard as the router would.
    */
-  function run(): Promise<unknown> {
+  function run(url = '/'): Promise<unknown> {
     return TestBed.runInInjectionContext(
-      () => authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot) as Promise<unknown>,
+      () =>
+        authGuard({} as ActivatedRouteSnapshot, { url } as RouterStateSnapshot) as Promise<unknown>,
     );
   }
 
@@ -46,6 +47,14 @@ describe('authGuard', () => {
     http.expectOne('/api/config').flush({ areaLabel: 'Normandie', authRequired: true });
 
     expect(((await result) as UrlTree).toString()).toBe('/login');
+  });
+
+  it('remembers the page asked for, to come back to it after signing in', async () => {
+    const result = run('/offres/job-1');
+    await new Promise((resolve) => setTimeout(resolve));
+    http.expectOne('/api/config').flush({ areaLabel: 'Normandie', authRequired: true });
+
+    expect(((await result) as UrlTree).toString()).toBe('/login?returnUrl=%2Foffres%2Fjob-1');
   });
 
   it('lets the page load when no password is set', async () => {

@@ -63,8 +63,8 @@
 
   @include motion {
     transition:
-      border-color 0.16s ease,
-      box-shadow 0.16s ease;
+      border-color var(--duration-quick) ease,
+      box-shadow var(--duration-quick) ease;
   }
 }
 
@@ -82,7 +82,7 @@
   font-size: 0.875rem;
 
   @include motion {
-    animation: login-shake 0.36s var(--ease-standard);
+    animation: login-shake var(--duration-shake) var(--ease-standard);
   }
 }
 

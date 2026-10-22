@@ -45,7 +45,7 @@
   box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--color-ink) 12%, transparent);
 
   @include motion {
-    animation: settings-menu-in 0.14s var(--ease-standard);
+    animation: settings-menu-in var(--duration-quick) var(--ease-standard);
   }
 }
 

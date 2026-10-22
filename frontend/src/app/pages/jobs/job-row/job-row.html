@@ -18,7 +18,13 @@
 </div>
 
 <!-- Title links to the detail; the link stretches over the whole card. -->
-<a class="job-row__title" [routerLink]="detailLink()" queryParamsHandling="preserve">
+<a
+  class="job-row__title"
+  [routerLink]="detailLink()"
+  queryParamsHandling="preserve"
+  [attr.aria-current]="selected() ? 'true' : null"
+  (click)="open($event)"
+>
   {{ job().title }}
 </a>
 

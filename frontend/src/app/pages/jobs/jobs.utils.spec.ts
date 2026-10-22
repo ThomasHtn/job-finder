@@ -3,9 +3,12 @@ import type { JobListResponse, JobSummary } from '@job-finder/contract';
 import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
 
 import {
-  applyJobPatch,
+  applyJobPatches,
   buildTabItems,
+  newHeadlineText,
   newOffersMessage,
+  pickNewJobs,
+  pickSeenJobs,
   sourceName,
   toShellTab,
 } from './jobs.utils';
@@ -50,28 +53,72 @@ describe('jobs utils', () => {
     });
   });
 
-  describe('applyJobPatch', () => {
-    it('replaces the row and keeps the others in order', () => {
-      const patched = { ...row('b', false), title: 'renamed' };
+  describe('applyJobPatches', () => {
+    it('replaces the rows and keeps the others in order', () => {
+      const patches = new Map([['b', { ...row('b', false), title: 'renamed' }]]);
 
-      const result = applyJobPatch(list(row('a', false), row('b', false)), patched);
+      const result = applyJobPatches(list(row('a', false), row('b', false)), patches);
 
       expect(result?.jobs.map((job) => job.title)).toEqual(['a', 'renamed']);
     });
 
     it('moves the favourites count when the star changes', () => {
-      const starred = applyJobPatch(list(row('a', false)), row('a', true));
-      const unstarred = applyJobPatch(list(row('a', true)), row('a', false));
+      const starred = applyJobPatches(list(row('a', false)), new Map([['a', row('a', true)]]));
+      const unstarred = applyJobPatches(list(row('a', true)), new Map([['a', row('a', false)]]));
 
       expect(starred?.counts.favorites).toBe(2);
       expect(unstarred?.counts.favorites).toBe(0);
     });
 
-    it('leaves the list untouched when the offer is not in it', () => {
+    it('applies several changes at once', () => {
+      const patches = new Map([
+        ['a', row('a', true)],
+        ['b', row('b', true)],
+      ]);
+
+      const result = applyJobPatches(list(row('a', false), row('b', false)), patches);
+
+      expect(result?.counts.favorites).toBe(3);
+    });
+
+    it('leaves a row the list already shows as patched alone', () => {
+      const result = applyJobPatches(list(row('a', true)), new Map([['a', row('a', true)]]));
+
+      expect(result?.counts.favorites).toBe(1);
+    });
+
+    it('leaves the list untouched when no offer of it changed', () => {
       const current = list(row('a', false));
 
-      expect(applyJobPatch(current, row('z', true))).toBe(current);
-      expect(applyJobPatch(null, row('z', true))).toBeNull();
+      expect(applyJobPatches(current, new Map([['z', row('z', true)]]))?.jobs).toEqual(
+        current.jobs,
+      );
+      expect(applyJobPatches(current, new Map())).toBe(current);
+      expect(applyJobPatches(null, new Map([['z', row('z', true)]]))).toBeNull();
+    });
+  });
+
+  describe('pickNewJobs and pickSeenJobs', () => {
+    const jobs = [
+      { ...row('old', false), firstSeenAt: '2026-09-01T00:00:00.000Z' },
+      { ...row('new', false), firstSeenAt: '2026-09-06T00:00:00.000Z' },
+    ];
+
+    it('split the offers around the previous visit', () => {
+      expect(pickNewJobs(jobs, '2026-09-05T00:00:00.000Z').map((job) => job.id)).toEqual(['new']);
+      expect(pickSeenJobs(jobs, '2026-09-05T00:00:00.000Z').map((job) => job.id)).toEqual(['old']);
+    });
+
+    it('call everything seen on the very first visit', () => {
+      expect(pickNewJobs(jobs, null)).toEqual([]);
+      expect(pickSeenJobs(jobs, null)).toHaveLength(2);
+    });
+  });
+
+  describe('newHeadlineText', () => {
+    it('agrees with the count', () => {
+      expect(newHeadlineText(1)).toBe('1 nouvelle offre');
+      expect(newHeadlineText(3)).toBe('3 nouvelles offres');
     });
   });
 

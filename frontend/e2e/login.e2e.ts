@@ -6,7 +6,8 @@ test.use({ storageState: { cookies: [], origins: [] } });
 test.describe('login', () => {
   test('guards the feed behind the password', async ({ page }) => {
     await page.goto('/?tab=remote');
-    await expect(page).toHaveURL(/\/login$/);
+    /* The page asked for rides along, to come back to it after signing in. */
+    await expect(page).toHaveURL(/\/login\?returnUrl=%2F%3Ftab%3Dremote$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText("Votre veille d'offres");
   });
 

@@ -8,7 +8,7 @@ import type { JobSummary } from '@job-finder/contract';
 import { Clock } from '@core/date/clock';
 import { Language } from '@core/i18n/language';
 import { isNewSince, rowPlaceLabel } from '@core/jobs/job.utils';
-import { JOB_DETAIL_PATH } from '@core/jobs/jobs.constants';
+import { JOB_DETAIL_PATH } from '@core/jobs/job-route.constants';
 import { LastVisit } from '@core/jobs/last-visit';
 import { Icon } from '@shared/icon/icon';
 import { IconButton } from '@shared/icon-button/icon-button';
@@ -59,6 +59,11 @@ export class JobRow {
    * True while this offer is the one open in the panel.
    */
   public readonly selected = input(false);
+
+  /**
+   * Emits the title link when the reader presses it, so the page knows what to give the focus back to.
+   */
+  public readonly opened = output<HTMLElement>();
 
   /**
    * Emits the offer id when the star is pressed.
@@ -115,6 +120,13 @@ export class JobRow {
     this.language.active();
     return rowPlaceLabel(this.job());
   });
+
+  /**
+   * Title link pressed: the router opens the offer, the page notes the opener.
+   */
+  protected open(event: Event): void {
+    this.opened.emit(event.currentTarget as HTMLElement);
+  }
 
   /**
    * Star pressed. The whole row is a link: the star must not open the detail.

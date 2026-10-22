@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { HOME_ROUTE } from '@core/auth/auth.constants';
 import { AuthSession } from '@core/auth/auth-session';
+import { safeReturnUrl } from '@core/auth/return-url.utils';
 import { Brand } from '@shared/brand/brand';
 import { Button } from '@shared/button/button';
 import { Icon } from '@shared/icon/icon';
@@ -29,9 +29,14 @@ export class LoginPage {
   private readonly session = inject(AuthSession);
 
   /**
-   * Leaves for the feed once signed in.
+   * Leaves for the page the reader came for once signed in.
    */
   private readonly router = inject(Router);
+
+  /**
+   * Bound from the `?returnUrl=` query parameter: where the guard or a refused token sent the reader from.
+   */
+  public readonly returnUrl = input<string>();
 
   /**
    * Password as typed.
@@ -67,7 +72,7 @@ export class LoginPage {
     this.error.set(null);
     try {
       await this.session.signIn(this.password());
-      await this.router.navigateByUrl(HOME_ROUTE);
+      await this.router.navigateByUrl(safeReturnUrl(this.returnUrl()));
     } catch (error: unknown) {
       this.error.set(loginErrorMessage(error));
       this.loading.set(false);

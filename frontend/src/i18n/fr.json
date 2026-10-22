@@ -76,6 +76,8 @@
     "unavailable": "L'état des sources n'a pas pu être chargé."
   },
   "feed": {
+    "title": "Offres d'emploi",
+    "panelLabel": "Offre sélectionnée",
     "loading": "Chargement des offres…",
     "newHeadlineOne": "{{ count }} nouvelle offre",
     "newHeadlineOther": "{{ count }} nouvelles offres",

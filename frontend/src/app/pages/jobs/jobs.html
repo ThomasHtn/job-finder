@@ -1,8 +1,11 @@
 <!-- Header: who we are, the tabs, the way to read the sources again with when it last happened, then the settings. -->
-<header class="jobs__head" [attr.inert]="sheetOpen() ? '' : null">
+<header class="jobs__head" [attr.inert]="sheet.sheetOpen() ? '' : null">
   <div class="jobs__head-row flex items-center">
     <!-- The mark and the app's name, on every screen. -->
     <app-brand />
+
+    <!-- The page's one title for assistive tech, which the visual layout does without. -->
+    <h1 class="sr-only">{{ 'feed.title' | transloco }}</h1>
 
     <!-- On a wide screen the tabs live in the header; on a phone they are in the bottom bar. -->
     @if (!compact()) {
@@ -26,13 +29,13 @@
         [class.jobs__sync--degraded]="health.degraded()"
       >
         <span class="sr-only">{{ 'head.lastSync' | transloco }}</span>
-        @if (refreshMessage(); as message) {
+        @if (refresh.message(); as message) {
           <span class="jobs__stamp-fresh">{{ message }}</span>
-        } @else if (refreshing()) {
+        } @else if (refresh.running()) {
           {{ 'head.searching' | transloco }}
-        } @else if (listed()) {
+        } @else if (feed.listed()) {
           <span class="jobs__stamp">{{
-            lastIngestionAt() | syncLabel: language.active() : now()
+            feed.lastIngestionAt() | syncLabel: language.active() : now()
           }}</span>
         }
       </span>
@@ -43,18 +46,18 @@
         type="button"
         class="jobs__refresh"
         [class.jobs__refresh--degraded]="health.degraded()"
-        [class.jobs__refresh--spinning]="refreshing()"
+        [class.jobs__refresh--spinning]="refresh.running()"
         [attr.aria-label]="'head.refresh' | transloco"
         aria-describedby="jobs-sync"
         [attr.title]="health.label() || null"
-        [disabled]="refreshing()"
+        [disabled]="refresh.running()"
         (click)="refreshJobs()"
       >
         <app-icon class="jobs__refresh-icon" name="refresh" />
       </button>
 
       <!-- Announces the outcome of a refresh once, where the ageing sync time would every minute. -->
-      <span class="sr-only" aria-live="polite">{{ refreshMessage() }}</span>
+      <span class="sr-only" aria-live="polite">{{ refresh.message() }}</span>
 
       <!-- Settings at the far right: the sources board and the language. -->
       <app-settings-menu
@@ -67,14 +70,14 @@
   </div>
 
   <!-- Thin progress line under the bar while anything loads. -->
-  <app-scan-line [active]="loading() || refreshing()" />
+  <app-scan-line [active]="feed.loading() || refresh.running()" />
 </header>
 
 <!-- Feed beside the detail panel, or the sources board alone on its own tab. -->
 <div class="jobs__layout" [class.jobs__layout--single]="showingSources()">
   @if (showingSources()) {
     <!-- The sources replace the feed and need no panel beside them. -->
-    <main class="jobs__feed" #feed>
+    <main class="jobs__feed" #scroller>
       <!-- Keeps the sources tab from looking blank when the status request failed. -->
       @if (health.failed()) {
         <app-notice class="jobs__notice" tone="alert">
@@ -94,10 +97,10 @@
 
     <!-- The feed itself. -->
     <main
-      #feed
+      #scroller
       class="jobs__feed"
-      [attr.aria-busy]="loading() || refreshing()"
-      [attr.inert]="sheetOpen() ? '' : null"
+      [attr.aria-busy]="feed.loading() || refresh.running()"
+      [attr.inert]="sheet.sheetOpen() ? '' : null"
     >
       <!-- On a phone the intro scrolls with the cards. -->
       @if (compact()) {
@@ -107,12 +110,12 @@
       <!-- A refresh, star or reload that failed: said above the list, which stays as it was. -->
       @if (actionError(); as message) {
         <app-notice class="jobs__notice" tone="alert">{{ message }}</app-notice>
-      } @else if (reloadError(); as message) {
+      } @else if (feed.reloadError(); as message) {
         <app-notice class="jobs__notice" tone="alert">{{ message }}</app-notice>
       }
 
       <!-- Non-blocking warning when some sources failed during the last refresh. -->
-      @if (sourceWarning(); as warning) {
+      @if (refresh.warning(); as warning) {
         <app-notice class="jobs__notice" tone="alert">{{ warning }}</app-notice>
       } @else if (health.degraded()) {
         <!-- A tooltip on the refresh button says this too, and a phone never shows tooltips. -->
@@ -120,13 +123,13 @@
       }
 
       <!-- Blocking error (the list itself could not load), placeholder cards, empty state, or the rows. -->
-      @if (error(); as message) {
+      @if (feed.error(); as message) {
         <app-empty-state [title]="message">
           <button app-button variant="primary" type="button" (click)="reload()">
             {{ 'feed.retry' | transloco }}
           </button>
         </app-empty-state>
-      } @else if (jobs().length === 0 && loading()) {
+      } @else if (jobs().length === 0 && feed.loading()) {
         <!-- First load of a list: cards shaped like the ones on their way. -->
         <app-feed-skeleton class="jobs__list" />
       } @else if (jobs().length === 0) {
@@ -154,7 +157,7 @@
               app-button
               variant="primary"
               type="button"
-              [disabled]="refreshing()"
+              [disabled]="refresh.running()"
               (click)="refreshJobs()"
             >
               {{ 'feed.fetchOffers' | transloco }}
@@ -162,14 +165,15 @@
           </app-empty-state>
         }
       } @else {
-        <!-- New offers first, a rule where the last visit stopped, then the rest; the row emits, the page persists and reloads. -->
+        <!-- New offers first, a rule where the last visit stopped, then the rest; a row emits, the page stars it and the feed patches it in place. -->
         <div class="jobs__list">
           <!-- Each card cascades in after the one above it, `--row-index` steps apart. -->
           @for (job of newJobs(); track job.id) {
             <app-job-row
               [style.--row-index]="$index"
               [job]="job"
-              [selected]="job.id === selectedId()"
+              [selected]="job.id === sheet.selectedId()"
+              (opened)="sheet.rememberOpener($event)"
               (favoriteToggled)="toggleFavorite($event)"
             />
           }
@@ -187,7 +191,8 @@
             <app-job-row
               [style.--row-index]="newJobs().length + $index"
               [job]="job"
-              [selected]="job.id === selectedId()"
+              [selected]="job.id === sheet.selectedId()"
+              (opened)="sheet.rememberOpener($event)"
               (favoriteToggled)="toggleFavorite($event)"
             />
           }
@@ -196,12 +201,16 @@
     </main>
 
     <!-- One panel, laid out as a right-hand column on a wide screen and as a sheet on a phone. -->
-    <aside class="jobs__panel flex flex-col" [class.jobs__panel--open]="detailOpen()">
+    <aside
+      class="jobs__panel flex flex-col"
+      [class.jobs__panel--open]="sheet.detailOpen()"
+      [attr.aria-label]="'feed.panelLabel' | transloco"
+    >
       <!-- The detail child route renders here; its activation is what opens the panel. -->
-      <router-outlet (activate)="panelActivated()" (deactivate)="panelDeactivated()" />
+      <router-outlet (activate)="sheet.panelActivated()" (deactivate)="sheet.panelDeactivated()" />
 
       <!-- Placeholder for the empty column; hidden on a phone, where the panel stays closed. -->
-      @if (!detailOpen()) {
+      @if (!sheet.detailOpen()) {
         <p class="jobs__idle">{{ 'feed.idlePanel' | transloco }}</p>
       }
     </aside>
@@ -237,7 +246,7 @@
 @if (compact()) {
   <app-job-tabs
     variant="bar"
-    [attr.inert]="sheetOpen() ? '' : null"
+    [attr.inert]="sheet.sheetOpen() ? '' : null"
     [label]="'tabs.label' | transloco"
     [items]="tabItems()"
     [current]="currentView()"

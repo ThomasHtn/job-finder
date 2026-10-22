@@ -5,6 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
 import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
+import { Language } from '@core/i18n/language';
 import { jobDetail, jobSummary } from '@core/jobs/job.fixtures';
 import { JobPatchBus } from '@core/jobs/job-patch-bus';
 import { Viewport } from '@core/layout/viewport';
@@ -32,6 +33,7 @@ describe('JobDetailPage', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
+        JobPatchBus,
         { provide: Viewport, useValue: { isCompact: compact } },
       ],
     });
@@ -88,7 +90,7 @@ describe('JobDetailPage', () => {
     expect(text(fixture)).toContain("Cette source ne publie qu'un extrait.");
     expect(text(fixture)).toContain('apec.fr');
     expect(text(fixture)).toContain("Voir l'offre sur France Travail");
-    expect(TestBed.inject(JobPatchBus).lastPatch()?.isViewed).toBe(true);
+    expect(TestBed.inject(JobPatchBus).patches().get('job-1')?.isViewed).toBe(true);
   });
 
   it('stars the offer and mirrors it to the feed', async () => {
@@ -97,12 +99,14 @@ describe('JobDetailPage', () => {
     await settle(fixture);
 
     (fixture.nativeElement.querySelector('.job-detail__star') as HTMLButtonElement).click();
-    http.expectOne('/api/jobs/job-1/favorite').flush(jobSummary({ isFavorite: true }));
+    const request = http.expectOne('/api/jobs/job-1/favorite');
+    expect(request.request.body).toEqual({ isFavorite: true });
+    request.flush(jobSummary({ isFavorite: true }));
     await settle(fixture);
 
     const star = fixture.nativeElement.querySelector('.job-detail__star') as HTMLElement;
     expect(star.getAttribute('aria-label')).toBe('Retirer des favoris');
-    expect(TestBed.inject(JobPatchBus).lastPatch()?.isFavorite).toBe(true);
+    expect(TestBed.inject(JobPatchBus).patches().get('job-1')?.isFavorite).toBe(true);
   });
 
   it('says why a star failed, and keeps the offer as it was', async () => {
@@ -157,7 +161,10 @@ describe('JobDetailPage', () => {
 
     expect(text(fixture)).toContain('Cette offre est introuvable.');
     (fixture.nativeElement.querySelector('app-empty-state button') as HTMLButtonElement).click();
-    expect(navigate).toHaveBeenCalledWith(['/'], { queryParamsHandling: 'preserve' });
+    expect(navigate).toHaveBeenCalledWith(['/'], {
+      queryParamsHandling: 'preserve',
+      replaceUrl: true,
+    });
   });
 
   it('closes on Escape', async () => {
@@ -167,7 +174,87 @@ describe('JobDetailPage', () => {
     await settle(fixture);
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    expect(navigate).toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith(['/'], {
+      queryParamsHandling: 'preserve',
+      replaceUrl: true,
+    });
+  });
+
+  it('leaves an Escape already taken, by the settings menu for instance', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+
+    const taken = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    taken.preventDefault();
+    document.dispatchEvent(taken);
+
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('is a labelled modal dialog as a sheet, and a plain column otherwise', async () => {
+    compact.set(true);
+    const fixture = await open();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.getAttribute('role')).toBe('dialog');
+    expect(host.getAttribute('aria-modal')).toBe('true');
+    expect(host.getAttribute('aria-label')).toBe("Chargement de l'offre…");
+
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+    expect(host.getAttribute('aria-label')).toBe('Développeur Angular');
+
+    compact.set(false);
+    await settle(fixture);
+    expect(host.hasAttribute('role')).toBe(false);
+    expect(host.hasAttribute('aria-modal')).toBe(false);
+    expect(host.hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('takes the focus when a narrowing window turns the column into a sheet', async () => {
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+    const close = fixture.nativeElement.querySelector('.job-detail__close');
+    expect(document.activeElement).not.toBe(close);
+
+    compact.set(true);
+    await settle(fixture);
+
+    expect(document.activeElement).toBe(close);
+  });
+
+  it('words a failed star in the language picked afterwards', async () => {
+    localStorage.setItem('job-finder-locale', 'fr');
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+    (fixture.nativeElement.querySelector('.job-detail__star') as HTMLButtonElement).click();
+    http.expectOne('/api/jobs/job-1/favorite').flush(null, { status: 500, statusText: 'Error' });
+    await settle(fixture);
+    expect(text(fixture)).toContain('Impossible de modifier le favori.');
+
+    await TestBed.inject(Language).use('en');
+    await settle(fixture);
+
+    expect(text(fixture)).toContain('Could not update the favorite.');
+    expect(text(fixture)).not.toContain('Impossible de modifier');
+  });
+
+  it('keeps following the stars published in a row, one after the other', async () => {
+    const fixture = await open();
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+    const bus = TestBed.inject(JobPatchBus);
+
+    bus.publish(jobSummary({ isFavorite: true }));
+    bus.publish(jobSummary({ isFavorite: false }));
+    bus.publish(jobSummary({ id: 'other', isFavorite: true }));
+    await settle(fixture);
+
+    const star = fixture.nativeElement.querySelector('.job-detail__star') as HTMLElement;
+    expect(star.getAttribute('aria-label')).toBe('Ajouter aux favoris');
   });
 
   it('takes the focus as a sheet over the feed, and leaves it alone in the column', async () => {
@@ -209,7 +296,10 @@ describe('JobDetailPage', () => {
 
     await drag(fixture, DISMISS_DISTANCE_PX + 1);
 
-    expect(navigate).toHaveBeenCalledWith(['/'], { queryParamsHandling: 'preserve' });
+    expect(navigate).toHaveBeenCalledWith(['/'], {
+      queryParamsHandling: 'preserve',
+      replaceUrl: true,
+    });
   });
 
   it('springs a sheet pulled down a little back into place', async () => {

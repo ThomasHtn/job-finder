@@ -14,7 +14,10 @@ import { JobRow } from './job-row';
  */
 function create(job: JobSummary, previousVisitAt: string | null) {
   TestBed.configureTestingModule({
-    providers: [provideRouter([]), { provide: LastVisit, useValue: { previousVisitAt } }],
+    providers: [
+      provideRouter([{ path: '**', children: [] }]),
+      { provide: LastVisit, useValue: { previousVisitAt } },
+    ],
   });
   const fixture = TestBed.createComponent(JobRow);
   fixture.componentRef.setInput('job', job);
@@ -94,5 +97,27 @@ describe('JobRow', () => {
     (fixture.nativeElement.querySelector('.job-row__star') as HTMLButtonElement).click();
 
     expect(starred).toEqual(['job-1']);
+  });
+
+  it('hands its title link to the page when pressed, so the focus can come back to it', () => {
+    const fixture = create(jobSummary(), null);
+    const link = fixture.nativeElement.querySelector('a.job-row__title') as HTMLAnchorElement;
+    const opened: HTMLElement[] = [];
+    fixture.componentInstance.opened.subscribe((opener) => opened.push(opener));
+
+    link.click();
+
+    expect(opened).toEqual([link]);
+  });
+
+  it('marks the title link of the offer open in the panel as the current one', () => {
+    const fixture = create(jobSummary(), null);
+    const link = fixture.nativeElement.querySelector('a.job-row__title') as HTMLAnchorElement;
+    expect(link.hasAttribute('aria-current')).toBe(false);
+
+    fixture.componentRef.setInput('selected', true);
+    fixture.detectChanges();
+
+    expect(link.getAttribute('aria-current')).toBe('true');
   });
 });

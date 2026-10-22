@@ -50,6 +50,17 @@ describe('authInterceptor', () => {
     expect(navigate).toHaveBeenCalledWith('/login');
   });
 
+  it('remembers the page the reader was on', async () => {
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'url', 'get').mockReturnValue('/offres/job-1');
+    const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const call = firstValueFrom(client.get('/api/jobs')).catch(() => null);
+    http.expectOne('/api/jobs').flush(null, { status: 401, statusText: 'Unauthorized' });
+    await call;
+
+    expect(navigate).toHaveBeenCalledWith('/login?returnUrl=%2Foffres%2Fjob-1');
+  });
+
   it('leaves a wrong password to the login screen', async () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const call = firstValueFrom(client.post('/api/auth/login', {})).catch(() => null);

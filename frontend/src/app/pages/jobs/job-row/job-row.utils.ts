@@ -1,3 +1,4 @@
+import { SalaryRange } from './job-row.model';
 import {
   SALARY_AMOUNT,
   SALARY_FOREIGN_CURRENCY,
@@ -5,8 +6,7 @@ import {
   SALARY_MIN_AMOUNT,
   SALARY_MONTHLY_HINT,
   SALARY_THOUSANDS_HINT,
-} from './job-row.constants';
-import { SalaryRange } from './job-row.model';
+} from './salary.constants';
 
 /**
  * The amounts of a source's salary text, `null` when it names none the row can shorten safely.

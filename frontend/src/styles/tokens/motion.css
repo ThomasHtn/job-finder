@@ -11,6 +11,20 @@
   --duration-entry: 0.42s;
   --duration-fade: 0.25s;
 
+  /* Hovers, presses and focus rings reacting to the pointer. */
+  --duration-quick: 0.16s;
+
+  /* A panel sliding over the feed. */
+  --duration-sheet: 0.3s;
+
+  /* One cycle of a loop: the progress sweep, the pulsing placeholders, the refresh glyph. */
+  --duration-sweep: 1.3s;
+  --duration-pulse: 1.4s;
+  --duration-spin: 0.9s;
+
+  /* The password field shaking after a refusal. */
+  --duration-shake: 0.36s;
+
   /* Delay between two cards of the feed cascading in. */
   --motion-step: 40ms;
 }

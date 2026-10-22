@@ -11,7 +11,7 @@
   opacity: 0;
 
   @include motion {
-    transition: opacity 0.25s ease;
+    transition: opacity var(--duration-fade) ease;
   }
 }
 
@@ -32,7 +32,7 @@
     width: 34%;
     background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
     opacity: 1;
-    animation: scan-line-sweep 1.3s var(--ease-standard) infinite;
+    animation: scan-line-sweep var(--duration-sweep) var(--ease-standard) infinite;
   }
 }
 

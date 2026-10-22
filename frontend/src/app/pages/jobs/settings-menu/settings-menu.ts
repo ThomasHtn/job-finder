@@ -34,7 +34,7 @@ import { LANGUAGE_NATIVE_NAMES } from './settings-menu.constants';
   host: {
     class: 'settings-menu',
     '(document:pointerdown)': 'closeFromOutside($event)',
-    '(document:keydown.escape)': 'closeWithEscape()',
+    '(document:keydown.escape)': 'closeWithEscape($event)',
   },
 })
 export class SettingsMenu {
@@ -101,7 +101,7 @@ export class SettingsMenu {
    * Sources picked: the panel closes on the way.
    */
   protected showSources(): void {
-    this.open.set(false);
+    this.closeToTrigger();
     this.sourcesSelected.emit();
   }
 
@@ -109,7 +109,7 @@ export class SettingsMenu {
    * Switches language; a tab left open across a deployment reloads to find the other one.
    */
   protected useLanguage(locale: AppLocale): void {
-    this.open.set(false);
+    this.closeToTrigger();
     if (locale === this.language.active()) {
       return;
     }
@@ -129,12 +129,21 @@ export class SettingsMenu {
   }
 
   /**
-   * Escape closes the panel and puts the focus back on the gear.
+   * Escape closes the panel and puts the focus back on the gear. The key is consumed, so the offer
+   * open beside it stays open.
    */
-  protected closeWithEscape(): void {
+  protected closeWithEscape(event: Event): void {
     if (this.open()) {
-      this.open.set(false);
-      this.trigger().nativeElement.focus();
+      event.preventDefault();
+      this.closeToTrigger();
     }
+  }
+
+  /**
+   * Hides the panel and gives the focus back to the gear, which the vanished item would have taken with it.
+   */
+  private closeToTrigger(): void {
+    this.open.set(false);
+    this.trigger().nativeElement.focus();
   }
 }

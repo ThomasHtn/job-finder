@@ -3,7 +3,7 @@ import { inject, Service } from '@angular/core';
 
 import { firstValueFrom } from 'rxjs';
 
-import type { JobSummary } from '@job-finder/contract';
+import type { FavoriteUpdate, JobSummary } from '@job-finder/contract';
 
 import { API_ENDPOINTS } from '@core/http/api-endpoints';
 
@@ -18,9 +18,10 @@ export class JobsApi {
   private readonly http = inject(HttpClient);
 
   /**
-   * Stars or un-stars the offer, answering its new state.
+   * Sets the star of the offer to the state asked, answering the offer as saved.
    */
-  public toggleFavorite(id: string): Promise<JobSummary> {
-    return firstValueFrom(this.http.patch<JobSummary>(API_ENDPOINTS.favorite(id), {}));
+  public setFavorite(id: string, isFavorite: boolean): Promise<JobSummary> {
+    const body: FavoriteUpdate = { isFavorite };
+    return firstValueFrom(this.http.patch<JobSummary>(API_ENDPOINTS.favorite(id), body));
   }
 }

@@ -1,4 +1,4 @@
-import { activeLocale, isSingular, pickLocale, toLocale } from './i18n.utils';
+import { activeLocale, isSingular, pickLocale, startLanguage, toLocale } from './i18n.utils';
 
 describe('i18n utils', () => {
   afterEach(() => {
@@ -36,5 +36,26 @@ describe('i18n utils', () => {
     document.documentElement.lang = 'en';
     expect(isSingular(0)).toBe(false);
     expect(isSingular(1)).toBe(true);
+  });
+});
+
+describe('startLanguage', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('lets the app boot when no texts can be loaded, and says why in the console', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const failure = new Error('offline');
+
+    await expect(startLanguage({ start: () => Promise.reject(failure) })).resolves.toBeUndefined();
+
+    expect(log).toHaveBeenCalledWith(expect.any(String), failure);
+  });
+
+  it('starts the language otherwise', async () => {
+    const start = vi.fn().mockResolvedValue(undefined);
+
+    await startLanguage({ start });
+
+    expect(start).toHaveBeenCalledOnce();
   });
 });

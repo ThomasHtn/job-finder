@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from '@core/auth/auth.guards';
-import { JOB_DETAIL_PATH, JOB_ID_PARAM } from '@core/jobs/jobs.constants';
+import { JOB_DETAIL_PATH, JOB_ID_PARAM } from '@core/jobs/job-route.constants';
 
 /**
  * Two screens, each lazy: login, and the feed. One offer is a child of the feed, never a page on its

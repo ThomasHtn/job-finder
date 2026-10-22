@@ -33,3 +33,8 @@ export interface JobTabItem {
    */
   icon: IconName;
 }
+
+/**
+ * What the last manual refresh told, kept as data so its wording follows a language switch.
+ */
+export type RefreshOutcome = { kind: 'inserted'; count: number } | { kind: 'busy' };

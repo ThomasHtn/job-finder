@@ -3,7 +3,7 @@ import { inject, Service } from '@angular/core';
 
 import { storageOf, writeStorage } from '@core/storage/storage.utils';
 
-import { LAST_VISIT_STORAGE_KEY } from './jobs.constants';
+import { LAST_VISIT_STORAGE_KEY } from './last-visit.constants';
 
 /**
  * Snapshot of the previous visit's timestamp, taken once before it is overwritten with now.

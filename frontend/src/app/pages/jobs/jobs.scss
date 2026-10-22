@@ -85,7 +85,7 @@
 /* Its glyph turns. */
 .jobs__refresh--spinning .jobs__refresh-icon {
   @include motion {
-    animation: jobs-spin 0.9s linear infinite;
+    animation: jobs-spin var(--duration-spin) linear infinite;
   }
 }
 
@@ -312,8 +312,8 @@
 
     @include motion {
       transition:
-        transform 0.3s var(--ease-standard),
-        visibility 0.3s;
+        transform var(--duration-sheet) var(--ease-standard),
+        visibility var(--duration-sheet);
     }
   }
 

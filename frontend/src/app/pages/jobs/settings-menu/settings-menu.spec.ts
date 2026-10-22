@@ -49,9 +49,10 @@ describe('SettingsMenu', () => {
     expect(host.querySelector('.settings-menu__panel')).toBeNull();
   });
 
-  it('emits the sources pick and closes', async () => {
+  it('emits the sources pick, closes and gives the focus back to the gear', async () => {
     const fixture = await create();
     const host = fixture.nativeElement as HTMLElement;
+    document.body.append(host);
     const picked = vi.fn();
     fixture.componentInstance.sourcesSelected.subscribe(picked);
 
@@ -62,6 +63,8 @@ describe('SettingsMenu', () => {
 
     expect(picked).toHaveBeenCalledOnce();
     expect(host.querySelector('.settings-menu__panel')).toBeNull();
+    expect(document.activeElement).toBe(trigger(host));
+    host.remove();
   });
 
   it('marks the sources board on screen, and a source down on the gear', async () => {
@@ -79,6 +82,7 @@ describe('SettingsMenu', () => {
   it('names each language in itself and switches to the one picked', async () => {
     const fixture = await create();
     const host = fixture.nativeElement as HTMLElement;
+    document.body.append(host);
 
     trigger(host).click();
     fixture.detectChanges();
@@ -93,6 +97,8 @@ describe('SettingsMenu', () => {
 
     expect(TestBed.inject(Language).active()).toBe('en');
     expect(localStorage.getItem('job-finder-locale')).toBe('en');
+    expect(document.activeElement).toBe(trigger(host));
+    host.remove();
   });
 
   it('closes on a press outside, and on Escape with the focus back on the gear', async () => {
@@ -112,6 +118,23 @@ describe('SettingsMenu', () => {
     fixture.detectChanges();
     expect(host.querySelector('.settings-menu__panel')).toBeNull();
     expect(document.activeElement).toBe(trigger(host));
+    host.remove();
+  });
+
+  it('consumes the Escape that closes it, and leaves any other to the page', async () => {
+    const fixture = await create();
+    const host = fixture.nativeElement as HTMLElement;
+    document.body.append(host);
+
+    const idle = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    document.dispatchEvent(idle);
+    expect(idle.defaultPrevented).toBe(false);
+
+    trigger(host).click();
+    fixture.detectChanges();
+    const closing = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    document.dispatchEvent(closing);
+    expect(closing.defaultPrevented).toBe(true);
     host.remove();
   });
 

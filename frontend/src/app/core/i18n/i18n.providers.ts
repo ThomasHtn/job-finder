@@ -3,6 +3,7 @@ import { EnvironmentProviders, inject, isDevMode, provideAppInitializer } from '
 import { provideTransloco } from '@jsverse/transloco';
 
 import { APP_LOCALES, SOURCE_LOCALE } from './i18n.constants';
+import { startLanguage } from './i18n.utils';
 import { Language } from './language';
 import { TranslationLoader } from './translation-loader';
 
@@ -22,6 +23,6 @@ export function provideI18n(): EnvironmentProviders[] {
       },
       loader: TranslationLoader,
     }),
-    provideAppInitializer(() => inject(Language).start()),
+    provideAppInitializer(() => startLanguage(inject(Language))),
   ];
 }

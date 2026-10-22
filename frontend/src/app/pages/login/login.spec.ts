@@ -57,6 +57,26 @@ describe('LoginPage', () => {
     expect(navigate).toHaveBeenCalledWith('/');
   });
 
+  it('goes back to the page the reader came for', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    fixture.componentRef.setInput('returnUrl', '/offres/job-9');
+    submit('secret');
+    http.expectOne('/api/auth/login').flush({ token: 'token-1' });
+    await settle(fixture);
+
+    expect(navigate).toHaveBeenCalledWith('/offres/job-9');
+  });
+
+  it('refuses a return URL leading out of the app', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    fixture.componentRef.setInput('returnUrl', '//evil.test');
+    submit('secret');
+    http.expectOne('/api/auth/login').flush({ token: 'token-1' });
+    await settle(fixture);
+
+    expect(navigate).toHaveBeenCalledWith('/');
+  });
+
   it('says the password is wrong on a refusal', async () => {
     submit('nope');
     http.expectOne('/api/auth/login').flush(null, { status: 401, statusText: 'Unauthorized' });

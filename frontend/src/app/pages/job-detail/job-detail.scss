@@ -8,7 +8,7 @@
   background: var(--color-surface);
 
   @include motion {
-    transition: transform 0.28s var(--ease-standard);
+    transition: transform var(--duration-sheet) var(--ease-standard);
   }
 }
 

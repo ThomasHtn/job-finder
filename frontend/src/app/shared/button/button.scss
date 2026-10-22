@@ -19,9 +19,9 @@
 
   @include motion {
     transition:
-      transform 0.16s var(--ease-standard),
-      background-color 0.16s ease,
-      border-color 0.16s ease;
+      transform var(--duration-quick) var(--ease-standard),
+      background-color var(--duration-quick) ease,
+      border-color var(--duration-quick) ease;
   }
 }
 

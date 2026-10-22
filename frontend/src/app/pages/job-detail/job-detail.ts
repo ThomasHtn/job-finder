@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import {
-  afterNextRender,
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -20,8 +20,10 @@ import { translate, TranslocoPipe } from '@jsverse/transloco';
 
 import type { JobDetail } from '@job-finder/contract';
 
+import type { ActionFailure } from '@core/http/action-failure.model';
+import { actionFailureText } from '@core/http/action-failure.utils';
 import { API_ENDPOINTS } from '@core/http/api-endpoints';
-import { describeHttpError, isNotFound } from '@core/http/api-error.utils';
+import { isNotFound } from '@core/http/api-error.utils';
 import { resourceValue } from '@core/http/resource.utils';
 import { Language } from '@core/i18n/language';
 import { detailPlaceLabel } from '@core/jobs/job.utils';
@@ -64,7 +66,10 @@ import { Prose } from './prose/prose';
   host: {
     '[style.transform]': "dragOffset() ? 'translateY(' + dragOffset() + 'px)' : null",
     '[class.job-detail--dragging]': 'dragging()',
-    '(document:keydown.escape)': 'close()',
+    '[attr.role]': "compact() ? 'dialog' : null",
+    '[attr.aria-modal]': "compact() ? 'true' : null",
+    '[attr.aria-label]': 'compact() ? panelLabel() : null',
+    '(document:keydown.escape)': 'closeOnEscape($event)',
   },
 })
 export class JobDetailPage {
@@ -147,9 +152,26 @@ export class JobDetailPage {
   });
 
   /**
-   * Why the last star failed, above the offer; cleared when another offer opens.
+   * Why the last star failed; cleared when another offer opens.
    */
-  protected readonly actionError = signal<string | null>(null);
+  private readonly actionFailure = signal<ActionFailure | null>(null);
+
+  /**
+   * That failure in the active language, above the offer.
+   */
+  protected readonly actionError = computed(() => {
+    this.language.active();
+    const failure = this.actionFailure();
+    return failure ? actionFailureText(failure) : null;
+  });
+
+  /**
+   * Name of the sheet for assistive tech: the offer's title once known.
+   */
+  protected readonly panelLabel = computed(() => {
+    this.language.active();
+    return this.job()?.title ?? translate('detail.loading');
+  });
 
   /**
    * How far the sheet has been pulled down, in pixels.
@@ -185,10 +207,10 @@ export class JobDetailPage {
   /**
    * Starts every offer at its top, tells the feed behind that the loaded one is now viewed, and
    * follows a star pressed on its row in the feed. A sheet takes the focus, the feed behind being
-   * out of reach.
+   * out of reach: when it opens, and when a narrowing window turns the column into one.
    */
   constructor() {
-    afterNextRender(() => {
+    afterRenderEffect(() => {
       if (this.compact()) {
         this.closeButton()?.nativeElement.focus();
       }
@@ -196,7 +218,7 @@ export class JobDetailPage {
     effect(() => {
       this.id();
       untracked(() => {
-        this.actionError.set(null);
+        this.actionFailure.set(null);
         this.scroller()?.nativeElement.scrollTo({ top: 0 });
       });
     });
@@ -207,7 +229,7 @@ export class JobDetailPage {
       }
     });
     effect(() => {
-      const patch = this.patches.lastPatch();
+      const patch = this.patches.patches().get(this.id());
       if (patch) {
         untracked(() => this.setFavorite(patch.id, patch.isFavorite));
       }
@@ -215,33 +237,41 @@ export class JobDetailPage {
   }
 
   /**
-   * Back to the feed, keeping the tab in the URL.
+   * Back to the feed, keeping the tab in the URL. The offer's history entry is replaced, so Back does
+   * not reopen the offer just closed.
    */
   protected close(): void {
-    void this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
+    void this.router.navigate(['/'], { queryParamsHandling: 'preserve', replaceUrl: true });
   }
 
   /**
-   * Stars or un-stars, updating only the flag here and, through the patch bus, on the row behind.
+   * Escape closes the offer, unless something open on top of it, like the settings menu, already took
+   * the key.
+   */
+  protected closeOnEscape(event: Event): void {
+    if (!event.defaultPrevented) {
+      this.close();
+    }
+  }
+
+  /**
+   * Stars or un-stars through the patch bus: the flag here and the row behind both follow it.
    */
   protected async toggleFavorite(): Promise<void> {
     const current = this.job();
     if (!current) {
       return;
     }
-    this.actionError.set(null);
+    this.actionFailure.set(null);
     try {
-      const summary = await this.jobsApi.toggleFavorite(current.id);
-      this.setFavorite(summary.id, summary.isFavorite);
-      this.patches.publish(summary);
+      this.patches.publish(await this.jobsApi.setFavorite(current.id, !current.isFavorite));
     } catch (error: unknown) {
-      this.actionError.set(translate('feed.favoriteFailed', { detail: describeHttpError(error) }));
+      this.actionFailure.set({ key: 'feed.favoriteFailed', cause: error });
     }
   }
 
   /**
-   * Flips the star of the offer shown, only if it is still `id`: the reader may have opened another
-   * one while the request was on its way.
+   * Flips the star of the offer shown, only if it is still `id`: the patch may concern another offer.
    */
   private setFavorite(id: string, isFavorite: boolean): void {
     this.job.update((job) => (job?.id === id ? { ...job, isFavorite } : job));

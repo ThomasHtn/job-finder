@@ -14,8 +14,8 @@
 
   @include motion {
     transition:
-      color 0.16s ease,
-      background-color 0.16s ease;
+      color var(--duration-quick) ease,
+      background-color var(--duration-quick) ease;
   }
 }
 
@@ -42,7 +42,7 @@
 /* A count not known yet: the empty pill breathes until the first list answers. */
 .job-tabs__count--pending {
   @include motion {
-    animation: job-tabs-pending 1.4s ease-in-out infinite;
+    animation: job-tabs-pending var(--duration-pulse) ease-in-out infinite;
   }
 }
 

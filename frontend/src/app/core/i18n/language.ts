@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { storageOf, writeStorage } from '@core/storage/storage.utils';
 
-import { LOCALE_STORAGE_KEY } from './i18n.constants';
+import { LOCALE_STORAGE_KEY, SOURCE_LOCALE } from './i18n.constants';
 import { AppLocale } from './i18n.model';
 import { pickLocale, toLocale } from './i18n.utils';
 
@@ -42,10 +42,20 @@ export class Language {
   public readonly active = this.current.asReadonly();
 
   /**
-   * Loads the starting language before the first screen, so no key ever shows.
+   * Loads the starting language before the first screen, so no key ever shows. When its texts cannot
+   * load, the source language is tried instead; if that fails too, the error is the caller's.
    */
   public async start(): Promise<void> {
-    await this.apply(this.current());
+    const wanted = this.current();
+    try {
+      await this.apply(wanted);
+    } catch (error: unknown) {
+      if (wanted === SOURCE_LOCALE) {
+        throw error;
+      }
+      console.error(`Texts of "${wanted}" could not load, using "${SOURCE_LOCALE}".`, error);
+      await this.apply(SOURCE_LOCALE);
+    }
   }
 
   /**

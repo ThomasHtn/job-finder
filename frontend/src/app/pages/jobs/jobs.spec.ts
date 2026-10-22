@@ -2,37 +2,24 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
-import type { IngestionSummary, SourceStatus } from '@job-finder/contract';
+import type { SourceStatus } from '@job-finder/contract';
 
 import { LOCALE_STORAGE_KEY } from '@core/i18n/i18n.constants';
 import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
+import { Language } from '@core/i18n/language';
+import { ingestionSummary } from '@core/ingestion/ingestion.fixtures';
 import { jobList, jobSummary } from '@core/jobs/job.fixtures';
 import { JobPatchBus } from '@core/jobs/job-patch-bus';
-import { LAST_VISIT_STORAGE_KEY } from '@core/jobs/jobs.constants';
+import { LAST_VISIT_STORAGE_KEY } from '@core/jobs/last-visit.constants';
 import { Viewport } from '@core/layout/viewport';
 import { useCleanStorage } from '@core/storage/storage.fixtures';
 import { settle } from '@core/testing/testing.fixtures';
 
 import { JobsPage } from './jobs';
-
-/**
- * A manual refresh that found `inserted` offers, with the given sources down.
- */
-function ingestion(inserted: number, failedSources: string[] = []): IngestionSummary {
-  return {
-    fetched: inserted,
-    kept: inserted,
-    inserted,
-    updated: 0,
-    merged: 0,
-    purged: 0,
-    skippedSources: [],
-    failedSources,
-  };
-}
 
 /**
  * Stands in for the detail page, which this spec does not render.
@@ -116,6 +103,20 @@ describe('JobsPage', () => {
   }
 
   /**
+   * The favourites tab of the header, whose accessible name carries its count.
+   */
+  function favoritesTab(fixture: ComponentFixture<JobsPage>): HTMLButtonElement {
+    return find<HTMLButtonElement>(fixture, 'app-job-tabs button:nth-child(3)');
+  }
+
+  /**
+   * The patch bus the page provides to itself and to the panel.
+   */
+  function bus(fixture: ComponentFixture<JobsPage>): JobPatchBus {
+    return fixture.debugElement.injector.get(JobPatchBus);
+  }
+
+  /**
    * The first element matching `selector`.
    */
   function find<T extends HTMLElement>(fixture: ComponentFixture<JobsPage>, selector: string): T {
@@ -170,16 +171,34 @@ describe('JobsPage', () => {
     expect(text(fixture)).toContain('commune non précisée');
   });
 
-  it('toggles the favourite from the star and reloads', async () => {
+  it('stars a row in place, counts it, and does not reload the list', async () => {
     const fixture = await create();
     await answerList(fixture);
 
     find<HTMLButtonElement>(fixture, '.job-row__star').click();
     http.expectOne('/api/jobs/job-1/favorite').flush(jobSummary({ isFavorite: true }));
     await settle(fixture);
-    await answerList(fixture, [jobSummary({ isFavorite: true })]);
 
+    http.expectNone((request) => request.url === '/api/jobs');
     expect(find(fixture, '.job-row__star').getAttribute('aria-label')).toBe('Retirer des favoris');
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 1');
+  });
+
+  it('un-stars a row the same way', async () => {
+    const fixture = await create();
+    const starred = jobSummary({ isFavorite: true });
+    http
+      .expectOne((request) => request.url === '/api/jobs')
+      .flush({ ...jobList([starred]), counts: { local: 1, remote: 0, favorites: 1 } });
+    await settle(fixture);
+
+    find<HTMLButtonElement>(fixture, '.job-row__star').click();
+    http.expectOne('/api/jobs/job-1/favorite').flush(jobSummary({ isFavorite: false }));
+    await settle(fixture);
+
+    http.expectNone((request) => request.url === '/api/jobs');
+    expect(find(fixture, '.job-row__star').getAttribute('aria-pressed')).toBe('false');
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 0');
   });
 
   it('triggers a manual ingestion run and reloads the list from the refresh button', async () => {
@@ -189,7 +208,7 @@ describe('JobsPage', () => {
     find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
     const run = http.expectOne('/api/ingestion/run');
     expect(run.request.method).toBe('POST');
-    run.flush(ingestion(1));
+    run.flush(ingestionSummary(1));
     await settle(fixture);
 
     await answerList(fixture, [jobSummary(), jobSummary({ id: 'job-2' })]);
@@ -205,7 +224,7 @@ describe('JobsPage', () => {
     await answerList(fixture);
 
     find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
-    http.expectOne('/api/ingestion/run').flush(ingestion(0, ['FREE_WORK']));
+    http.expectOne('/api/ingestion/run').flush(ingestionSummary(0, ['FREE_WORK']));
     await settle(fixture);
     await answerList(fixture);
     http.expectOne('/api/ingestion/status').flush([]);
@@ -300,11 +319,56 @@ describe('JobsPage', () => {
     const fixture = await create();
     await answerList(fixture);
 
-    TestBed.inject(JobPatchBus).publish(jobSummary({ isFavorite: true, isViewed: true }));
+    bus(fixture).publish(jobSummary({ isFavorite: true, isViewed: true }));
     await settle(fixture);
 
     expect(find(fixture, 'app-job-row').classList).toContain('job-row--viewed');
-    expect(text(fixture)).toContain('1');
+    expect(find(fixture, '.job-row__star').getAttribute('aria-pressed')).toBe('true');
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 1');
+  });
+
+  it('applies a change published before the list arrived', async () => {
+    const fixture = await create();
+    bus(fixture).publish(jobSummary({ isFavorite: true }));
+    await settle(fixture);
+
+    await answerList(fixture);
+
+    expect(find(fixture, '.job-row__star').getAttribute('aria-pressed')).toBe('true');
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 1');
+  });
+
+  it('keeps a change when a list loaded earlier arrives after it', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+    find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
+    http.expectOne('/api/ingestion/run').flush(ingestionSummary(0));
+    await settle(fixture);
+    const reload = http.expectOne((request) => request.url === '/api/jobs');
+
+    bus(fixture).publish(jobSummary({ isFavorite: true }));
+    reload.flush(jobList([jobSummary()]));
+    http.expectOne('/api/ingestion/status').flush([]);
+    await settle(fixture);
+
+    expect(find(fixture, '.job-row__star').getAttribute('aria-pressed')).toBe('true');
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 1');
+  });
+
+  it('keeps every change published within one tick', async () => {
+    const fixture = await create();
+    await answerList(fixture, [jobSummary(), jobSummary({ id: 'job-2' })]);
+
+    bus(fixture).publish(jobSummary({ id: 'job-1', isFavorite: true }));
+    bus(fixture).publish(jobSummary({ id: 'job-2', isFavorite: true }));
+    await settle(fixture);
+
+    const stars = fixture.nativeElement.querySelectorAll('.job-row__star');
+    expect([...stars].map((star) => (star as HTMLElement).getAttribute('aria-pressed'))).toEqual([
+      'true',
+      'true',
+    ]);
+    expect(favoritesTab(fixture).getAttribute('aria-label')).toBe('Favoris 2');
   });
 
   it('shows the sources board on its tab', async () => {
@@ -381,9 +445,9 @@ describe('JobsPage', () => {
     await settle(harness.fixture);
     const page = harness.routeNativeElement!;
     const link = page.querySelector<HTMLAnchorElement>('a.job-row__title')!;
-    link.focus();
 
-    await harness.navigateByUrl('/offres/job-1');
+    link.click();
+    await harness.fixture.whenStable();
     await settle(harness.fixture);
 
     expect(page.querySelector('.jobs__feed')!.hasAttribute('inert')).toBe(true);
@@ -412,12 +476,13 @@ describe('JobsPage', () => {
     const fixture = await create();
     await answerList(fixture);
 
-    find<HTMLButtonElement>(fixture, '.job-row__star').click();
-    http.expectOne('/api/jobs/job-1/favorite').flush(jobSummary({ isFavorite: true }));
+    find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
+    http.expectOne('/api/ingestion/run').flush(ingestionSummary(0));
     await settle(fixture);
     http
       .expectOne((request) => request.url === '/api/jobs')
       .flush(null, { status: 502, statusText: 'Bad Gateway' });
+    http.expectOne('/api/ingestion/status').flush([]);
     await settle(fixture);
 
     expect(find(fixture, 'app-notice').textContent).toContain('Impossible de charger les offres');
@@ -448,12 +513,67 @@ describe('JobsPage', () => {
 
     expect(find(fixture, '#jobs-sync').hasAttribute('aria-live')).toBe(false);
     find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
-    http.expectOne('/api/ingestion/run').flush(ingestion(2));
+    http.expectOne('/api/ingestion/run').flush(ingestionSummary(2));
     await settle(fixture);
     await answerList(fixture);
     http.expectOne('/api/ingestion/status').flush([]);
     await settle(fixture);
 
     expect(find(fixture, '[aria-live="polite"]').textContent).toContain('2 nouvelles offres.');
+  });
+
+  it('words the notices in the language picked after they appeared', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+    find<HTMLButtonElement>(fixture, '.jobs__refresh').click();
+    http.expectOne('/api/ingestion/run').flush(ingestionSummary(1, ['FREE_WORK']));
+    await settle(fixture);
+    await answerList(fixture);
+    http.expectOne('/api/ingestion/status').flush([]);
+    await settle(fixture);
+    expect(text(fixture)).toContain('1 nouvelle offre.');
+    expect(text(fixture)).toContain('Source(s) indisponible(s) : Free-Work.');
+
+    await TestBed.inject(Language).use('en');
+    await settle(fixture);
+
+    expect(text(fixture)).toContain('1 new offer.');
+    expect(text(fixture)).toContain('Unavailable source(s): Free-Work.');
+  });
+
+  it('words a failure in the language picked after it appeared', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+    find<HTMLButtonElement>(fixture, '.job-row__star').click();
+    http.expectOne('/api/jobs/job-1/favorite').flush(null, { status: 0, statusText: 'Unknown' });
+    await settle(fixture);
+    expect(find(fixture, 'app-notice').textContent).toContain('Impossible de modifier le favori.');
+
+    await TestBed.inject(Language).use('en');
+    await settle(fixture);
+
+    expect(find(fixture, 'app-notice').textContent).toContain('Could not update the favorite.');
+  });
+
+  it('speaks of the feed to assistive tech with a title and a labelled panel', async () => {
+    const fixture = await create();
+    await answerList(fixture);
+
+    expect(find(fixture, 'h1.sr-only').textContent).toContain("Offres d'emploi");
+    expect(find(fixture, 'aside.jobs__panel').getAttribute('aria-label')).toBe(
+      'Offre sélectionnée',
+    );
+  });
+
+  it('shares its patch bus with the panel it hosts', async () => {
+    const harness = await routed('/offres/job-1');
+    http.expectOne((request) => request.url === '/api/jobs').flush(jobList([jobSummary()]));
+    await settle(harness.fixture);
+
+    const panelBus = harness.routeDebugElement
+      ?.query(By.directive(DetailStub))
+      .injector.get(JobPatchBus);
+
+    expect(panelBus).toBe(harness.routeDebugElement?.injector.get(JobPatchBus));
   });
 });

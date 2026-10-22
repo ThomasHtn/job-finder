@@ -76,6 +76,8 @@
     "unavailable": "The source status could not be loaded."
   },
   "feed": {
+    "title": "Job offers",
+    "panelLabel": "Selected offer",
     "loading": "Loading the offers…",
     "newHeadlineOne": "{{ count }} new offer",
     "newHeadlineOther": "{{ count }} new offers",

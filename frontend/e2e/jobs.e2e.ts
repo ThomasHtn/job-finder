@@ -39,12 +39,18 @@ test.describe('feed', () => {
 
     const star = page.locator('app-job-detail-page').getByRole('button', { name: /favoris/ });
     const starred = (await star.getAttribute('aria-pressed')) === 'true';
-    await star.click();
-    await expect(star).toHaveAttribute('aria-pressed', String(!starred));
-    await expect.poll(() => tabCount(page, 'Favoris')).toBe(before + (starred ? -1 : 1));
+    try {
+      await star.click();
+      await expect(star).toHaveAttribute('aria-pressed', String(!starred));
+      await expect.poll(() => tabCount(page, 'Favoris')).toBe(before + (starred ? -1 : 1));
+    } finally {
+      /* Puts the star back whatever happened above, so a failure here never leaks into the next test. */
+      await page.waitForLoadState('networkidle');
+      if ((await star.getAttribute('aria-pressed')) !== String(starred)) {
+        await star.click();
+      }
+    }
 
-    /* Puts the star back, so the next test meets the seeded state. */
-    await star.click();
     await expect(star).toHaveAttribute('aria-pressed', String(starred));
     await expect.poll(() => tabCount(page, 'Favoris')).toBe(before);
   });

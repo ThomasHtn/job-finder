@@ -8,6 +8,7 @@ import {
 } from '@job-finder/contract';
 
 import { isSingular } from '@core/i18n/i18n.utils';
+import { isNewSince } from '@core/jobs/job.utils';
 
 import { SOURCES_TAB } from './jobs.constants';
 import { JobTabItem, ShellTab } from './jobs.model';
@@ -20,24 +21,26 @@ export function toShellTab(value: unknown): ShellTab {
 }
 
 /**
- * Replaces one row of the list in place and moves the favourites count with it.
- * Returns the list untouched when the offer is not in it.
+ * The list with every known change applied to its rows, the favourites count moving with them. A
+ * change to an offer the list does not hold is ignored; applying the same change twice is harmless.
  */
-export function applyJobPatch(
+export function applyJobPatches(
   current: JobListResponse | null,
-  patched: JobSummary,
+  patches: ReadonlyMap<string, JobSummary>,
 ): JobListResponse | null {
-  const previous = current?.jobs.find((job) => job.id === patched.id);
-  if (!current || !previous) {
+  if (!current || patches.size === 0) {
     return current;
   }
-  const favorites =
-    current.counts.favorites + (patched.isFavorite ? 1 : 0) - (previous.isFavorite ? 1 : 0);
-  return {
-    ...current,
-    jobs: current.jobs.map((job) => (job.id === patched.id ? patched : job)),
-    counts: { ...current.counts, favorites },
-  };
+  let favorites = current.counts.favorites;
+  const jobs = current.jobs.map((job) => {
+    const patched = patches.get(job.id);
+    if (!patched) {
+      return job;
+    }
+    favorites += Number(patched.isFavorite) - Number(job.isFavorite);
+    return patched;
+  });
+  return { ...current, jobs, counts: { ...current.counts, favorites } };
 }
 
 /**
@@ -82,4 +85,25 @@ export function newOffersMessage(count: number): string {
  */
 export function sourceName(source: string): string {
   return translate(`sources.names.${source}`);
+}
+
+/**
+ * The offers first seen after the previous visit, by the same rule as the row's own dot.
+ */
+export function pickNewJobs(jobs: JobSummary[], previousVisitAt: string | null): JobSummary[] {
+  return jobs.filter((job) => isNewSince(job, previousVisitAt));
+}
+
+/**
+ * The offers already there at the previous visit.
+ */
+export function pickSeenJobs(jobs: JobSummary[], previousVisitAt: string | null): JobSummary[] {
+  return jobs.filter((job) => !isNewSince(job, previousVisitAt));
+}
+
+/**
+ * "3 new offers", agreed with the count, in the active language.
+ */
+export function newHeadlineText(count: number): string {
+  return translate(isSingular(count) ? 'feed.newHeadlineOne' : 'feed.newHeadlineOther', { count });
 }

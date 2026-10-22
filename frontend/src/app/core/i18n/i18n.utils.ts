@@ -30,6 +30,18 @@ export function activeLocale(): AppLocale {
 }
 
 /**
+ * Starts the language so the app boots whatever happens: a failure is logged and the screens show
+ * their text keys, rather than the start-up screen staying up for ever.
+ */
+export async function startLanguage(language: { start(): Promise<void> }): Promise<void> {
+  try {
+    await language.start();
+  } catch (error: unknown) {
+    console.error('No texts could be loaded, the app starts without translations.', error);
+  }
+}
+
+/**
  * Whether `count` takes the singular in the active language: 0 and 1 in French, only 1 in English.
  */
 export function isSingular(count: number): boolean {
