@@ -344,13 +344,13 @@
     padding-inline: 0;
   }
 
-  .jobs__intro,
-  .jobs__list {
-    padding-inline: var(--layout-gutter);
+  .jobs__intro {
+    padding: 1rem var(--layout-gutter) 0.875rem;
   }
 
-  .jobs__intro {
-    padding-block: 1rem 0.875rem;
+  /* Cards closer to the edges than the text above them. */
+  .jobs__list {
+    padding-inline: var(--layout-card-gutter);
   }
 
   .jobs__headline {

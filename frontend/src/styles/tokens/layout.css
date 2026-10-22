@@ -4,6 +4,9 @@
   /* Side padding of every column; tighter below the wide layout, see below. */
   --layout-gutter: 1.5rem;
 
+  /* Side margin of the feed cards on a phone, tighter than the gutter to give them reading width. */
+  --layout-card-gutter: 0.5rem;
+
   /* Height of the header's first row. */
   --layout-header-height: 4rem;
 
