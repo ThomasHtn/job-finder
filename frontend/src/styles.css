@@ -11,3 +11,6 @@
 
 /* Element defaults. */
 @import './styles/base.css';
+
+/* Start-up screen of index.html. */
+@import './styles/splash.css';

@@ -11,15 +11,13 @@
   height: 100dvh;
 }
 
-/* Sticky frosted header, a hairline under it. */
+/* Sticky header on a plain white ground, a hairline under it. */
 .jobs__head {
   position: sticky;
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--color-line);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: var(--color-surface);
 }
 
 /* The header's single row, as wide as the content below. */
@@ -98,10 +96,28 @@
   }
 }
 
+/* The sync time, fading in once the first list has told it. */
+.jobs__stamp {
+  @include motion {
+    animation: jobs-fade-in var(--duration-fade) ease-out;
+  }
+}
+
 /* What a manual refresh just brought. */
 .jobs__stamp-fresh {
   color: var(--color-accent-ink);
   font-weight: 600;
+
+  @include motion {
+    animation: jobs-fade-in var(--duration-fade) ease-out;
+  }
+}
+
+/* A message swapping in. */
+@keyframes jobs-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* Reading and choosing get the same room: neither column is the leftover of the other. */
@@ -109,7 +125,7 @@
   display: grid;
   flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(24rem, 1fr);
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0.75rem;
   width: 100%;
   min-height: 0;
@@ -123,8 +139,16 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* The intro above the feed column only, so the first card and the panel start on one line. */
+.jobs__intro-row {
+  grid-column: 1;
+  grid-row: 1;
+  padding: var(--panel-gap) 0.75rem 0 0;
+}
+
 /* The feed column, its own scroller, inset like the panel so both start and end on the same lines. */
 .jobs__feed {
+  grid-row: 2;
   min-width: 0;
   margin-block: var(--panel-gap);
   padding: 0 0.75rem 0 0;
@@ -142,13 +166,31 @@
 
 /* The count of new offers and the filter, lined up with the cards. */
 .jobs__intro {
-  padding: 0 0 1.375rem;
+  padding: 0;
+
+  @include motion {
+    animation: jobs-intro-enter var(--duration-entry) var(--ease-entry) backwards;
+  }
 }
 
-/* "3 new offers": the first thing to read. */
+/* The intro rising into place with the first cards. */
+@keyframes jobs-intro-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* "3 new offers": the first thing to read, in the teal's text shade. */
 .jobs__headline {
-  font-size: 1.75rem;
-  font-weight: 650;
+  color: var(--color-accent-ink);
+  font-size: 1.875rem;
+  font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
@@ -156,8 +198,9 @@
 /* When the previous visit was. */
 .jobs__since {
   margin: 0.375rem 0 0;
-  color: var(--color-ink-2);
+  color: var(--color-ink-3);
   font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 /* The filter's glyph. */
@@ -179,18 +222,18 @@
   gap: 0.875rem;
 }
 
-/* Where the previous visit stopped: what is above arrived since. */
+/* Where the previous visit stopped: what is above arrived since, said quietly. */
 .jobs__seen {
   margin: 0.375rem 0;
-  color: var(--color-accent-ink);
+  color: var(--color-ink-3);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* The rule on each side of the label. */
 .jobs__seen-rule {
   height: 1px;
-  background: var(--color-accent);
+  background: var(--color-line-2);
 }
 
 /* Its glyph. */
@@ -201,17 +244,24 @@
 /* The panel, a card like the offers, with the same air above and below. */
 .jobs__panel {
   position: relative;
+  grid-row: 2;
   margin-block: var(--panel-gap);
   overflow: hidden;
-  border: 1px solid var(--color-line-2);
-  border-radius: 1.375rem;
+  border-radius: 1.25rem;
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+
+  @include motion {
+    transition:
+      background-color var(--duration-fade) ease,
+      box-shadow var(--duration-fade) ease;
+  }
 }
 
 /* Nothing open, nothing to frame: the invitation floats on the page itself. */
 .jobs__panel:not(.jobs__panel--open) {
-  border-color: transparent;
   background: none;
+  box-shadow: none;
 }
 
 /* The invitation of the empty panel. */
@@ -274,6 +324,11 @@
 
   .jobs__idle {
     display: none;
+  }
+
+  /* Inside the scrolling feed, the intro keeps its distance from the first card. */
+  .jobs__intro {
+    padding-bottom: 1.375rem;
   }
 }
 

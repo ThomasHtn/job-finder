@@ -34,8 +34,9 @@ import { Icon } from '@shared/icon/icon';
 import { IconButton } from '@shared/icon-button/icon-button';
 import { Notice } from '@shared/notice/notice';
 import { ScanLine } from '@shared/scan-line/scan-line';
+import { Skeleton } from '@shared/skeleton/skeleton';
 
-import { DISMISS_DISTANCE_PX } from './job-detail.constants';
+import { DISMISS_DISTANCE_PX, PLACEHOLDER_TEXT_LINES } from './job-detail.constants';
 import { AlternativeLink } from './job-detail.model';
 import { hostLabel } from './job-detail.utils';
 import { Prose } from './prose/prose';
@@ -46,7 +47,18 @@ import { Prose } from './prose/prose';
 @Component({
   selector: 'app-job-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, DatePipe, EmptyState, Icon, IconButton, Notice, Prose, ScanLine, TranslocoPipe],
+  imports: [
+    Button,
+    DatePipe,
+    EmptyState,
+    Icon,
+    IconButton,
+    Notice,
+    Prose,
+    ScanLine,
+    Skeleton,
+    TranslocoPipe,
+  ],
   templateUrl: './job-detail.html',
   styleUrl: './job-detail.scss',
   host: {
@@ -113,6 +125,14 @@ export class JobDetailPage {
    * True until the request settles.
    */
   protected readonly loading = this.detail.isLoading;
+
+  /**
+   * One entry per line of text the placeholder draws.
+   */
+  protected readonly placeholderLines = Array.from(
+    { length: PLACEHOLDER_TEXT_LINES },
+    (_, index) => index,
+  );
 
   /**
    * Message shown instead of the offer.

@@ -1,0 +1,20 @@
+@use 'tools' as *;
+
+/* A rounded tile on the tile ground; the parent sets its width and height. */
+:host {
+  display: block;
+  height: 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--color-surface-2);
+
+  @include motion {
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+/* A slow fade in and out, the one sign the block is waiting for content. */
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}

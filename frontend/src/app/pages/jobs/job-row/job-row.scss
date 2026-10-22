@@ -1,23 +1,47 @@
 @use 'tools' as *;
 
-/* One offer as a card: employer and place, the title, one fact per line, then the footer pills. */
+/* One offer as a card: employer and place, the title, its bulleted facts, then the freshness and date. */
 :host {
-  --row-pad: 1.375rem;
-  --row-radius: 1.375rem;
+  --row-pad: 1.25rem;
+  --row-radius: 1.25rem;
 
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.875rem;
   padding: var(--row-pad);
-  border: 1px solid var(--color-line-2);
+  border: 2px solid transparent;
   border-radius: var(--row-radius);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 
   @include motion {
     transition:
       background-color 0.14s ease,
-      border-color 0.14s ease;
+      border-color 0.14s ease,
+      transform 0.16s var(--ease-standard);
+    animation: job-row-enter var(--duration-entry) var(--ease-entry) backwards;
+    animation-delay: calc(min(var(--row-index, 0), 8) * var(--motion-step));
+  }
+}
+
+/* Pressed card, the feel of a tap before the offer opens. */
+:host(:active) {
+  @include motion {
+    transform: scale(0.99);
+  }
+}
+
+/* A card rising into the list; only the first eight wait for the ones above them. */
+@keyframes job-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -28,7 +52,7 @@
   }
 }
 
-/* The offer currently open in the panel: only its border takes the accent, the fill stays plain, hovered or not. */
+/* The offer currently open in the panel: only its border takes the teal, the fill stays plain, hovered or not. */
 :host(.job-row--selected) {
   border-color: var(--color-accent);
   background: var(--color-surface);
@@ -39,26 +63,26 @@
   padding-right: 2.5rem;
 }
 
-/* The employer's tile: no logo from the boards, so one glyph on a soft square. */
+/* The employer's tile: no logo from the boards, so one quiet glyph on a mint square. */
 .job-row__logo {
-  --icon-size: 1.625rem;
+  --icon-size: 1.25rem;
 
   display: grid;
   flex: none;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-lg);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-ink);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--color-surface-2);
+  color: var(--color-ink-3);
 }
 
 /* The employer, bold, the first thing read. */
 .job-row__company {
   overflow: hidden;
   color: var(--color-ink);
-  font-size: 1.0625rem;
-  font-weight: 650;
+  font-size: 0.9375rem;
+  font-weight: 800;
   line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -66,27 +90,33 @@
 
 /* The place under it, greyed. */
 .job-row__place {
-  margin-top: 0.125rem;
   color: var(--color-ink-3);
-  font-size: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   line-height: 1.3;
 }
 
 /* The note on a region-only offer: town not given. */
 .job-row__note {
   margin-left: 0.375rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
-/* Title, the link to the offer, the boldest and largest line of the card. */
+/* Title, the link to the offer, in the display face. */
 .job-row__title {
-  color: var(--color-accent-ink);
-  font-size: 1.1875rem;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   text-decoration: none;
   text-wrap: balance;
+}
+
+/* Hovered title, in the teal's text shade. */
+.job-row__title:hover {
+  color: var(--color-accent-ink);
 }
 
 /* Stretches the click target to the whole card without nesting interactive content. */
@@ -97,24 +127,31 @@
   content: '';
 }
 
-/* Already opened: one step lighter, the accent kept. */
+/* Already opened: one step lighter. */
 :host(.job-row--viewed) .job-row__title {
-  font-weight: 600;
+  font-weight: 550;
 }
 
-/* Stack, salary and contract, one per line. */
+/* Salary, stack and contract, one per line, in the scheme's ink. */
 .job-row__facts {
   color: var(--color-ink);
   font-size: 0.9375rem;
+  font-weight: 600;
   line-height: 1.4;
 }
 
-/* The glyph before each fact, on the first line of a wrapped one. */
-.job-row__icon {
-  --icon-size: 1.375rem;
+/* The bullet: each fact's glyph on a small mint tile, like the employer's. */
+.job-row__bullet {
+  --icon-size: 1rem;
 
+  display: grid;
   flex: none;
-  color: var(--color-accent-ink);
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5625rem;
+  background: var(--color-surface-2);
+  color: var(--color-ink-3);
 }
 
 /* A source's full salary sentence may wrap anywhere. */
@@ -122,36 +159,27 @@
   overflow-wrap: anywhere;
 }
 
-/* No salary given: the short "not stated", greyed. */
-.job-row__fact--unknown {
-  color: var(--color-ink-3);
-}
-
-/* The pills. */
+/* The footer: freshness, then the publication date. */
 .job-row__foot {
-  margin-top: 0.125rem;
+  min-height: 1.5rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
-/* The publication date, bold on a soft fill. */
-.job-row__pill {
-  padding: 0.25rem 0.625rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-2);
-  color: var(--color-ink);
-  font-size: 0.875rem;
-  font-weight: 650;
-  line-height: 1.4;
-}
-
-/* The publication date, pushed to the card's right edge. */
-.job-row__pill--date {
-  margin-left: auto;
-}
-
-/* The one loud mark in the feed: an offer that appeared since the last visit. */
-.job-row__pill--new {
-  background: var(--color-accent-soft);
+/* "New", after the logo's teal dot: what arrived since the last visit. */
+.job-row__fresh {
   color: var(--color-accent-ink);
+  font-weight: 800;
+}
+
+/* The dot before it. */
+.job-row__fresh::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  content: '';
 }
 
 /* Top right, level with the employer's name; above the stretched title link. */
@@ -159,10 +187,10 @@
   --icon-size: 1.375rem;
 
   position: absolute;
-  top: calc(var(--row-pad) - 0.125rem);
+  top: calc(var(--row-pad) - 0.25rem);
   right: calc(var(--row-pad) - 0.5rem);
   z-index: 1;
-  color: var(--color-ink-2);
+  color: var(--color-ink-3);
 }
 
 /* A starred offer's star. */
@@ -173,32 +201,22 @@
 /* Phones: a little tighter, the type one step smaller. */
 @include below(sm) {
   :host {
-    --row-pad: 1.125rem;
+    --row-pad: 1rem;
     --row-radius: 1.125rem;
 
-    gap: 0.875rem;
-  }
-
-  .job-row__logo {
-    --icon-size: 1.375rem;
-
-    width: 3rem;
-    height: 3rem;
-  }
-
-  .job-row__company {
-    font-size: 1rem;
-  }
-
-  .job-row__place {
-    font-size: 0.9375rem;
+    gap: 0.75rem;
   }
 
   .job-row__title {
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
   }
 
   .job-row__facts {
     font-size: 0.875rem;
+  }
+
+  .job-row__bullet {
+    width: 1.625rem;
+    height: 1.625rem;
   }
 }

@@ -24,9 +24,9 @@ export interface JobTabItem {
   label: string;
 
   /**
-   * Offers currently in that tab.
+   * Offers currently in that tab, `null` until the first list answers.
    */
-  count: number;
+  count: number | null;
 
   /**
    * Glyph drawn before the label.

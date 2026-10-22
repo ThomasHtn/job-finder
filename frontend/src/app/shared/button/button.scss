@@ -1,6 +1,6 @@
 @use 'tools' as *;
 
-/* Neutral text button; parent rules win over the states below, which carry no extra weight. */
+/* Neutral pill button; parent rules win over the states below, which carry no extra weight. */
 :host {
   display: inline-flex;
   align-items: center;
@@ -9,7 +9,7 @@
   min-height: 2.75rem;
   padding: 0.625rem 1.125rem;
   border: 1px solid var(--color-line-2);
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-ink);
   font: 500 0.9375rem/1.2 var(--font-sans);
@@ -42,12 +42,14 @@
   pointer-events: none;
 }
 
-/* The main action: filled with the accent. */
+/* The main action: filled with the teal, in the display face. */
 :host(.button--primary) {
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 /* Main action, hovered. */

@@ -86,6 +86,14 @@ describe('jobs utils', () => {
         ['Favoris', 1],
       ]);
     });
+
+    it('leaves the counts unknown until the first list answers', () => {
+      expect(buildTabItems('Normandie', null).map((item) => item.count)).toEqual([
+        null,
+        null,
+        null,
+      ]);
+    });
   });
 
   describe('newOffersMessage', () => {

@@ -1,5 +1,4 @@
 import {
-  DEFAULT_CONTRACT,
   SALARY_AMOUNT,
   SALARY_FOREIGN_CURRENCY,
   SALARY_FROM_HINT,
@@ -8,13 +7,6 @@ import {
   SALARY_THOUSANDS_HINT,
 } from './job-row.constants';
 import { SalaryRange } from './job-row.model';
-
-/**
- * Contract wording worth a slot in the row: every offer here is permanent, so only another wording is.
- */
-export function unusualContract(label: string | null): string | null {
-  return label && label.toUpperCase() !== DEFAULT_CONTRACT ? label : null;
-}
 
 /**
  * The amounts of a source's salary text, `null` when it names none the row can shorten safely.

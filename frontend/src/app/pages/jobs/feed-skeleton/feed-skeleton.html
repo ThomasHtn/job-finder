@@ -1,0 +1,25 @@
+<!-- Said once to screen readers; the cards below are decoration. -->
+<span class="sr-only">{{ 'feed.loading' | transloco }}</span>
+
+<!-- One card per row: employer tile and lines, the title, three facts, the date. -->
+@for (row of rows; track row) {
+  <div class="feed-skeleton__card flex flex-col gap-3.5">
+    <div class="flex items-center gap-3">
+      <app-skeleton class="feed-skeleton__tile" />
+      <div class="flex flex-1 flex-col gap-1.5">
+        <app-skeleton class="feed-skeleton__company" />
+        <app-skeleton class="feed-skeleton__place" />
+      </div>
+    </div>
+    <app-skeleton class="feed-skeleton__title" />
+    <div class="flex flex-col gap-2">
+      @for (fact of facts; track fact) {
+        <div class="flex items-center gap-2.5">
+          <app-skeleton class="feed-skeleton__bullet" />
+          <app-skeleton class="feed-skeleton__fact" />
+        </div>
+      }
+    </div>
+    <app-skeleton class="feed-skeleton__date" />
+  </div>
+}

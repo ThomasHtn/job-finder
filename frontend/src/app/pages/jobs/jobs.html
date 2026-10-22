@@ -30,8 +30,10 @@
           <span class="jobs__stamp-fresh">{{ message }}</span>
         } @else if (refreshing()) {
           {{ 'head.searching' | transloco }}
-        } @else {
-          {{ lastIngestionAt() | syncLabel: language.active() : now() }}
+        } @else if (listed()) {
+          <span class="jobs__stamp">{{
+            lastIngestionAt() | syncLabel: language.active() : now()
+          }}</span>
         }
       </span>
 
@@ -83,6 +85,13 @@
       <app-source-board [statuses]="health.statuses()" />
     </main>
   } @else {
+    <!-- On a wide screen the intro sits above the feed alone, so the cards and the panel start on one line. -->
+    @if (!compact() && newCount() > 0) {
+      <div class="jobs__intro-row">
+        <ng-container [ngTemplateOutlet]="intro" />
+      </div>
+    }
+
     <!-- The feed itself. -->
     <main
       #feed
@@ -90,27 +99,9 @@
       [attr.aria-busy]="loading() || refreshing()"
       [attr.inert]="sheetOpen() ? '' : null"
     >
-      <!-- What changed since last time: the first thing to read, and a way to see only that. -->
-      @if (newCount() > 0) {
-        <div class="jobs__intro flex flex-wrap items-end gap-x-5 gap-y-3">
-          <div class="min-w-0 flex-1">
-            <h2 class="jobs__headline tabular-nums">{{ newHeadline() }}</h2>
-            <p class="jobs__since">
-              {{ previousVisitAt | sinceVisitLabel: language.active() : now() }}
-            </p>
-          </div>
-          <button
-            app-button
-            type="button"
-            class="jobs__only-new"
-            [class.jobs__only-new--active]="onlyNew()"
-            [attr.aria-pressed]="onlyNew()"
-            (click)="toggleOnlyNew()"
-          >
-            <app-icon class="jobs__only-new-icon" name="filter" />
-            <span class="max-sm:sr-only">{{ 'feed.onlyNew' | transloco }}</span>
-          </button>
-        </div>
+      <!-- On a phone the intro scrolls with the cards. -->
+      @if (compact()) {
+        <ng-container [ngTemplateOutlet]="intro" />
       }
 
       <!-- A refresh, star or reload that failed: said above the list, which stays as it was. -->
@@ -128,14 +119,17 @@
         <app-notice class="jobs__notice">{{ health.label() }}</app-notice>
       }
 
-      <!-- Blocking error (the list itself could not load), empty state, or the rows. -->
+      <!-- Blocking error (the list itself could not load), placeholder cards, empty state, or the rows. -->
       @if (error(); as message) {
         <app-empty-state [title]="message">
           <button app-button variant="primary" type="button" (click)="reload()">
             {{ 'feed.retry' | transloco }}
           </button>
         </app-empty-state>
-      } @else if (jobs().length === 0 && !loading()) {
+      } @else if (jobs().length === 0 && loading()) {
+        <!-- First load of a list: cards shaped like the ones on their way. -->
+        <app-feed-skeleton class="jobs__list" />
+      } @else if (jobs().length === 0) {
         <!-- Empty state, worded per tab and per filter. -->
         @if (onlyNew()) {
           <app-empty-state
@@ -170,8 +164,10 @@
       } @else {
         <!-- New offers first, a rule where the last visit stopped, then the rest; the row emits, the page persists and reloads. -->
         <div class="jobs__list">
+          <!-- Each card cascades in after the one above it, `--row-index` steps apart. -->
           @for (job of newJobs(); track job.id) {
             <app-job-row
+              [style.--row-index]="$index"
               [job]="job"
               [selected]="job.id === selectedId()"
               (favoriteToggled)="toggleFavorite($event)"
@@ -189,6 +185,7 @@
           }
           @for (job of seenJobs(); track job.id) {
             <app-job-row
+              [style.--row-index]="newJobs().length + $index"
               [job]="job"
               [selected]="job.id === selectedId()"
               (favoriteToggled)="toggleFavorite($event)"
@@ -210,6 +207,31 @@
     </aside>
   }
 </div>
+
+<!-- What changed since last time: the first thing to read, and a way to see only that. -->
+<ng-template #intro>
+  @if (newCount() > 0) {
+    <div class="jobs__intro flex flex-wrap items-end gap-x-5 gap-y-3">
+      <div class="min-w-0 flex-1">
+        <h2 class="jobs__headline tabular-nums">{{ newHeadline() }}</h2>
+        <p class="jobs__since">
+          {{ previousVisitAt | sinceVisitLabel: language.active() : now() }}
+        </p>
+      </div>
+      <button
+        app-button
+        type="button"
+        class="jobs__only-new"
+        [class.jobs__only-new--active]="onlyNew()"
+        [attr.aria-pressed]="onlyNew()"
+        (click)="toggleOnlyNew()"
+      >
+        <app-icon class="jobs__only-new-icon" name="filter" />
+        <span class="max-sm:sr-only">{{ 'feed.onlyNew' | transloco }}</span>
+      </button>
+    </div>
+  }
+</ng-template>
 
 <!-- Thumb-height navigation, out of the way of the reading area. -->
 @if (compact()) {

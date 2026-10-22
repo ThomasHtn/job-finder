@@ -14,7 +14,7 @@ import { Icon } from '@shared/icon/icon';
 import { IconButton } from '@shared/icon-button/icon-button';
 
 import { ROW_STACK_LIMIT } from './job-row.constants';
-import { parseSalary, salaryAmounts, unusualContract } from './job-row.utils';
+import { parseSalary, salaryAmounts } from './job-row.utils';
 import { PublishedLabelPipe } from './published-label.pipe';
 
 /**
@@ -76,9 +76,12 @@ export class JobRow {
   protected readonly detailLink = computed(() => ['/', JOB_DETAIL_PATH, this.job().id]);
 
   /**
-   * Contract wording, only when it says something other than the usual permanent contract.
+   * Contract wording from the source, else the permanent contract every offer here is.
    */
-  protected readonly contract = computed(() => unusualContract(this.job().contractLabel));
+  protected readonly contract = computed(() => {
+    this.language.active();
+    return this.job().contractLabel ?? translate('detail.defaultContract');
+  });
 
   /**
    * The first stack keywords the offer names, `null` when it names none.

@@ -27,13 +27,20 @@
     background: var(--color-accent-soft);
   }
 
-  /* Thin scrollbars on every scroller: a quiet rounded thumb on no track, darker on hover. */
+  /* Titles take the display face. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* Thin scrollbars on every scroller: a light teal rounded thumb on no track, deep teal on hover. */
   * {
-    --scrollbar-thumb: color-mix(in srgb, var(--color-ink-3) 40%, transparent);
+    --scrollbar-thumb: var(--color-scrollbar);
   }
 
   :hover {
-    --scrollbar-thumb: color-mix(in srgb, var(--color-ink-3) 70%, transparent);
+    --scrollbar-thumb: var(--color-accent);
   }
 
   /* Chrome and Safari: the WebKit pseudo-elements, which drop the arrow buttons; `scrollbar-color` would override them. */

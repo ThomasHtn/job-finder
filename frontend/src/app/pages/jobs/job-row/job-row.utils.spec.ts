@@ -1,13 +1,6 @@
-import { parseSalary, salaryAmounts, unusualContract } from './job-row.utils';
+import { parseSalary, salaryAmounts } from './job-row.utils';
 
 describe('job row utils', () => {
-  it('keeps only a contract wording other than the usual one', () => {
-    expect(unusualContract('CDI')).toBeNull();
-    expect(unusualContract('cdi')).toBeNull();
-    expect(unusualContract(null)).toBeNull();
-    expect(unusualContract('Full-time')).toBe('Full-time');
-  });
-
   it('reads the salary wordings of every source', () => {
     const range = (min: number, max: number, from = false, monthly = false) => ({
       min,

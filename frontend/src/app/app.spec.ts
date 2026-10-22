@@ -20,6 +20,21 @@ describe('App', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
+  it('fades the start-up screen out once the first navigation settles', async () => {
+    const splash = document.createElement('div');
+    splash.className = 'app-splash';
+    document.body.append(splash);
+    const fixture = TestBed.createComponent(App);
+    const navigation = TestBed.inject(Router).navigateByUrl('/');
+    await new Promise((resolve) => setTimeout(resolve));
+    http.expectOne('/api/config').flush({ areaLabel: 'Normandie', authRequired: true });
+    await navigation;
+    await fixture.whenStable();
+
+    expect(splash.classList).toContain('app-splash--leaving');
+    splash.remove();
+  });
+
   it('sends a visitor without a token to the login screen when the API asks for a password', async () => {
     const fixture = TestBed.createComponent(App);
     const navigation = TestBed.inject(Router).navigateByUrl('/');

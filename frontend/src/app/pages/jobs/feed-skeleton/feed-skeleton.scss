@@ -1,0 +1,59 @@
+/* The placeholder cards, spaced like the list. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* One card, framed like an offer card. */
+.feed-skeleton__card {
+  padding: 1.25rem;
+  border: 2px solid transparent;
+  border-radius: 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* The employer's tile. */
+.feed-skeleton__tile {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+}
+
+/* The employer's name. */
+.feed-skeleton__company {
+  width: 40%;
+}
+
+/* The place. */
+.feed-skeleton__place {
+  width: 28%;
+  height: 0.75rem;
+}
+
+/* The title, the tallest line. */
+.feed-skeleton__title {
+  width: 72%;
+  height: 1.25rem;
+}
+
+/* A fact's bullet tile. */
+.feed-skeleton__bullet {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5625rem;
+}
+
+/* A fact. */
+.feed-skeleton__fact {
+  width: 45%;
+}
+
+/* The date. */
+.feed-skeleton__date {
+  width: 5rem;
+  height: 0.75rem;
+}

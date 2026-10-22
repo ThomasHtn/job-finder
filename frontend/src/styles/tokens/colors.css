@@ -1,26 +1,35 @@
 /* App palette, light then dark. `static`: Tailwind never sees component stylesheets, so it must emit every token. */
 
 @theme static {
-  /* Grounds, from the page to the raised and hovered surfaces. */
-  --color-paper: #fbfcfd;
+  /* Grounds: the pale mint page, white cards, the mint tiles and bands inside them. */
+  --color-paper: #f3f9f8;
   --color-surface: #fff;
-  --color-surface-2: #f1f4f6;
-  --color-surface-hover: #f6f8f9;
+  --color-surface-2: #e7f3f1;
+  --color-surface-hover: #f8fcfb;
 
-  /* Text, strongest first; `ink-3` carries real labels and still clears 4.5:1 on the paper. */
+  /* Text, strongest first; `ink-3` carries real labels and still clears 4.5:1 on the paper and the tiles. */
   --color-ink: #101822;
   --color-ink-2: #545f6d;
-  --color-ink-3: #6c7784;
+  --color-ink-3: #5f6a77;
 
-  /* Hairlines, used instead of shadows. */
-  --color-line: rgb(16 24 34 / 9%);
-  --color-line-2: rgb(16 24 34 / 16%);
+  /* Hairlines, tinted by the teal. */
+  --color-line: #dcebe8;
+  --color-line-2: #c6dcd8;
 
-  /* Burnt orange: what arrived since the last visit, the active tab, and the one main action of a screen. */
-  --color-accent: #b84d00;
-  --color-accent-ink: #9c4300;
-  --color-accent-soft: rgb(184 77 0 / 10%);
+  /* Card shadow, tinted by the teal. */
+  --shadow-card: 0 6px 18px rgb(14 110 99 / 8%);
+
+  /* Deep teal: fills, rules and dots; `accent-ink` is its text shade, `accent-soft` its light tint. */
+  --color-accent: #0e6e63;
+  --color-accent-ink: #0b5a51;
+  --color-accent-soft: #d9efeb;
   --color-on-accent: #fff;
+
+  /* White veil laid on the teal fill: a count on the selected tab. */
+  --color-accent-veil: rgb(255 255 255 / 22%);
+
+  /* Scrollbar thumb, a light teal. */
+  --color-scrollbar: #b3d6d0;
 
   /* Failures: a source down, a refused password. */
   --color-alert: #a8331f;
@@ -39,10 +48,13 @@
     --color-ink-3: #838e9a;
     --color-line: rgb(255 255 255 / 9%);
     --color-line-2: rgb(255 255 255 / 18%);
-    --color-accent: #fb923c;
-    --color-accent-ink: #fdba74;
-    --color-accent-soft: rgb(251 146 60 / 14%);
+    --shadow-card: 0 6px 18px rgb(0 0 0 / 28%);
+    --color-accent: #3fb8a6;
+    --color-accent-ink: #5cd0bd;
+    --color-accent-soft: rgb(63 184 166 / 14%);
     --color-on-accent: #0d1013;
+    --color-accent-veil: rgb(255 255 255 / 40%);
+    --color-scrollbar: rgb(63 184 166 / 45%);
     --color-alert: #e2705f;
     --color-alert-soft: rgb(226 112 95 / 12%);
   }

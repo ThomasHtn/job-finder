@@ -53,11 +53,17 @@ describe('JobRow', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Nouveau');
   });
 
-  it('shows only an unusual contract wording, and the salary in thousands', () => {
+  it('shows the contract wording, and the salary in thousands', () => {
     const fixture = create(jobSummary({ contractLabel: 'Full-time', salary: '45 k€' }), null);
 
     expect(fixture.nativeElement.textContent).toContain('Full-time');
     expect(fixture.nativeElement.textContent).toContain('45K €');
+  });
+
+  it('falls back on the permanent contract when the source names none', () => {
+    const fixture = create(jobSummary({ contractLabel: null }), null);
+
+    expect(fixture.nativeElement.textContent).toContain('CDI');
   });
 
   it('keeps the source wording of a salary with no amount to shorten', () => {

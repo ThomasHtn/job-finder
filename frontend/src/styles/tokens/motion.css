@@ -1,6 +1,16 @@
-/* Motion curve shared by every transition. */
+/* Motion tokens; every animation using them sits behind `prefers-reduced-motion: no-preference`. */
 
 @theme static {
   /* Quick start, long soft landing: sheets, presses, the progress sweep. */
   --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Arrivals decelerate hard: cards, the open offer, a screen rising into place. */
+  --ease-entry: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Durations: `entry` for things arriving, `fade` for things leaving or swapping. */
+  --duration-entry: 0.42s;
+  --duration-fade: 0.25s;
+
+  /* Delay between two cards of the feed cascading in. */
+  --motion-step: 40ms;
 }

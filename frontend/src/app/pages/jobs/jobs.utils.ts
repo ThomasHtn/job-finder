@@ -42,21 +42,26 @@ export function applyJobPatch(
 
 /**
  * The tab strip entries, in the active language. The on-site tab is named after the configured
- * area, a placeholder until it is known.
+ * area, a placeholder until it is known; the counts stay unknown until the first list answers.
  */
-export function buildTabItems(areaLabel: string | null, counts: JobCounts): JobTabItem[] {
+export function buildTabItems(areaLabel: string | null, counts: JobCounts | null): JobTabItem[] {
   return [
     {
       tab: 'local',
       label: areaLabel ?? translate('tabs.areaPlaceholder'),
-      count: counts.local,
+      count: counts?.local ?? null,
       icon: 'pin',
     },
-    { tab: 'remote', label: translate('tabs.remote'), count: counts.remote, icon: 'remote' },
+    {
+      tab: 'remote',
+      label: translate('tabs.remote'),
+      count: counts?.remote ?? null,
+      icon: 'remote',
+    },
     {
       tab: 'favorites',
       label: translate('tabs.favorites'),
-      count: counts.favorites,
+      count: counts?.favorites ?? null,
       icon: 'star',
     },
   ];

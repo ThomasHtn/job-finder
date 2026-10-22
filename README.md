@@ -161,7 +161,7 @@ Then open http://localhost:8001 and sign in with `job-finder-demo-password`.
     the contract carries the types both share" />
 
 - **Contract**: the API types in one npm workspace, imported by both halves, so a renamed field breaks the build rather than a screen.
-- **Frontend**: Angular 22 (standalone, zoneless, signals, `httpResource`), Tailwind 4 for layout, SCSS for visuals, Transloco for French and English, self-hosted Figtree, served by nginx.
+- **Frontend**: Angular 22 (standalone, zoneless, signals, `httpResource`), Tailwind 4 for layout, SCSS for visuals, Transloco for French and English, self-hosted Outfit and Nunito Sans, served by nginx.
 - **Backend**: NestJS 12 on Node 22, Prisma 7 and PostgreSQL 17, a zod-validated environment, one connector per job board.
 - **Auth**: one shared password (scrypt), a session token, a sign-in throttle, and a production API that refuses to run open.
 - **Deployment**: two images. Your proxy sends the domain to the frontend, which relays the API to the backend; `/readyz`, `/healthz` and an ingestion heartbeat feed your uptime monitor.

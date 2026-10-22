@@ -1,8 +1,8 @@
-<!-- Publication label, shown in the footer pill. -->
+<!-- Publication label, shown in the footer. -->
 @let published = job().publishedAt | publishedLabel: language.active() : now();
 
 <!-- Who and where: the employer's tile, its name, then the place; region-only offers say so. -->
-<div class="job-row__head flex items-center gap-3.5">
+<div class="job-row__head flex items-center gap-3">
   <span class="job-row__logo" aria-hidden="true">
     <app-icon name="building" />
   </span>
@@ -22,37 +22,35 @@
   {{ job().title }}
 </a>
 
-<!-- One fact per line behind its glyph: stack, salary, then an unusual contract. -->
+<!-- Bulleted facts under the title, each glyph on a mint tile like the employer's: salary, stack, contract. -->
 <ul class="job-row__facts flex flex-col gap-2">
+  <li class="job-row__fact flex items-center gap-2.5 tabular-nums">
+    <span class="job-row__bullet" aria-hidden="true"><app-icon name="salary" /></span>
+    <span class="job-row__salary min-w-0">{{ salary() }}</span>
+  </li>
   @if (stack(); as stack) {
-    <li class="job-row__fact flex items-start gap-3">
-      <app-icon class="job-row__icon" name="code" />
+    <li class="job-row__fact flex items-center gap-2.5">
+      <span class="job-row__bullet" aria-hidden="true"><app-icon name="code" /></span>
       <span class="min-w-0">{{ stack }}</span>
     </li>
   }
-  <li
-    class="job-row__fact flex items-start gap-3 tabular-nums"
-    [class.job-row__fact--unknown]="!job().salary"
-  >
-    <app-icon class="job-row__icon" name="salary" />
-    <span class="job-row__salary min-w-0">{{ salary() }}</span>
+  <li class="job-row__fact flex items-center gap-2.5">
+    <span class="job-row__bullet" aria-hidden="true"><app-icon name="contract" /></span>
+    <span class="min-w-0">{{ contract() }}</span>
   </li>
-  @if (contract(); as contract) {
-    <li class="job-row__fact flex items-start gap-3">
-      <app-icon class="job-row__icon" name="contract" />
-      <span class="min-w-0">{{ contract }}</span>
-    </li>
-  }
 </ul>
 
-<!-- Footer: the "new" pill on the left, the publication pill on the right; the source is told in the detail. -->
+<!-- Footer: freshness as text, the logo's teal dot and "New" before the date; the source is told in the detail. -->
 @if (isNew() || published) {
   <p class="job-row__foot flex flex-wrap items-center gap-2">
     @if (isNew()) {
-      <span class="job-row__pill job-row__pill--new">{{ 'row.new' | transloco }}</span>
+      <span class="job-row__fresh flex items-center gap-1.75">{{ 'row.new' | transloco }}</span>
+      @if (published) {
+        <span class="job-row__sep" aria-hidden="true">·</span>
+      }
     }
     @if (published) {
-      <span class="job-row__pill job-row__pill--date">{{ published }}</span>
+      <span class="job-row__date">{{ published }}</span>
     }
   </p>
 }

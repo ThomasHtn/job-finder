@@ -117,7 +117,7 @@ Tailwind classes in the template, for layout only. Everything visual goes in the
 }
 ```
 
-The palette, both schemes, lives in `src/styles/tokens/colors.css`. Animations always sit inside the `motion` mixin, so they hold still for anyone who asked for less motion. One typeface, Figtree, self-hosted under `public/fonts/figtree`.
+The palette, both schemes, lives in `src/styles/tokens/colors.css`. Animations always sit inside the `motion` mixin, so they hold still for anyone who asked for less motion. The start-up screen lives in `index.html` and `src/styles/splash.css`, faded out by the app after its first navigation; content still loading shows `<app-skeleton>` blocks shaped like what is coming. Two typefaces, self-hosted under `public/fonts`: Outfit for titles and the main buttons (`--font-display`), Nunito Sans for everything else (`--font-sans`).
 
 ## Banana peels
 

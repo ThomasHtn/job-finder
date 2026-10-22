@@ -34,7 +34,8 @@
 /* Where the offer was found. */
 .job-detail__origin {
   color: var(--color-ink-3);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
 /* The origin's glyph. */
@@ -74,6 +75,74 @@
   container-type: inline-size;
 }
 
+/* The loaded offer fading up into the panel. */
+.job-detail__article {
+  @include motion {
+    animation: job-detail-enter var(--duration-entry) var(--ease-entry) backwards;
+  }
+}
+
+/* The offer arriving. */
+@keyframes job-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The placeholder of a loading offer, its blocks stacked like the offer. */
+.job-detail__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* The title, on one and a half lines. */
+.job-detail__placeholder-title {
+  width: 85%;
+  height: 1.625rem;
+}
+
+/* The title's second, shorter line. */
+.job-detail__placeholder-title--short {
+  width: 50%;
+}
+
+/* Company and place. */
+.job-detail__placeholder-meta {
+  width: 60%;
+  margin-bottom: 0.75rem;
+}
+
+/* The facts band. */
+.job-detail__placeholder-band {
+  height: 4.5rem;
+  border-radius: 1rem;
+}
+
+/* The stack chips. */
+.job-detail__placeholder-stack {
+  width: 70%;
+  height: 1.75rem;
+  margin: 0.75rem 0 1.25rem;
+  border-radius: 999px;
+}
+
+/* A line of the ad's text. */
+.job-detail__placeholder-line {
+  height: 0.9375rem;
+}
+
+/* The last line of the paragraph, shorter. */
+.job-detail__placeholder-line:last-child {
+  width: 60%;
+}
+
 /* Footer holding the way to the original ad. */
 .job-detail__foot {
   flex: none;
@@ -87,12 +156,12 @@
   --icon-size: 1rem;
 }
 
-/* The offer's title. */
+/* The offer's title, in the display face. */
 .job-detail__title {
-  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.625rem);
   font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -100,12 +169,12 @@
 .job-detail__meta {
   color: var(--color-ink-2);
   font-size: 0.9375rem;
+  font-weight: 700;
 }
 
-/* The company, weighted. */
+/* The company, darker. */
 .job-detail__company {
   color: var(--color-ink);
-  font-weight: 500;
 }
 
 /* The glyph before the company and the place. */
@@ -116,46 +185,46 @@
   color: var(--color-ink-3);
 }
 
-/* Contract, salary and date: one band split by hairlines, not three cards. */
+/* Salary, contract and date: one mint band split by hairlines, not three cards. */
 .job-detail__facts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  margin: 1.75rem 0;
-  border-block: 1px solid var(--color-line);
-  background: var(--color-line);
+  margin: 1.5rem 0;
+  padding: 0.875rem 0;
+  border-radius: 1rem;
+  background: var(--color-surface-2);
 }
 
 /* One fact. */
 .job-detail__fact {
-  padding: 0.875rem 1rem 0.875rem 0;
-  background: var(--color-surface);
+  padding: 0 1rem;
 }
 
-/* Facts after the first, inset from the hairline. */
+/* Facts after the first, behind a hairline. */
 .job-detail__fact:not(:first-child) {
-  padding-left: 1rem;
+  border-left: 1px solid var(--color-line-2);
 }
 
 /* A fact's name: contract, salary, date. */
 .job-detail__fact-term {
   color: var(--color-ink-3);
   font-size: 0.8125rem;
+  font-weight: 800;
 }
 
-/* The glyph before a fact's name. */
+/* The glyph before a fact's name, in the teal's text shade. */
 .job-detail__fact-icon {
   --icon-size: 0.9375rem;
 
   flex: none;
+  color: var(--color-accent-ink);
 }
 
 /* A fact's value. */
 .job-detail__fact-value {
-  margin: 0.1875rem 0 0;
+  margin: 0.25rem 0 0;
   font-size: 0.9375rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 800;
 }
 
 /* The stack keywords the ad names, under the facts. */
@@ -168,24 +237,25 @@
   margin: 0 0 0.625rem;
   color: var(--color-ink-3);
   font-size: 0.8125rem;
+  font-weight: 800;
 }
 
-/* One keyword, tinted like the new offers: it is what the search looks for. */
+/* One keyword, a light teal pill: it is what the search looks for. */
 .job-detail__chip {
-  padding: 0.25rem 0.625rem;
-  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
   background: var(--color-accent-soft);
   color: var(--color-accent-ink);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 800;
 }
 
-/* Section heading inside the offer: small, weighted, in sentence case. */
+/* Section heading inside the offer: the display face, in sentence case. */
 .job-detail__section-title {
   margin: 0 0 0.875rem;
   color: var(--color-ink);
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 1.0625rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
@@ -217,6 +287,10 @@
     grid-template-columns: 1fr;
   }
 
+  .job-detail__facts {
+    padding: 0.25rem 1rem;
+  }
+
   .job-detail__fact {
     display: flex;
     align-items: baseline;
@@ -226,7 +300,8 @@
   }
 
   .job-detail__fact:not(:first-child) {
-    padding-left: 0;
+    border-top: 1px solid var(--color-line-2);
+    border-left: 0;
   }
 
   .job-detail__fact-value {

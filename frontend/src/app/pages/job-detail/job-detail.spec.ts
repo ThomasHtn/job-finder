@@ -57,6 +57,18 @@ describe('JobDetailPage', () => {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';
   }
 
+  it('draws a placeholder shaped like the offer while it loads', async () => {
+    const fixture = await open();
+    const panel = fixture.nativeElement as HTMLElement;
+
+    expect(panel.querySelector('.job-detail__placeholder')).not.toBeNull();
+    expect(text(fixture)).toContain("Chargement de l'offre");
+
+    http.expectOne('/api/jobs/job-1').flush(jobDetail());
+    await settle(fixture);
+    expect(panel.querySelector('.job-detail__placeholder')).toBeNull();
+  });
+
   it('renders the offer and tells the feed it is now viewed', async () => {
     const fixture = await open();
     http.expectOne('/api/jobs/job-1').flush(

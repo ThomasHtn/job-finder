@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import {
   afterNextRender,
@@ -46,9 +46,10 @@ import { IconButton } from '@shared/icon-button/icon-button';
 import { Notice } from '@shared/notice/notice';
 import { ScanLine } from '@shared/scan-line/scan-line';
 
+import { FeedSkeleton } from './feed-skeleton/feed-skeleton';
 import { JobRow } from './job-row/job-row';
 import { JobTabs } from './job-tabs/job-tabs';
-import { NO_COUNTS, REFRESH_MESSAGE_MS, SOURCES_TAB } from './jobs.constants';
+import { REFRESH_MESSAGE_MS, SOURCES_TAB } from './jobs.constants';
 import { ShellTab } from './jobs.model';
 import {
   applyJobPatch,
@@ -73,10 +74,12 @@ import { SyncLabelPipe } from './sync-label/sync-label.pipe';
     Brand,
     Button,
     EmptyState,
+    FeedSkeleton,
     Icon,
     IconButton,
     JobRow,
     JobTabs,
+    NgTemplateOutlet,
     Notice,
     RouterOutlet,
     ScanLine,
@@ -297,9 +300,14 @@ export class JobsPage {
   private refreshMessageTimer: ReturnType<typeof setTimeout> | undefined;
 
   /**
-   * Counts for the three tabs.
+   * Counts for the three tabs, `null` until the first list answers.
    */
-  protected readonly counts = computed(() => this.data()?.counts ?? NO_COUNTS);
+  protected readonly counts = computed(() => this.data()?.counts ?? null);
+
+  /**
+   * True once a list has answered, so the header stops guessing its sync time and counts.
+   */
+  protected readonly listed = computed(() => this.data() !== null);
 
   /**
    * End of the last successful ingestion.

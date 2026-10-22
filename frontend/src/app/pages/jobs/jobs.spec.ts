@@ -122,6 +122,17 @@ describe('JobsPage', () => {
     return (fixture.nativeElement as HTMLElement).querySelector<T>(selector)!;
   }
 
+  it('draws placeholder cards while the first list loads', async () => {
+    const fixture = await create();
+    const page = fixture.nativeElement as HTMLElement;
+
+    expect(page.querySelector('app-feed-skeleton')).not.toBeNull();
+
+    await answerList(fixture);
+    expect(page.querySelector('app-feed-skeleton')).toBeNull();
+    expect(page.querySelectorAll('app-job-row')).toHaveLength(1);
+  });
+
   it('loads the local tab by default and renders its rows', async () => {
     const fixture = await create();
 

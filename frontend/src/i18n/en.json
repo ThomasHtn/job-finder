@@ -76,6 +76,7 @@
     "unavailable": "The source status could not be loaded."
   },
   "feed": {
+    "loading": "Loading the offers…",
     "newHeadlineOne": "{{ count }} new offer",
     "newHeadlineOther": "{{ count }} new offers",
     "sinceVisitAt": "since your visit at {{ time }}",
@@ -124,6 +125,7 @@
     "approximate": "{{ city }} (town not stated)"
   },
   "detail": {
+    "loading": "Loading the offer…",
     "close": "Close the offer",
     "backToList": "Back to the list",
     "contract": "Contract",
