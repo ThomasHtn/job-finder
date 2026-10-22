@@ -8,11 +8,10 @@
     <base href="/" />
     <!-- Edge to edge on notched phones; the layout pads itself with the safe-area insets. -->
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <!-- Both schemes are designed, so native controls follow the system one. -->
-    <meta name="color-scheme" content="light dark" />
-    <!-- Browser chrome tinted to the page background in each scheme. -->
-    <meta name="theme-color" content="#f3f9f8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d1013" media="(prefers-color-scheme: dark)" />
+    <!-- The app is dark only, so native controls are drawn dark too. -->
+    <meta name="color-scheme" content="dark" />
+    <!-- Browser chrome tinted to the page background. -->
+    <meta name="theme-color" content="#0d1013" />
     <!-- Vector tab icon, with the multi-size favicon for browsers that skip SVG. -->
     <link rel="icon" type="image/svg+xml" href="icon.svg" sizes="any" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
@@ -24,7 +23,8 @@
     <!-- Standalone on iOS before 17.4, which does not read display from the manifest. -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="JobFinder" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- iOS status bar: black with light text, like the page. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <!-- Both typefaces, self-hosted: fetched before the stylesheet asks for them. -->
     <link
       rel="preload"

@@ -7,23 +7,33 @@
     <style>
       /* Stage styles: the app's palette and typeface, served by the app itself on the same origin. */
 
-      /* The app's Figtree, so captions and screens share one typeface. */
+      /* The app's Outfit for titles, so captions and screens share their typefaces. */
       @font-face {
-        font-family: Figtree;
-        font-weight: 300 900;
-        src: url('/fonts/figtree/figtree-latin-wght.woff2') format('woff2-variations');
+        font-family: Outfit;
+        font-weight: 400 800;
+        src: url('/fonts/outfit/outfit-latin-wght.woff2') format('woff2-variations');
       }
 
-      /* The light tokens of frontend/src/styles/tokens/colors.css, plus the bright orange of the icon. */
+      /* The app's Nunito Sans for text. */
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-weight: 400 900;
+        src: url('/fonts/nunito-sans/nunito-sans-latin-wght.woff2') format('woff2-variations');
+      }
+
+      /* The tokens of frontend/src/styles/tokens/colors.css, plus the device and window greys. */
       :root {
-        --paper: #fbfcfd;
-        --surface: #fff;
-        --ink: #101822;
-        --ink-2: #545f6d;
-        --ink-3: #6c7784;
-        --accent: #b84d00;
-        --accent-soft: rgb(184 77 0 / 9%);
-        --bright: #fb923c;
+        --paper: #0d1013;
+        --surface: #14181c;
+        --surface-2: #1e242a;
+        --ink: #e9edf1;
+        --ink-2: #a0aab5;
+        --ink-3: #838e9a;
+        --accent: #3fb8a6;
+        --accent-soft: rgb(63 184 166 / 14%);
+        --bright: #5cd0bd;
+        --device: #262d34;
+        --device-line: rgb(255 255 255 / 9%);
       }
 
       /* No default margins anywhere. */
@@ -44,11 +54,11 @@
       body {
         position: relative;
         background: var(--paper);
-        font-family: Figtree, system-ui, sans-serif;
+        font-family: 'Nunito Sans', system-ui, sans-serif;
         color: var(--ink);
       }
 
-      /* Soft orange blobs, the only decoration. */
+      /* Soft teal blobs, the only decoration. */
       .blob {
         position: absolute;
         border-radius: 50%;
@@ -64,13 +74,13 @@
         top: -240px;
       }
 
-      /* Bottom right blob, in the brighter orange. */
+      /* Bottom right blob, in the brighter teal. */
       .blob--b {
         width: 420px;
         height: 420px;
         right: -140px;
         bottom: -220px;
-        background: rgb(251 146 60 / 12%);
+        background: rgb(92 208 189 / 10%);
       }
 
       /* Bottom middle blob. */
@@ -131,6 +141,7 @@
 
       /* Card title. */
       .card h1 {
+        font-family: Outfit, system-ui, sans-serif;
         font-size: 54px;
         font-weight: 700;
         letter-spacing: -0.02em;
@@ -150,8 +161,8 @@
         margin-top: 34px;
         padding: 12px 22px;
         border-radius: 12px;
-        background: var(--ink);
-        color: #e9edf1;
+        background: var(--surface-2);
+        color: var(--ink);
         font:
           500 20px ui-monospace,
           'JetBrains Mono',
@@ -199,6 +210,7 @@
 
       /* Caption title, on two lines next to the phone. */
       .caption__title {
+        font-family: Outfit, system-ui, sans-serif;
         margin-top: 22px;
         font-size: 50px;
         font-weight: 700;
@@ -275,8 +287,10 @@
         height: 684px;
         padding: 12px;
         border-radius: 52px;
-        background: var(--ink);
-        box-shadow: 0 30px 60px rgb(16 24 34 / 18%);
+        background: var(--device);
+        box-shadow:
+          0 30px 60px rgb(0 0 0 / 45%),
+          0 0 0 1px var(--device-line);
       }
 
       /* Phone screen, cropping the scaled app. */
@@ -308,8 +322,8 @@
         border-radius: 14px;
         background: var(--surface);
         box-shadow:
-          0 30px 70px rgb(16 24 34 / 16%),
-          0 0 0 1px rgb(16 24 34 / 9%);
+          0 30px 70px rgb(0 0 0 / 45%),
+          0 0 0 1px var(--device-line);
       }
 
       /* Browser title bar. */
@@ -319,7 +333,7 @@
         gap: 8px;
         height: 34px;
         padding: 0 14px;
-        background: #eef1f3;
+        background: var(--device);
       }
 
       /* The three window buttons. */
@@ -327,7 +341,7 @@
         width: 11px;
         height: 11px;
         border-radius: 50%;
-        background: #cfd5da;
+        background: var(--ink-3);
       }
 
       /* Address field. */
@@ -338,7 +352,7 @@
         margin-left: 18px;
         padding: 0 12px;
         border-radius: 7px;
-        background: #fff;
+        background: var(--surface-2);
         font-size: 12px;
         line-height: 22px;
         color: var(--ink-3);
@@ -367,9 +381,9 @@
         width: 44px;
         height: 44px;
         margin: -22px 0 0 -22px;
-        border: 2px solid rgb(184 77 0 / 55%);
+        border: 2px solid rgb(63 184 166 / 65%);
         border-radius: 50%;
-        background: rgb(184 77 0 / 28%);
+        background: rgb(63 184 166 / 30%);
         opacity: 0;
         transform: scale(0.4);
         pointer-events: none;

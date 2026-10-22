@@ -27,12 +27,11 @@ const browser = await chromium.launch();
 const token = await signIn();
 
 /**
- * Opens the feed on a phone, loaded and settled, in the given colour scheme.
+ * Opens the feed on a phone, loaded and settled.
  */
-async function openFeed(colorScheme) {
+async function openFeed() {
   const context = await openContext(browser, token, {
     ...PHONE_DEVICE,
-    colorScheme,
     reducedMotion: 'reduce',
   });
   const page = await context.newPage();
@@ -58,9 +57,9 @@ const openTab = (page, index) =>
   page.locator('.job-tabs__item').filter({ visible: true }).nth(index).click();
 
 /**
- * The light feed, reused for the offer, the remote tab and the sources.
+ * The feed, reused for the offer, the remote tab and the sources.
  */
-const page = await openFeed('light');
+const page = await openFeed();
 await shoot(page, 'feed');
 await page.locator(ROW_TITLE).nth(1).click();
 await shoot(page, 'detail');
@@ -71,6 +70,5 @@ await shoot(page, 'remote');
 await page.locator('.settings-menu__trigger').filter({ visible: true }).click();
 await page.locator('.settings-menu__item--sources').click();
 await shoot(page, 'sources');
-await shoot(await openFeed('dark'), 'dark');
 
 await browser.close();

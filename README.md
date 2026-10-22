@@ -37,13 +37,12 @@ An hour a day, for three genuinely new offers.
 ## A peek inside
 
 <p align="center">
-  <img src="docs/media/screen-feed.png" alt="The feed: five new offers since yesterday's visit, one card each" width="19%">
-  <img src="docs/media/screen-detail.png" alt="An offer: salary, contract, date and the stack it names" width="19%">
-  <img src="docs/media/screen-remote.png" alt="Full remote: its own tab, with a seen-up-to-here divider" width="19%">
-  <img src="docs/media/screen-sources.png" alt="Sources: the health of every board" width="19%">
-  <img src="docs/media/screen-dark.png" alt="The feed again, in the dark theme" width="19%">
+  <img src="docs/media/screen-feed.png" alt="The feed: seven new offers since yesterday's visit, one card each" width="24%">
+  <img src="docs/media/screen-detail.png" alt="An offer: salary, contract, date and the stack it names" width="24%">
+  <img src="docs/media/screen-remote.png" alt="Full remote: its own tab, with a seen-up-to-here divider" width="24%">
+  <img src="docs/media/screen-sources.png" alt="Sources: the health of every board" width="24%">
   <br>
-  <sub><b>The&nbsp;feed</b> · <b>The&nbsp;offer</b> · <b>Full&nbsp;remote</b> · <b>Sources</b> · <b>After&nbsp;dark</b></sub>
+  <sub><b>The&nbsp;feed</b> · <b>The&nbsp;offer</b> · <b>Full&nbsp;remote</b> · <b>Sources</b></sub>
 </p>
 
 ## The round is done before you get there
@@ -113,8 +112,8 @@ dropped in silence.
   </tr>
 </table>
 
-Add it to the home screen and it feels like an app: full screen, its own icon, French or English,
-light or dark, following the phone.
+Add it to the home screen and it feels like an app: full screen, its own icon, dark from edge to
+edge, in French or English.
 
 ## A typical morning
 

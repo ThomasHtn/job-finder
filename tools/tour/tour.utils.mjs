@@ -29,7 +29,7 @@ export async function openContext(browser, token, options) {
   const lastVisit = new Date();
   lastVisit.setDate(lastVisit.getDate() - 1);
   lastVisit.setHours(Math.floor(LAST_VISIT_HOUR), (LAST_VISIT_HOUR % 1) * 60, 0, 0);
-  const context = await browser.newContext({ locale: 'en-GB', colorScheme: 'light', ...options });
+  const context = await browser.newContext({ locale: 'en-GB', colorScheme: 'dark', ...options });
   await context.addInitScript(
     ([visit, session]) => {
       localStorage.setItem('job-finder-locale', 'en');
