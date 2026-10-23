@@ -7,6 +7,13 @@
     text-size-adjust: 100%;
   }
 
+  /* Screens scroll their own content: the window itself never scrolls. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
   body {
     background: var(--color-paper);
     color: var(--color-ink);
@@ -43,21 +50,23 @@
     --scrollbar-thumb: var(--color-accent);
   }
 
-  /* Chrome and Safari: the WebKit pseudo-elements, which drop the arrow buttons; `scrollbar-color` would override them. */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
+  /* Chrome and Safari with a mouse: the WebKit pseudo-elements, which drop the arrow buttons; phones keep their overlay ones. */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
 
-  ::-webkit-scrollbar-track,
-  ::-webkit-scrollbar-corner {
-    background: transparent;
-  }
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
 
-  ::-webkit-scrollbar-thumb {
-    border: 3px solid transparent;
-    border-radius: 999px;
-    background: var(--scrollbar-thumb) padding-box;
+    ::-webkit-scrollbar-thumb {
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background: var(--scrollbar-thumb) padding-box;
+    }
   }
 
   /* Firefox: the standard properties. */

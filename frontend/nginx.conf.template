@@ -116,10 +116,20 @@ server {
 		try_files $uri =404;
 	}
 
-	# App icons and manifest keep their URL across deployments: cached a week, so a new logo still lands.
-	location ~* ^/(?:favicon\.ico|icon\.svg|icons/[^/]+\.png|manifest\.webmanifest)$ {
+	# Manifest: read again on every install, so a colour change reaches the installed app within the hour.
+	location = /manifest.webmanifest {
 		types {
 			application/manifest+json webmanifest;
+		}
+		add_header X-Robots-Tag "noindex, nofollow" always;
+		add_header X-Content-Type-Options "nosniff" always;
+		add_header Cache-Control "public, max-age=3600";
+		try_files $uri =404;
+	}
+
+	# App icons keep their URL across deployments: cached a week, so a new logo still lands.
+	location ~* ^/(?:favicon\.ico|icon\.svg|icons/[^/]+\.png)$ {
+		types {
 			image/x-icon ico;
 			image/svg+xml svg;
 			image/png png;

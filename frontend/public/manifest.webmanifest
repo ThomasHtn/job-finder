@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "JobFinder",
   "short_name": "JobFinder",
   "description": "Votre veille d'offres en CDI.",
@@ -7,14 +8,8 @@
   "scope": "/",
   "display": "standalone",
   "background_color": "#0d1013",
-  "theme_color": "#0d1013",
+  "theme_color": "#14181c",
   "icons": [
-    {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
