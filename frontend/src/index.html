@@ -17,14 +17,8 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
     <!-- iOS ignores SVG here and screenshots the page instead: it needs the raster tile. -->
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-    <!-- Home-screen install: name, icons and a standalone window. -->
+    <!-- Installable app; `start_url` is the root, whatever page it was added from. -->
     <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <!-- Standalone on iOS before 17.4, which does not read display from the manifest. -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="JobFinder" />
-    <!-- iOS status bar: black with light text, like the page. -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <!-- Both typefaces, self-hosted: fetched before the stylesheet asks for them. -->
     <link
       rel="preload"
