@@ -73,7 +73,8 @@ test.describe('feed', () => {
   }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Paramètres' }).click();
-    await page.getByRole('button', { name: 'Sources' }).click();
+    /* Exact: the warning triangle of a failing source speaks of sources too. */
+    await page.getByRole('button', { name: 'Sources', exact: true }).click();
 
     await expect(page).toHaveURL(/tab=sources/);
     await expect(page.locator('app-source-board')).toContainText('France Travail');
