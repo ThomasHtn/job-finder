@@ -20,7 +20,6 @@ export const ICON_NAMES = [
   'contract',
   'calendar',
   'eye',
-  'filter',
   'settings',
   'check',
 ] as const;

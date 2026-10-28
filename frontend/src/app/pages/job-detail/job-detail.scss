@@ -65,14 +65,27 @@
   display: none;
 }
 
-/* The offer, scrolling on its own; its width decides how the facts lay out. */
+/* The offer, scrolling on its own; its width decides how the facts lay out. Set in from the panel's right edge, so its scrollbar is too. */
 .job-detail__scroll {
   flex: 1;
   min-height: 0;
-  padding: 1.75rem 1.5rem 2.5rem;
+  margin-right: 0.375rem;
+  padding: 1.75rem 1.125rem 2.5rem 1.5rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   container-type: inline-size;
+}
+
+/* A wider scrollbar than the shared one, like the feed's. */
+.job-detail__scroll::-webkit-scrollbar {
+  width: 0.875rem;
+}
+
+/* Firefox has no width in between: its regular scrollbar, not the thin one. */
+@supports not selector(::-webkit-scrollbar) {
+  .job-detail__scroll {
+    scrollbar-width: auto;
+  }
 }
 
 /* The loaded offer fading up into the panel. */
@@ -324,8 +337,14 @@
     padding-top: 0.25rem;
   }
 
+  /* Full width on a phone, with the shared thin scrollbar. */
   .job-detail__scroll {
+    margin-right: 0;
     padding: 1.5rem var(--layout-gutter) 2rem;
+  }
+
+  .job-detail__scroll::-webkit-scrollbar {
+    width: 10px;
   }
 
   .job-detail__foot {

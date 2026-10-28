@@ -1,9 +1,9 @@
-<!-- Said once to screen readers; the cards below are decoration. -->
+<!-- Said once to screen readers; the rows below are decoration. -->
 <span class="sr-only">{{ 'feed.loading' | transloco }}</span>
 
-<!-- One card per row: employer tile and lines, the title, three facts, the date. -->
+<!-- One placeholder per row: employer tile and lines, the title, three facts, the date on the right. -->
 @for (row of rows; track row) {
-  <div class="feed-skeleton__card flex flex-col gap-3.5">
+  <div class="feed-skeleton__row flex flex-col gap-3.5">
     <div class="flex items-center gap-3">
       <app-skeleton class="feed-skeleton__tile" />
       <div class="flex flex-1 flex-col gap-1.5">

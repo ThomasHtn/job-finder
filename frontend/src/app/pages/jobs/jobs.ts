@@ -1,4 +1,4 @@
-import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -34,22 +34,16 @@ import { Notice } from '@shared/notice/notice';
 import { ScanLine } from '@shared/scan-line/scan-line';
 
 import { FeedSkeleton } from './feed-skeleton/feed-skeleton';
+import { HealthAlert } from './health-alert/health-alert';
 import { JobRow } from './job-row/job-row';
 import { JobTabs } from './job-tabs/job-tabs';
 import { SOURCES_TAB } from './jobs.constants';
 import { ShellTab } from './jobs.model';
-import {
-  buildTabItems,
-  newHeadlineText,
-  pickNewJobs,
-  pickSeenJobs,
-  toShellTab,
-} from './jobs.utils';
+import { buildTabItems, pickNewJobs, pickSeenJobs, toShellTab } from './jobs.utils';
 import { JobsFeed } from './jobs-feed';
 import { JobsRefresh } from './jobs-refresh';
 import { JobsSheet } from './jobs-sheet';
 import { SettingsMenu } from './settings-menu/settings-menu';
-import { SinceVisitLabelPipe } from './since-visit-label/since-visit-label.pipe';
 import { SourceBoard } from './source-board/source-board';
 import { SourceHealth } from './source-health';
 import { SyncLabelPipe } from './sync-label/sync-label.pipe';
@@ -65,16 +59,15 @@ import { SyncLabelPipe } from './sync-label/sync-label.pipe';
     Button,
     EmptyState,
     FeedSkeleton,
+    HealthAlert,
     Icon,
     IconButton,
     JobRow,
     JobTabs,
-    NgTemplateOutlet,
     Notice,
     RouterOutlet,
     ScanLine,
     SettingsMenu,
-    SinceVisitLabelPipe,
     SourceBoard,
     SyncLabelPipe,
     TranslocoPipe,
@@ -105,7 +98,7 @@ export class JobsPage {
   private readonly router = inject(Router);
 
   /**
-   * Previous visit timestamp, for the "new" filter and the line under the count of new offers.
+   * Previous visit timestamp, which splits the new offers from the ones already seen.
    */
   protected readonly previousVisitAt = inject(LastVisit).previousVisitAt;
 
@@ -115,7 +108,7 @@ export class JobsPage {
   private readonly document = inject(DOCUMENT);
 
   /**
-   * The feed column, which scrolls on its own on a wide screen.
+   * The feed column, which scrolls on its own.
    */
   private readonly scroller = viewChild<ElementRef<HTMLElement>>('scroller');
 
@@ -185,11 +178,6 @@ export class JobsPage {
   });
 
   /**
-   * Narrows the feed to the offers that appeared since the previous visit.
-   */
-  protected readonly onlyNew = signal(false);
-
-  /**
    * The tab strip entries: where they lead, how they read, how many offers they hold.
    */
   protected readonly tabItems = computed(() => {
@@ -203,24 +191,10 @@ export class JobsPage {
   protected readonly newJobs = computed(() => pickNewJobs(this.feed.jobs(), this.previousVisitAt));
 
   /**
-   * How many offers arrived since the previous visit.
-   */
-  protected readonly newCount = computed(() => this.newJobs().length);
-
-  /**
-   * "3 new offers", agreed with the count.
-   */
-  protected readonly newHeadline = computed(() => {
-    this.language.active();
-    return newHeadlineText(this.newCount());
-  });
-
-  /**
-   * Offers already there at the previous visit, listed under the new ones; none while the filter
-   * keeps only the new.
+   * Offers already there at the previous visit, listed under the new ones.
    */
   protected readonly seenJobs = computed(() =>
-    this.onlyNew() ? [] : pickSeenJobs(this.feed.jobs(), this.previousVisitAt),
+    pickSeenJobs(this.feed.jobs(), this.previousVisitAt),
   );
 
   /**
@@ -238,7 +212,6 @@ export class JobsPage {
     effect(() => {
       const view = this.currentView();
       untracked(() => {
-        this.onlyNew.set(false);
         this.actionFailure.set(null);
         if (view === SOURCES_TAB && !firstView) {
           this.health.refresh();
@@ -260,13 +233,6 @@ export class JobsPage {
       return;
     }
     void this.router.navigate(['/'], { queryParams: { tab }, replaceUrl: true });
-  }
-
-  /**
-   * Toggles the "new since last visit" filter.
-   */
-  protected toggleOnlyNew(): void {
-    this.onlyNew.update((value) => !value);
   }
 
   /**

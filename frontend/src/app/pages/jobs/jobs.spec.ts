@@ -123,7 +123,7 @@ describe('JobsPage', () => {
     return (fixture.nativeElement as HTMLElement).querySelector<T>(selector)!;
   }
 
-  it('draws placeholder cards while the first list loads', async () => {
+  it('draws placeholder rows while the first list loads', async () => {
     const fixture = await create();
     const page = fixture.nativeElement as HTMLElement;
 
@@ -294,7 +294,7 @@ describe('JobsPage', () => {
     expect(text(fixture)).toContain('0/1 sources disponibles - en échec : Free-Work');
   });
 
-  it('narrows the feed to the offers new since the last visit', async () => {
+  it('lists the offers new since the last visit first', async () => {
     localStorage.setItem(LAST_VISIT_STORAGE_KEY, '2026-09-05T00:00:00.000Z');
     const fixture = await create();
     await answerList(fixture, [
@@ -302,17 +302,11 @@ describe('JobsPage', () => {
       jobSummary({ id: 'new', title: 'Nouvelle', firstSeenAt: '2026-09-06T00:00:00.000Z' }),
     ]);
 
-    expect(text(fixture)).toContain('1 nouvelle offre');
     expect(text(fixture)).toContain("Vu jusqu'ici");
     const titles = [...fixture.nativeElement.querySelectorAll('.job-row__title')].map((title) =>
       (title as HTMLElement).textContent?.trim(),
     );
     expect(titles).toEqual(['Nouvelle', 'Ancienne']);
-    find<HTMLButtonElement>(fixture, '.jobs__only-new').click();
-    await settle(fixture);
-
-    expect(text(fixture)).toContain('Nouvelle');
-    expect(text(fixture)).not.toContain('Ancienne');
   });
 
   it('patches a row changed in the panel without reloading', async () => {

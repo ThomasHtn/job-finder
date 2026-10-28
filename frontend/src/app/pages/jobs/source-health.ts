@@ -50,7 +50,7 @@ export class SourceHealth {
   public readonly degraded = computed(() => this.failedSources().length > 0);
 
   /**
-   * e.g. "3/4 sources available" plus the down ones, shown as the refresh button's tooltip.
+   * e.g. "3/4 sources available" plus the down ones, shown in the header triangle's tooltip.
    */
   public readonly label = computed(() => {
     this.language.active();

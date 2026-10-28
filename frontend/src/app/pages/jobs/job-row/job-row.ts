@@ -18,7 +18,7 @@ import { parseSalary, salaryAmounts } from './job-row.utils';
 import { PublishedLabelPipe } from './published-label.pipe';
 
 /**
- * One offer of the feed as a card: who and where, the title, its facts, then the date.
+ * One offer of the feed as a list row: who and where, the title, its facts, then the date.
  */
 @Component({
   selector: 'app-job-row',

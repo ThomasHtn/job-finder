@@ -1,0 +1,65 @@
+@use 'tools' as *;
+
+/* Anchor of the tooltip. */
+:host {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The triangle, a step smaller than the header's other glyphs, in the alert colour. */
+.health-alert__trigger {
+  --icon-size: 1.125rem;
+
+  color: var(--color-alert);
+}
+
+/* The tooltip, under the triangle and flush with its right edge so it stays on screen. */
+.health-alert__tip {
+  position: absolute;
+  top: calc(100% + 0.375rem);
+  right: 0;
+  z-index: 40;
+  display: none;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 2rem));
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Shown while the triangle is hovered, focused from the keyboard, or pressed. */
+.health-alert__trigger:hover + .health-alert__tip,
+.health-alert__trigger:focus-visible + .health-alert__tip,
+.health-alert__tip--open {
+  display: block;
+
+  @include motion {
+    animation: health-alert-in var(--duration-quick) var(--ease-standard);
+  }
+}
+
+/* Drops in from just above. */
+@keyframes health-alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* On a phone the triangle sits mid-header: the tooltip spans the screen under the header instead. */
+@include below(sm) {
+  .health-alert__tip {
+    position: fixed;
+    top: calc(var(--layout-header-height) - 0.25rem);
+    right: var(--layout-gutter);
+    left: var(--layout-gutter);
+    width: auto;
+    max-width: none;
+  }
+}

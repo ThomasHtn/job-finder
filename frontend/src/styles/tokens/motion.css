@@ -25,6 +25,6 @@
   /* The password field shaking after a refusal. */
   --duration-shake: 0.36s;
 
-  /* Delay between two cards of the feed cascading in. */
+  /* Delay between two rows of the feed cascading in. */
   --motion-step: 40ms;
 }

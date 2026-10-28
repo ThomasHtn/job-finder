@@ -1,38 +1,26 @@
 @use 'tools' as *;
 
-/* One offer as a card: employer and place, the title, its bulleted facts, then the freshness and date. */
+/* One offer as a card: employer and place, the title, its bulleted facts, then the freshness dot and date. */
 :host {
   --row-pad: 1.25rem;
-  --row-radius: 1.25rem;
 
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
   padding: var(--row-pad);
-  border: 2px solid transparent;
-  border-radius: var(--row-radius);
+  border: 1px solid var(--color-line);
+  border-radius: 1.25rem;
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
 
   @include motion {
-    transition:
-      background-color var(--duration-quick) ease,
-      border-color var(--duration-quick) ease,
-      transform var(--duration-quick) var(--ease-standard);
+    transition: background-color var(--duration-quick) ease;
     animation: job-row-enter var(--duration-entry) var(--ease-entry) backwards;
     animation-delay: calc(min(var(--row-index, 0), 8) * var(--motion-step));
   }
 }
 
-/* Pressed card, the feel of a tap before the offer opens. */
-:host(:active) {
-  @include motion {
-    transform: scale(0.99);
-  }
-}
-
-/* A card rising into the list; only the first eight wait for the ones above them. */
+/* A row rising into the list; only the first eight wait for the ones above them. */
 @keyframes job-row-enter {
   from {
     opacity: 0;
@@ -45,17 +33,21 @@
   }
 }
 
-/* Hovered card, only where a pointer can hover. */
+/* Hovered row, only where a pointer can hover. */
 @media (hover: hover) {
   :host(:hover) {
     background: var(--color-surface-hover);
   }
 }
 
-/* The offer currently open in the panel: only its border takes the teal, the fill stays plain, hovered or not. */
+/* The offer currently open in the panel: the hover fill, kept, a teal outline and title. */
 :host(.job-row--selected) {
   border-color: var(--color-accent);
-  background: var(--color-surface);
+  background: var(--color-surface-hover);
+}
+
+:host(.job-row--selected) .job-row__title {
+  color: var(--color-accent-ink);
 }
 
 /* Room on the right of the header for the star. */
@@ -159,7 +151,7 @@
   overflow-wrap: anywhere;
 }
 
-/* The footer: freshness, then the publication date. */
+/* The footer, on the right: the freshness dot, then the publication date. */
 .job-row__foot {
   min-height: 1.5rem;
   color: var(--color-ink-3);
@@ -167,19 +159,12 @@
   font-weight: 600;
 }
 
-/* "New", after the logo's teal dot: what arrived since the last visit. */
+/* The teal dot of an offer that arrived since the last visit; its word is for screen readers only. */
 .job-row__fresh {
-  color: var(--color-accent-ink);
-  font-weight: 800;
-}
-
-/* The dot before it. */
-.job-row__fresh::before {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
   background: var(--color-accent);
-  content: '';
 }
 
 /* Top right, level with the employer's name; above the stretched title link. */
@@ -202,7 +187,6 @@
 @include below(sm) {
   :host {
     --row-pad: 1rem;
-    --row-radius: 1.125rem;
 
     gap: 0.75rem;
   }

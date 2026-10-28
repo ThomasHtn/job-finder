@@ -100,10 +100,3 @@ export function pickNewJobs(jobs: JobSummary[], previousVisitAt: string | null):
 export function pickSeenJobs(jobs: JobSummary[], previousVisitAt: string | null): JobSummary[] {
   return jobs.filter((job) => !isNewSince(job, previousVisitAt));
 }
-
-/**
- * "3 new offers", agreed with the count, in the active language.
- */
-export function newHeadlineText(count: number): string {
-  return translate(isSingular(count) ? 'feed.newHeadlineOne' : 'feed.newHeadlineOther', { count });
-}

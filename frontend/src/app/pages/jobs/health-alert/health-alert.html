@@ -1,0 +1,15 @@
+<!-- The triangle, named by the sentence it shows. -->
+<button
+  app-icon-button
+  type="button"
+  class="health-alert__trigger"
+  [attr.aria-label]="label()"
+  (click)="toggle()"
+>
+  <app-icon name="alert" />
+</button>
+
+<!-- The tooltip under it: on hover, on keyboard focus, or once pressed. -->
+<span class="health-alert__tip" [class.health-alert__tip--open]="open()" aria-hidden="true">
+  {{ label() }}
+</span>

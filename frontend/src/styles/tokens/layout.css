@@ -4,8 +4,11 @@
   /* Side padding of every column; tighter below the wide layout, see below. */
   --layout-gutter: 1.5rem;
 
-  /* Side margin of the feed cards on a phone, tighter than the gutter to give them reading width. */
-  --layout-card-gutter: 0.5rem;
+  /* Space between two offer cards of the feed. */
+  --layout-row-gap: 1.25rem;
+
+  /* Side margin of the feed list on a phone, tighter than the gutter to give it reading width. */
+  --layout-list-gutter: 0.25rem;
 
   /* Height of the header's first row. */
   --layout-header-height: 4rem;

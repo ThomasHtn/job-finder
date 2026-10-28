@@ -1,17 +1,18 @@
-/* The placeholder cards, spaced like the list. */
+@use 'tools' as *;
+
+/* The placeholder rows, stacked like the list. */
 :host {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
+  gap: var(--layout-row-gap);
 }
 
-/* One card, framed like an offer card. */
-.feed-skeleton__card {
+/* One card, shaped like an offer's. */
+.feed-skeleton__row {
   padding: 1.25rem;
-  border: 2px solid transparent;
+  border: 1px solid var(--color-line);
   border-radius: 1.25rem;
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
 }
 
 /* The employer's tile. */
@@ -52,8 +53,16 @@
   width: 45%;
 }
 
-/* The date. */
+/* The date, on the right like an offer's. */
 .feed-skeleton__date {
+  align-self: flex-end;
   width: 5rem;
   height: 0.75rem;
+}
+
+/* Phones: a little tighter, like the offers. */
+@include below(sm) {
+  .feed-skeleton__row {
+    padding: 1rem;
+  }
 }

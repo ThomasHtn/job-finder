@@ -5,7 +5,6 @@ import { useFrenchTexts } from '@core/i18n/i18n.fixtures';
 import {
   applyJobPatches,
   buildTabItems,
-  newHeadlineText,
   newOffersMessage,
   pickNewJobs,
   pickSeenJobs,
@@ -112,13 +111,6 @@ describe('jobs utils', () => {
     it('call everything seen on the very first visit', () => {
       expect(pickNewJobs(jobs, null)).toEqual([]);
       expect(pickSeenJobs(jobs, null)).toHaveLength(2);
-    });
-  });
-
-  describe('newHeadlineText', () => {
-    it('agrees with the count', () => {
-      expect(newHeadlineText(1)).toBe('1 nouvelle offre');
-      expect(newHeadlineText(3)).toBe('3 nouvelles offres');
     });
   });
 

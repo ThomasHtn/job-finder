@@ -17,7 +17,7 @@
   </div>
 </div>
 
-<!-- Title links to the detail; the link stretches over the whole card. -->
+<!-- Title links to the detail; the link stretches over the whole row. -->
 <a
   class="job-row__title"
   [routerLink]="detailLink()"
@@ -46,14 +46,13 @@
   </li>
 </ul>
 
-<!-- Footer: freshness as text, the logo's teal dot and "New" before the date; the source is told in the detail. -->
+<!-- Footer on the right: a teal dot when the offer is new, then the date; the source is told in the detail. -->
 @if (isNew() || published) {
-  <p class="job-row__foot flex flex-wrap items-center gap-2">
+  <p class="job-row__foot flex items-center justify-end gap-2">
     @if (isNew()) {
-      <span class="job-row__fresh flex items-center gap-1.75">{{ 'row.new' | transloco }}</span>
-      @if (published) {
-        <span class="job-row__sep" aria-hidden="true">·</span>
-      }
+      <span class="job-row__fresh"
+        ><span class="sr-only">{{ 'row.new' | transloco }}</span></span
+      >
     }
     @if (published) {
       <span class="job-row__date">{{ published }}</span>
