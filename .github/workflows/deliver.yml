@@ -142,8 +142,9 @@ jobs:
       # =============================================================================
       # The context is the repository root (one npm lockfile for the three workspaces); each Dockerfile
       # has its own .dockerignore next to it. The layer cache lives in GitHub Actions, so an image whose
-      # side did not change rebuilds in seconds. The extra tag is the name compose.yaml gives the image,
-      # so the smoke test starts this very build.
+      # side did not change rebuilds in seconds; the runtime stage is always rebuilt, so its
+      # `apk upgrade` picks up the Alpine fixes published since. The extra tag is the name compose.yaml
+      # gives the image, so the smoke test starts this very build.
       - name: Build backend
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -155,6 +156,7 @@ jobs:
             ${{ steps.meta-backend.outputs.tags }}
             job-finder-backend
           cache-from: type=gha,scope=backend
+          no-cache-filters: runtime
 
       - name: Build frontend
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -167,6 +169,7 @@ jobs:
             ${{ steps.meta-frontend.outputs.tags }}
             job-finder-frontend
           cache-from: type=gha,scope=frontend
+          no-cache-filters: runtime
 
       # =============================================================================
       # Smoke test: the whole app from its images, through its single entry point
