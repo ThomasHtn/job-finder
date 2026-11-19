@@ -10,7 +10,7 @@
 # npm 11, as packageManager says: unlike the npm 10 of the base image, it only runs the install
 # scripts the root allowScripts approves. Every workspace manifest is copied because npm ci checks
 # them all against the lockfile, before the sources, so this layer only changes with the dependencies.
-FROM node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS deps
+FROM node:22.23.5-alpine3.24@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS deps
 WORKDIR /workspace
 COPY package.json package-lock.json ./
 COPY contract/package.json contract/
@@ -43,7 +43,7 @@ RUN npx --yes npm@11.21.1 ci --workspace contract --workspace backend --omit=dev
 # =============================================================================
 # Runtime stage
 # =============================================================================
-FROM node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS runtime
+FROM node:22.23.5-alpine3.24@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS runtime
 
 # Alpine security fixes land days before a rebuilt base image: applied at build time, so the image
 # scan of the delivery only fails on what nobody can fix yet. npm and corepack are removed: nothing
